@@ -62,12 +62,10 @@ import com.util.ResourceUtil;
 import com.util.database.L2DatabaseFactory;
 import com.util.protection.nProtect;
 
-public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> implements Runnable
-{
+public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> implements Runnable {
 	private static final Log _log = LogFactory.getLog(L2GameClient.class);
 
-	public static enum GameClientState
-	{
+	public static enum GameClientState {
 		CONNECTED,
 		AUTHED,
 		IN_GAME
@@ -102,166 +100,137 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 	private final ArrayBlockingQueue<ReceivablePacket<L2GameClient>> _packetQueue;
 	private ReentrantLock _queueLock = new ReentrantLock();
 
-	public L2GameClient(MMOConnection<L2GameClient> con)
-	{
+	public L2GameClient(MMOConnection<L2GameClient> con) {
 		super(con);
 		state = GameClientState.CONNECTED;
 		_connectionStartTime = System.currentTimeMillis();
 		crypt = new GameCrypt();
 		_stats = new ClientStats();
-		_packetQueue = new ArrayBlockingQueue<ReceivablePacket<L2GameClient>>(com.mmocore.Config.CLIENT_PACKET_QUEUE_SIZE);
-		if(Config.AUTOSAVE_INITIAL_TIME > 0)
-		{
-			_autoSaveInDB = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(new AutoSave(activeChar), Config.AUTOSAVE_INITIAL_TIME, Config.AUTOSAVE_DELAY_TIME);
+		_packetQueue = new ArrayBlockingQueue<ReceivablePacket<L2GameClient>>(
+				com.mmocore.Config.CLIENT_PACKET_QUEUE_SIZE);
+		if (Config.AUTOSAVE_INITIAL_TIME > 0) {
+			_autoSaveInDB = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(new AutoSave(activeChar),
+					Config.AUTOSAVE_INITIAL_TIME, Config.AUTOSAVE_DELAY_TIME);
 		}
 		_guardCheckTask = nProtect.getInstance().startTask(this);
-		ThreadPoolManager.getInstance().scheduleGeneral(new Runnable()
-		{
+		ThreadPoolManager.getInstance().scheduleGeneral(new Runnable() {
 			@Override
-			public void run()
-			{
-				if(_closenow)
-				{
+			public void run() {
+				if (_closenow) {
 					close(new LeaveWorld());
 				}
 			}
 		}, 4000);
 	}
 
-	public byte[] enableCrypt()
-	{
+	public byte[] enableCrypt() {
 		byte[] key = BlowFishKeygen.getRandomKey();
 		GameCrypt.setKey(key, crypt);
 		return key;
 	}
 
-	public GameClientState getState()
-	{
+	public GameClientState getState() {
 		return state;
 	}
 
-	public void setState(GameClientState pState)
-	{
-		if(state != pState)
-		{
+	public void setState(GameClientState pState) {
+		if (state != pState) {
 			state = pState;
 			_packetQueue.clear();
 		}
 	}
 
-	public ClientStats getStats()
-	{
+	public ClientStats getStats() {
 		return _stats;
 	}
 
-	public long getConnectionStartTime()
-	{
+	public long getConnectionStartTime() {
 		return _connectionStartTime;
 	}
 
 	@Override
-	public boolean decrypt(ByteBuffer buf, int size)
-	{
+	public boolean decrypt(ByteBuffer buf, int size) {
 		_closenow = false;
 		GameCrypt.decrypt(buf.array(), buf.position(), size, crypt);
 		return true;
 	}
 
 	@Override
-	public boolean encrypt(final ByteBuffer buf, final int size)
-	{
+	public boolean encrypt(final ByteBuffer buf, final int size) {
 		GameCrypt.encrypt(buf.array(), buf.position(), size, crypt);
 		buf.position(buf.position() + size);
 		return true;
 	}
 
-	public L2PcInstance getActiveChar()
-	{
+	public L2PcInstance getActiveChar() {
 		return activeChar;
 	}
 
-	public void setActiveChar(L2PcInstance pActiveChar)
-	{
+	public void setActiveChar(L2PcInstance pActiveChar) {
 		activeChar = pActiveChar;
-		if(activeChar != null)
-		{
+		if (activeChar != null) {
 			L2World.storeObject(getActiveChar());
 		}
 	}
 
-	public ReentrantLock getActiveCharLock()
-	{
+	public ReentrantLock getActiveCharLock() {
 		return _activeCharLock;
 	}
 
-	public boolean isAuthedGG()
-	{
+	public boolean isAuthedGG() {
 		return _isAuthedGG;
 	}
 
-	public void setGameGuardOk(boolean val)
-	{
+	public void setGameGuardOk(boolean val) {
 		_isAuthedGG = val;
 	}
 
-	public void setAccountName(String pAccountName)
-	{
+	public void setAccountName(String pAccountName) {
 		accountName = pAccountName;
 	}
 
-	public String getAccountName()
-	{
+	public String getAccountName() {
 		return accountName;
 	}
 
-	public void setSessionId(SessionKey sk)
-	{
+	public void setSessionId(SessionKey sk) {
 		sessionId = sk;
 	}
 
-	public SessionKey getSessionId()
-	{
+	public SessionKey getSessionId() {
 		return sessionId;
 	}
 
-	public void sendPacket(L2GameServerPacket gsp)
-	{
-		if(_isDetached) 
-		{ 
-			return; 
-		} 
+	public void sendPacket(L2GameServerPacket gsp) {
+		if (_isDetached) {
+			return;
+		}
 
-		if(getConnection() != null)
-		{
+		if (getConnection() != null) {
 			getConnection().sendPacket(gsp);
 		}
 
 		gsp.runImpl();
 	}
 
-	public boolean isDetached()
-	{
+	public boolean isDetached() {
 		return _isDetached;
 	}
 
-	public void setDetached(boolean b)
-	{
+	public void setDetached(boolean b) {
 		_isDetached = b;
 	}
 
-	public byte markToDeleteChar(int charslot)
-	{
+	public byte markToDeleteChar(int charslot) {
 		int objid = getObjectIdForSlot(charslot);
 
-		if(objid < 0)
-		{
+		if (objid < 0) {
 			return -1;
 		}
 
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement = con.prepareStatement("SELECT clanId FROM characters WHERE obj_Id = ?");
 			statement.setInt(1, objid);
@@ -273,34 +242,24 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 
 			byte answer = 0;
 
-			if(clanId != 0)
-			{
+			if (clanId != 0) {
 				L2Clan clan = ClanTable.getInstance().getClan(clanId);
 
-				if(clan == null)
-				{
+				if (clan == null) {
 					answer = 0;
-				}
-				else if(clan.getLeaderId() == objid)
-				{
+				} else if (clan.getLeaderId() == objid) {
 					answer = 2;
-				}
-				else
-				{
+				} else {
 					answer = 1;
 				}
 
 				clan = null;
 			}
 
-			if(answer == 0)
-			{
-				if(Config.DELETE_DAYS == 0)
-				{
+			if (answer == 0) {
+				if (Config.DELETE_DAYS == 0) {
 					deleteCharByObjId(objid);
-				}
-				else
-				{
+				} else {
 					statement = con.prepareStatement("UPDATE characters SET deletetime = ? WHERE obj_Id = ?");
 					statement.setLong(1, System.currentTimeMillis() + Config.DELETE_DAYS * 86400000L);
 					statement.setInt(2, objid);
@@ -308,65 +267,49 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 					ResourceUtil.closeStatement(statement);
 					rs.close();
 				}
-			}
-			else
-			{
+			} else {
 				ResourceUtil.closeStatement(statement);
 				rs.close();
 			}
 
 			return answer;
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("Data error on update delete time of char", e);
 			return -1;
-		}
-		finally
-		{
-			ResourceUtil.closeConnection(con); 
+		} finally {
+			ResourceUtil.closeConnection(con);
 		}
 	}
 
-	public void markRestoredChar(int charslot) throws Exception
-	{
+	public void markRestoredChar(int charslot) throws Exception {
 		int objid = getObjectIdForSlot(charslot);
 
-		if(objid < 0)
-		{
+		if (objid < 0) {
 			return;
 		}
 
 		Connection con = null;
-		try
-		{
+		try {
 			con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement = con.prepareStatement("UPDATE characters SET deletetime = 0 WHERE obj_id = ?");
 			statement.setInt(1, objid);
 			statement.execute();
 			ResourceUtil.closeStatement(statement);
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("Data error on restoring char", e);
-		}
-		finally
-		{
-			ResourceUtil.closeConnection(con); 
+		} finally {
+			ResourceUtil.closeConnection(con);
 		}
 	}
 
-	public static void deleteCharByObjId(int objid)
-	{
-		if(objid < 0)
-		{
+	public static void deleteCharByObjId(int objid) {
+		if (objid < 0) {
 			return;
 		}
 
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement;
 
@@ -443,13 +386,15 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 			statement.close();
 			statement = null;
 
-			statement = con.prepareStatement("DELETE FROM pets WHERE item_obj_id IN (SELECT object_id FROM items WHERE items.owner_id = ?)");
+			statement = con.prepareStatement(
+					"DELETE FROM pets WHERE item_obj_id IN (SELECT object_id FROM items WHERE items.owner_id = ?)");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();
 			statement = null;
 
-			statement = con.prepareStatement("DELETE FROM augmentations WHERE item_id IN (SELECT object_id FROM items WHERE items.owner_id = ?)");
+			statement = con.prepareStatement(
+					"DELETE FROM augmentations WHERE item_id IN (SELECT object_id FROM items WHERE items.owner_id = ?)");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();
@@ -472,50 +417,36 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 			statement.execute();
 			statement.close();
 			statement = null;
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("Data error on deleting char", e);
-		}
-		finally
-		{
-			ResourceUtil.closeConnection(con); 
+		} finally {
+			ResourceUtil.closeConnection(con);
 		}
 	}
 
-	public L2PcInstance loadCharFromDisk(int charslot)
-	{
+	public L2PcInstance loadCharFromDisk(int charslot) {
 		final int objId = getObjectIdForSlot(charslot);
-		if(objId < 0)
-		{
+		if (objId < 0) {
 			return null;
 		}
 
 		L2PcInstance character = L2World.getInstance().getPlayer(objId);
-		if(character != null)
-		{
+		if (character != null) {
 			_log.warn("Attempt of double login: " + character.getName() + "(" + objId + ") " + getAccountName());
-			if(character.getClient() != null)
-			{
+			if (character.getClient() != null) {
 				character.getClient().closeNow();
-			}
-			else
-			{
+			} else {
 				character.deleteMe();
-				try
-				{
+				try {
 					character.store();
-				}
-				catch(Exception e2)
-				{
+				} catch (Exception e2) {
 				}
 			}
 		}
 
 		character = L2PcInstance.load(objId);
 
-		if(character != null)
-		{
+		if (character != null) {
 			character.setRunning();
 			character.standUp();
 			character.refreshOverloaded();
@@ -523,40 +454,33 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 			character.sendPacket(new UserInfo(character));
 			character.broadcastKarma();
 			character.setOnlineStatus(true);
-		}
-		else
-		{
+		} else {
 			_log.error("could not restore in slot: " + charslot, new Exception());
 		}
 
 		return character;
 	}
 
-	public void setCharSelection(CharSelectInfoPackage[] chars)
-	{
+	public void setCharSelection(CharSelectInfoPackage[] chars) {
 		_charSlotMapping.clear();
 
-		for(CharSelectInfoPackage c : chars)
-		{
+		for (CharSelectInfoPackage c : chars) {
 			int objectId = c.getObjectId();
 
-			_charSlotMapping.add(new Integer(objectId));
+			_charSlotMapping.add(Integer.valueOf(objectId));
 		}
 	}
 
-	public void close(L2GameServerPacket gsp)
-	{
-		if(getConnection()!=null)
-		{
+	public void close(L2GameServerPacket gsp) {
+		if (getConnection() != null) {
 			getConnection().close(gsp);
 		}
 	}
 
-	private int getObjectIdForSlot(int charslot)
-	{
-		if(charslot < 0 || charslot >= _charSlotMapping.size())
-		{
-			_log.warn(toString() + " tried to delete Character in slot " + charslot + " but no characters exits at that slot.");
+	private int getObjectIdForSlot(int charslot) {
+		if (charslot < 0 || charslot >= _charSlotMapping.size()) {
+			_log.warn(toString() + " tried to delete Character in slot " + charslot
+					+ " but no characters exits at that slot.");
 			return -1;
 		}
 
@@ -566,35 +490,27 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 	}
 
 	@Override
-	public void onForcedDisconnection()
-	{
+	public void onForcedDisconnection() {
 		_log.info("Client " + toString() + " disconnected abnormally.");
 		L2PcInstance player = getActiveChar();
-		if(player != null)
-		{
-			if(Olympiad.getInstance().isRegistered(player))
-			{
+		if (player != null) {
+			if (Olympiad.getInstance().isRegistered(player)) {
 				Olympiad.getInstance().unRegisterNoble(player);
 			}
 
-			if(player.isFlying())
-			{
+			if (player.isFlying()) {
 				player.removeSkill(SkillTable.getInstance().getInfo(4289, 1));
 			}
-			
-			if(player.isInParty())
-			{
+
+			if (player.isInParty()) {
 				player.getParty().removePartyMember(player);
 			}
-			
+
 			player.deleteMe();
 
-			try
-			{
+			try {
 				player.store();
-			}
-			catch(Exception e2)
-			{
+			} catch (Exception e2) {
 			}
 			FunEventsManager.getInstance().notifyPlayerLogout(player);
 			L2World.getInstance().removeFromAllPlayers(player);
@@ -605,35 +521,26 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 		nProtect.getInstance().closeSession(this);
 	}
 
-	public void stopGuardTask()
-	{
-		if(_guardCheckTask != null)
-		{
+	public void stopGuardTask() {
+		if (_guardCheckTask != null) {
 			_guardCheckTask.cancel(true);
 			_guardCheckTask = null;
 		}
 	}
 
 	@Override
-	public void onDisconnection()
-	{
-		try
-		{
+	public void onDisconnection() {
+		try {
 			ThreadPoolManager.getInstance().executeTask(new DisconnectTask());
 
-		}
-		catch(RejectedExecutionException e)
-		{
+		} catch (RejectedExecutionException e) {
 		}
 	}
 
-	public void closeNow()
-	{
+	public void closeNow() {
 		close(ServerClose.STATIC_PACKET);
-		synchronized(this)
-		{
-			if(_cleanupTask != null)
-			{
+		synchronized (this) {
+			if (_cleanupTask != null) {
 				cancelCleanup();
 			}
 
@@ -641,138 +548,106 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 		}
 	}
 
-
 	@Override
-	public String toString()
-	{
-		try
-		{
+	public String toString() {
+		try {
 			InetAddress address = getConnection().getInetAddress();
 			String ip = "N/A";
 
-			if(address == null)
-			{
+			if (address == null) {
 				ip = "disconnected";
-			}
-			else
-			{
+			} else {
 				ip = address.getHostAddress();
 			}
 
-			switch(getState())
-			{
+			switch (getState()) {
 				case CONNECTED:
 					return "[IP: " + ip + "]";
 				case AUTHED:
 					return "[Account: " + getAccountName() + " - IP: " + ip + "]";
 				case IN_GAME:
 					address = null;
-					return "[Character: " + (getActiveChar() == null ? "disconnected" : getActiveChar().getName()) + " - Account: " + getAccountName() + " - IP: " + ip + "]";
+					return "[Character: " + (getActiveChar() == null ? "disconnected" : getActiveChar().getName())
+							+ " - Account: " + getAccountName() + " - IP: " + ip + "]";
 				default:
 					address = null;
 					throw new IllegalStateException("Missing state on switch");
 			}
-		}
-		catch(NullPointerException e)
-		{
+		} catch (NullPointerException e) {
 			return "[Character read failed due to disconnect]";
 		}
 	}
 
-	class CleanupTask implements Runnable
-	{
+	class CleanupTask implements Runnable {
 		@Override
-		public void run()
-		{
-			try
-			{
-				if(_autoSaveInDB != null)
-				{
+		public void run() {
+			try {
+				if (_autoSaveInDB != null) {
 					_autoSaveInDB.cancel(true);
 				}
 
 				L2PcInstance player = L2GameClient.this.getActiveChar();
-				if(player != null)
-				{
+				if (player != null) {
 					player.setClient(null);
 
-					if(player.isOnline() == 1)
-					{
+					if (player.isOnline() == 1) {
 						player.deleteMe();
 					}
 				}
 
 				L2GameClient.this.setActiveChar(null);
-			}
-			catch(Exception e1)
-			{
+			} catch (Exception e1) {
 				_log.error("Error while cleanup client.", e1);
-			}
-			finally
-			{
+			} finally {
 				LoginServerThread.getInstance().sendLogout(L2GameClient.this.getAccountName());
 			}
 		}
 	}
 
-	class DisconnectTask implements Runnable
-	{
+	class DisconnectTask implements Runnable {
 		@Override
-		public void run()
-		{
-			try
-			{
-				try
-				{
+		public void run() {
+			try {
+				try {
 					RegionBBSManager.getInstance().changeCommunityBoard();
-				}
-				catch(Exception e)
-				{
+				} catch (Exception e) {
 					_log.error("", e);
 				}
 
-				if(_autoSaveInDB != null)
-				{
+				if (_autoSaveInDB != null) {
 					_autoSaveInDB.cancel(true);
 				}
 
 				L2PcInstance player = getActiveChar();
-				if(player != null)
-				{
-					if(player.isFlying())
-					{
+				if (player != null) {
+					if (player.isFlying()) {
 						player.removeSkill(SkillTable.getInstance().getInfo(4289, 1));
 					}
 
-					if(player.isInParty())
-					{
+					if (player.isInParty()) {
 						player.getParty().removePartyMember(player);
 					}
 
-					if(Olympiad.getInstance().isRegistered(player))
-					{
+					if (Olympiad.getInstance().isRegistered(player)) {
 						Olympiad.getInstance().unRegisterNoble(player);
 					}
 
-					if(player.isInStoreMode() && Config.OFFLINE_TRADE_ENABLE || player.isInCraftMode() && Config.OFFLINE_CRAFT_ENABLE)
-					{
+					if (player.isInStoreMode() && Config.OFFLINE_TRADE_ENABLE
+							|| player.isInCraftMode() && Config.OFFLINE_CRAFT_ENABLE) {
 						player.setOffline(true);
 						player.leaveParty();
 
-						if(Config.OFFLINE_SLEEP_EFFECT)
-						{
+						if (Config.OFFLINE_SLEEP_EFFECT) {
 							player.startAbnormalEffect(L2Character.ABNORMAL_EFFECT_SLEEP);
 						}
 
-						if(Config.OFFLINE_SET_NAME_COLOR)
-						{
+						if (Config.OFFLINE_SET_NAME_COLOR) {
 							player._originalNameColorOffline = player.getAppearance().getNameColor();
 							player.getAppearance().setNameColor(Config.OFFLINE_NAME_COLOR);
 							player.broadcastUserInfo();
 						}
 
-						if(player.getOfflineStartTime() == 0)
-						{
+						if (player.getOfflineStartTime() == 0) {
 							player.setOfflineStartTime(System.currentTimeMillis());
 						}
 
@@ -782,57 +657,42 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 					player.deleteMe();
 					player.store();
 
-					try
-					{
+					try {
 						player.store();
-					}
-					catch(Exception e2)
-					{
+					} catch (Exception e2) {
 					}
 				}
 
 				setActiveChar(null);
 
 				player = null;
-			}
-			catch(Exception e1)
-			{
+			} catch (Exception e1) {
 				_log.error("Error while disconnecting client", e1);
-			}
-			finally
-			{
+			} finally {
 				LoginServerThread.getInstance().sendLogout(getAccountName());
 			}
 		}
 	}
 
-	public boolean checkUnknownPackets()
-	{
-		if(getActiveChar() != null && !FloodProtector.getInstance().tryPerformAction(getActiveChar().getObjectId(), FloodProtector.PROTECTED_UNKNOWNPACKET))
-		{
+	public boolean checkUnknownPackets() {
+		if (getActiveChar() != null && !FloodProtector.getInstance().tryPerformAction(getActiveChar().getObjectId(),
+				FloodProtector.PROTECTED_UNKNOWNPACKET)) {
 			unknownPacketCount++;
 
-			if(unknownPacketCount >= Config.MAX_UNKNOWN_PACKETS)
-			{
+			if (unknownPacketCount >= Config.MAX_UNKNOWN_PACKETS) {
 				return true;
-			}
-			else
-			{
+			} else {
 				return false;
 			}
-		}
-		else
-		{
+		} else {
 			unknownPacketCount = 0;
 			return false;
 		}
 	}
 
-	private boolean cancelCleanup()
-	{
+	private boolean cancelCleanup() {
 		Future<?> task = _cleanupTask;
-		if(task != null)
-		{
+		if (task != null) {
 			_cleanupTask = null;
 			return task.cancel(true);
 		}
@@ -840,15 +700,12 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 		return false;
 	}
 
-	public boolean dropPacket()
-	{
-		if(_isDetached)
-		{
+	public boolean dropPacket() {
+		if (_isDetached) {
 			return true;
 		}
 
-		if(getStats().countPacket(_packetQueue.size()))
-		{
+		if (getStats().countPacket(_packetQueue.size())) {
 			sendPacket(ActionFailed.STATIC_PACKET);
 			return true;
 		}
@@ -856,138 +713,105 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>> i
 		return getStats().dropPacket();
 	}
 
-	public void onBufferUnderflow()
-	{
-		if(getStats().countUnderflowException())
-		{
+	public void onBufferUnderflow() {
+		if (getStats().countUnderflowException()) {
 			_log.error("Client " + toString() + " - Disconnected: Too many buffer underflow exceptions.");
 			closeNow();
 			return;
 		}
 
-		if(state == GameClientState.CONNECTED)
-		{
+		if (state == GameClientState.CONNECTED) {
 			closeNow();
 		}
 	}
 
-	public void execute(ReceivablePacket<L2GameClient> packet)
-	{
-		if(getStats().countFloods())
-		{
-			_log.error("Client " + toString() + " - Disconnected, too many floods:" + getStats().longFloods + " long and " + getStats().shortFloods + " short.");
+	public void execute(ReceivablePacket<L2GameClient> packet) {
+		if (getStats().countFloods()) {
+			_log.error("Client " + toString() + " - Disconnected, too many floods:" + getStats().longFloods
+					+ " long and " + getStats().shortFloods + " short.");
 			closeNow();
 			return;
 		}
 
-		if(!_packetQueue.offer(packet))
-		{
-			if(getStats().countQueueOverflow())
-			{
+		if (!_packetQueue.offer(packet)) {
+			if (getStats().countQueueOverflow()) {
 				_log.error("Client " + toString() + " - Disconnected, too many queue overflows.");
 				closeNow();
-			}
-			else
-			{
+			} else {
 				sendPacket(ActionFailed.STATIC_PACKET);
 			}
 
 			return;
 		}
 
-		if(_queueLock.isLocked())
-		{
+		if (_queueLock.isLocked()) {
 			return;
 		}
 
-		try
-		{
-			if(state == GameClientState.CONNECTED)
-			{
-				if(getStats().processedPackets > 3)
-				{
+		try {
+			if (state == GameClientState.CONNECTED) {
+				if (getStats().processedPackets > 3) {
 					closeNow();
 					return;
 				}
 
 				ThreadPoolManager.getInstance().executeIOPacket(this);
-			}
-			else
-			{
+			} else {
 				ThreadPoolManager.getInstance().executePacket(this);
 			}
-		}
-		catch(RejectedExecutionException e)
-		{
-			if(!ThreadPoolManager.getInstance().isShutdown())
-			{
+		} catch (RejectedExecutionException e) {
+			if (!ThreadPoolManager.getInstance().isShutdown()) {
 				_log.error("Failed executing: " + packet.getClass().getSimpleName() + " for Client: " + toString());
 			}
 		}
 	}
 
 	@Override
-	public void run()
-	{
-		if(!_queueLock.tryLock())
-		{
+	public void run() {
+		if (!_queueLock.tryLock()) {
 			return;
 		}
 
-		try
-		{
+		try {
 			int count = 0;
-			while(true)
-			{
+			while (true) {
 				final ReceivablePacket<L2GameClient> packet = _packetQueue.poll();
-				if(packet == null)
-				{
+				if (packet == null) {
 					return;
 				}
 
-				if(_isDetached)
-				{
+				if (_isDetached) {
 					_packetQueue.clear();
 					return;
 				}
 
-				try
-				{
+				try {
 					packet.run();
-				}
-				catch(Exception e)
-				{
-					_log.error("Exception during execution " + packet.getClass().getSimpleName() + ", client: " + toString() + "," + e.getMessage());
+				} catch (Exception e) {
+					_log.error("Exception during execution " + packet.getClass().getSimpleName() + ", client: "
+							+ toString() + "," + e.getMessage());
 				}
 
 				count++;
-				if(getStats().countBurst(count))
-				{
+				if (getStats().countBurst(count)) {
 					return;
 				}
 			}
-		}
-		finally
-		{
+		} finally {
 			_queueLock.unlock();
 		}
 	}
 
-	public void cleanMe(boolean fast)
-	{
-		try
-		{
-			synchronized(this)
-			{
-				if (_cleanupTask == null)
-				{
-					_cleanupTask = ThreadPoolManager.getInstance().scheduleGeneral(new CleanupTask(), fast ? 5 : 15000L);
+	public void cleanMe(boolean fast) {
+		try {
+			synchronized (this) {
+				if (_cleanupTask == null) {
+					_cleanupTask = ThreadPoolManager.getInstance().scheduleGeneral(new CleanupTask(),
+							fast ? 5 : 15000L);
 				}
 			}
-		}
-		catch (Exception e1)
-		{
-			_log.warn("Error during cleanup.", e1);                   
+		} catch (Exception e1) {
+			_log.warn("Error during cleanup.", e1);
 		}
 	}
 }

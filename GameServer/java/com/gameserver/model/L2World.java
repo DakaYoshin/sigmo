@@ -40,8 +40,7 @@ import com.gameserver.network.L2GameClient;
 import com.util.object.L2ObjectMap;
 import com.util.object.Point3D;
 
-public final class L2World
-{
+public final class L2World {
 	private static final Log _log = LogFactory.getLog(L2World.class.getName());
 
 	public static final int SHIFT_BY = 12;
@@ -66,11 +65,10 @@ public final class L2World
 	private static final L2World _instance = new L2World();
 
 	private Map<Integer, L2Character> _allCharacters;
-	
+
 	private L2WorldRegion[][] _worldRegions;
 
-	private L2World()
-	{
+	private L2World() {
 		_allPlayers = new FastMap<String, L2PcInstance>().shared();
 		_allCharacters = new ConcurrentHashMap<Integer, L2Character>();
 		_petsInstance = new FastMap<Integer, L2PetInstance>().shared();
@@ -79,23 +77,19 @@ public final class L2World
 		initRegions();
 	}
 
-	public static L2World getInstance()
-	{
+	public static L2World getInstance() {
 		return _instance;
 	}
 
-	public static void storeObject(L2Object object)
-	{
-		if(_allObjects.get(object.getObjectId()) != null)
-		{
+	public static void storeObject(L2Object object) {
+		if (_allObjects.get(object.getObjectId()) != null) {
 			return;
 		}
 
 		_allObjects.put(object);
 	}
 
-	public long timeStoreObject(L2Object object)
-	{
+	public long timeStoreObject(L2Object object) {
 		long time = System.currentTimeMillis();
 		_allObjects.put(object);
 		time -= System.currentTimeMillis();
@@ -103,29 +97,23 @@ public final class L2World
 		return time;
 	}
 
-	public void removeObject(L2Object object)
-	{
+	public void removeObject(L2Object object) {
 		_allObjects.remove(object);
 	}
 
-	public void removeObjects(List<L2Object> list)
-	{
-		for(L2Object o : list)
-		{
+	public void removeObjects(List<L2Object> list) {
+		for (L2Object o : list) {
 			_allObjects.remove(o);
 		}
 	}
 
-	public void removeObjects(L2Object[] objects)
-	{
-		for(L2Object o : objects)
-		{
+	public void removeObjects(L2Object[] objects) {
+		for (L2Object o : objects) {
 			_allObjects.remove(o);
 		}
 	}
 
-	public long timeRemoveObject(L2Object object)
-	{
+	public long timeRemoveObject(L2Object object) {
 		long time = System.currentTimeMillis();
 		_allObjects.remove(object);
 		time -= System.currentTimeMillis();
@@ -133,23 +121,20 @@ public final class L2World
 		return time;
 	}
 
-	public L2Object findObject(int oID)
-	{
+	public L2Object findObject(int oID) {
 		return _allObjects.get(oID);
 	}
 
-	public L2PcInstance findPlayer(int objectId)
-	{
+	public L2PcInstance findPlayer(int objectId) {
 		L2Object obj = _allObjects.get(objectId);
 
 		if (obj instanceof L2PcInstance)
-			return (L2PcInstance)obj;
+			return (L2PcInstance) obj;
 
 		return null;
 	}
-	
-	public long timeFindObject(int objectID)
-	{
+
+	public long timeFindObject(int objectID) {
 		long time = System.currentTimeMillis();
 		_allObjects.get(objectID);
 		time -= System.currentTimeMillis();
@@ -158,114 +143,92 @@ public final class L2World
 	}
 
 	@Deprecated
-	public final L2ObjectMap<L2Object> getAllVisibleObjects()
-	{
+	public final L2ObjectMap<L2Object> getAllVisibleObjects() {
 		return _allObjects;
 	}
 
-	public final int getAllVisibleObjectsCount()
-	{
+	public final int getAllVisibleObjectsCount() {
 		return _allObjects.size();
 	}
 
 	/**
-	 * Return the L2Character object that belongs to an ID or null if no object found.<BR><BR>
+	 * Return the L2Character object that belongs to an ID or null if no object
+	 * found.<BR>
+	 * <BR>
 	 *
 	 * @param oID Identifier of the L2Character
 	 */
-	public L2Character findCharacter(int oID)
-	{
+	public L2Character findCharacter(int oID) {
 		return _allCharacters.get(oID);
 	}
-	
-	public FastList<L2PcInstance> getAllGMs()
-	{
+
+	public FastList<L2PcInstance> getAllGMs() {
 		return GmListTable.getInstance().getAllGms(true);
 	}
 
-	public Collection<L2PcInstance> getAllPlayers()
-	{
+	public Collection<L2PcInstance> getAllPlayers() {
 		return _allPlayers.values();
 	}
 
-	public L2Character[] getAllCharacters()
-	{
+	public L2Character[] getAllCharacters() {
 		return _allCharacters.values().toArray(new L2Character[0]);
 	}
-	
-	public int getAllPlayersCount()
-	{
+
+	public int getAllPlayersCount() {
 		return _allPlayers.size();
 	}
 
-	public L2PcInstance getPlayer(String name)
-	{
+	public L2PcInstance getPlayer(String name) {
 		return _allPlayers.get(name.toLowerCase());
 	}
 
-	public L2PcInstance getPlayer(int playerObjId)
-	{
-		for(L2PcInstance actual:_allPlayers.values())
-		{
-			if(actual.getObjectId() == playerObjId)
-			{
+	public L2PcInstance getPlayer(int playerObjId) {
+		for (L2PcInstance actual : _allPlayers.values()) {
+			if (actual.getObjectId() == playerObjId) {
 				return actual;
 			}
 		}
 		return null;
 	}
 
-	public Collection<L2PetInstance> getAllPets()
-	{
+	public Collection<L2PetInstance> getAllPets() {
 		return _petsInstance.values();
 	}
 
-	public L2PetInstance getPet(int ownerId)
-	{
-		return _petsInstance.get(new Integer(ownerId));
+	public L2PetInstance getPet(int ownerId) {
+		return _petsInstance.get(Integer.valueOf(ownerId));
 	}
 
-	public L2PetInstance addPet(int ownerId, L2PetInstance pet)
-	{
-		return _petsInstance.put(new Integer(ownerId), pet);
+	public L2PetInstance addPet(int ownerId, L2PetInstance pet) {
+		return _petsInstance.put(Integer.valueOf(ownerId), pet);
 	}
 
-	public void removePet(int ownerId)
-	{
-		_petsInstance.remove(new Integer(ownerId));
+	public void removePet(int ownerId) {
+		_petsInstance.remove(Integer.valueOf(ownerId));
 	}
 
-	public void removePet(L2PetInstance pet)
-	{
+	public void removePet(L2PetInstance pet) {
 		_petsInstance.values().remove(pet);
 	}
 
-	public void addVisibleObject(L2Object object, L2WorldRegion newRegion, L2Character dropper)
-	{
-		if(object instanceof L2PcInstance)
-		{
+	public void addVisibleObject(L2Object object, L2WorldRegion newRegion, L2Character dropper) {
+		if (object instanceof L2PcInstance) {
 			L2PcInstance player = (L2PcInstance) object;
 			L2PcInstance tmp = _allPlayers.get(player.getName().toLowerCase());
 
-			if(tmp != null && tmp != player)
-			{
-				if((Config.OFFLINE_TRADE_ENABLE || Config.OFFLINE_CRAFT_ENABLE) && tmp.isOffline())
-				{
+			if (tmp != null && tmp != player) {
+				if ((Config.OFFLINE_TRADE_ENABLE || Config.OFFLINE_CRAFT_ENABLE) && tmp.isOffline()) {
 					_log.warn("Offline: Duplicate character!? Closing offline character (" + tmp.getName() + ")");
-					if(tmp._originalNameColorOffline!=0)
-					{
+					if (tmp._originalNameColorOffline != 0) {
 						tmp.getAppearance().setNameColor(tmp._originalNameColorOffline);
 					}
 					tmp.store();
 					tmp.logout();
 
-					if(tmp.getClient() != null)
-					{
+					if (tmp.getClient() != null) {
 						tmp.getClient().setActiveChar(null);
 					}
-				}
-				else
-				{
+				} else {
 					_log.warn("EnterWorld: Duplicate character!? Closing both characters (" + player.getName() + ")");
 					L2GameClient client = player.getClient();
 					player.store();
@@ -275,18 +238,15 @@ public final class L2World
 					tmp.store();
 					tmp.deleteMe();
 
-					if(client != null)
-					{
+					if (client != null) {
 						client.setActiveChar(null);
 					}
 					return;
 				}
 			}
 
-			if(!player.isTeleporting())
-			{
-				if(tmp != null)
-				{
+			if (!player.isTeleporting()) {
+				if (tmp != null) {
 					_log.warn("Duplicate character!? Closing both characters (" + player.getName() + ")");
 					player.closeNetConnection();
 					tmp.closeNetConnection();
@@ -300,48 +260,37 @@ public final class L2World
 
 		FastList<L2Object> visibles = getVisibleObjects(object, 2000);
 
-		for(L2Object visible : visibles)
-		{
+		for (L2Object visible : visibles) {
 			visible.getKnownList().addKnownObject(object, dropper);
 			object.getKnownList().addKnownObject(visible, dropper);
 		}
 	}
 
-	public void addToAllPlayers(L2PcInstance cha)
-	{
+	public void addToAllPlayers(L2PcInstance cha) {
 		_allPlayers.put(cha.getName().toLowerCase(), cha);
 	}
 
-	public void removeFromAllPlayers(L2PcInstance cha)
-	{
-		if(cha != null && !cha.isTeleporting())
-		{
+	public void removeFromAllPlayers(L2PcInstance cha) {
+		if (cha != null && !cha.isTeleporting()) {
 			_allPlayers.remove(cha.getName().toLowerCase());
 		}
 	}
 
-	public void removeVisibleObject(L2Object object, L2WorldRegion oldRegion)
-	{
-		if(object == null)
-		{
+	public void removeVisibleObject(L2Object object, L2WorldRegion oldRegion) {
+		if (object == null) {
 			return;
 		}
 
-		if(oldRegion != null)
-		{
+		if (oldRegion != null) {
 			oldRegion.removeVisibleObject(object);
 
-			for(L2WorldRegion reg : oldRegion.getSurroundingRegions())
-			{
-				for(L2Object obj : reg.getVisibleObjects())
-				{
-					if(obj != null && obj.getKnownList() != null)
-					{
+			for (L2WorldRegion reg : oldRegion.getSurroundingRegions()) {
+				for (L2Object obj : reg.getVisibleObjects()) {
+					if (obj != null && obj.getKnownList() != null) {
 						obj.getKnownList().removeKnownObject(object);
 					}
 
-					if(object.getKnownList() != null)
-					{
+					if (object.getKnownList() != null) {
 						object.getKnownList().removeKnownObject(obj);
 					}
 				}
@@ -349,27 +298,22 @@ public final class L2World
 
 			object.getKnownList().removeAllKnownObjects();
 
-			if(object instanceof L2PcInstance)
-			{
-				if(!((L2PcInstance) object).isTeleporting())
-				{
+			if (object instanceof L2PcInstance) {
+				if (!((L2PcInstance) object).isTeleporting()) {
 					removeFromAllPlayers((L2PcInstance) object);
 				}
 			}
 		}
 	}
 
-	public FastList<L2Object> getVisibleObjects(L2Object object)
-	{
-		if(object == null)
-		{
+	public FastList<L2Object> getVisibleObjects(L2Object object) {
+		if (object == null) {
 			return null;
 		}
 
 		L2WorldRegion reg = object.getWorldRegion();
 
-		if(reg == null)
-		{
+		if (reg == null) {
 			return null;
 		}
 
@@ -377,22 +321,17 @@ public final class L2World
 
 		FastList<L2WorldRegion> regions = reg.getSurroundingRegions();
 
-		for(int i = 0; i < regions.size(); i++)
-		{
-			for(L2Object _object : regions.get(i).getVisibleObjects())
-			{
-				if(_object == null)
-				{
+		for (int i = 0; i < regions.size(); i++) {
+			for (L2Object _object : regions.get(i).getVisibleObjects()) {
+				if (_object == null) {
 					continue;
 				}
 
-				if(_object.equals(object))
-				{
+				if (_object.equals(object)) {
 					continue;
 				}
 
-				if(!_object.isVisible())
-				{
+				if (!_object.isVisible()) {
 					continue;
 				}
 
@@ -402,10 +341,8 @@ public final class L2World
 		return result;
 	}
 
-	public FastList<L2Object> getVisibleObjects(L2Object object, int radius)
-	{
-		if(object == null || !object.isVisible())
-		{
+	public FastList<L2Object> getVisibleObjects(L2Object object, int radius) {
+		if (object == null || !object.isVisible()) {
 			return new FastList<L2Object>();
 		}
 
@@ -417,17 +354,13 @@ public final class L2World
 
 		FastList<L2WorldRegion> regions = object.getWorldRegion().getSurroundingRegions();
 
-		for(int i = 0; i < regions.size(); i++)
-		{
-			for(L2Object _object : regions.get(i).getVisibleObjects())
-			{
-				if(_object == null)
-				{
+		for (int i = 0; i < regions.size(); i++) {
+			for (L2Object _object : regions.get(i).getVisibleObjects()) {
+				if (_object == null) {
 					continue;
 				}
 
-				if(_object.equals(object))
-				{
+				if (_object.equals(object)) {
 					continue;
 				}
 
@@ -437,8 +370,7 @@ public final class L2World
 				double dx = x1 - x;
 				double dy = y1 - y;
 
-				if(dx * dx + dy * dy < sqRadius)
-				{
+				if (dx * dx + dy * dy < sqRadius) {
 					result.add(_object);
 				}
 			}
@@ -446,10 +378,8 @@ public final class L2World
 		return result;
 	}
 
-	public FastList<L2Object> getVisibleObjects3D(L2Object object, int radius)
-	{
-		if(object == null || !object.isVisible())
-		{
+	public FastList<L2Object> getVisibleObjects3D(L2Object object, int radius) {
+		if (object == null || !object.isVisible()) {
 			return new FastList<L2Object>();
 		}
 
@@ -462,17 +392,13 @@ public final class L2World
 
 		FastList<L2WorldRegion> regions = object.getWorldRegion().getSurroundingRegions();
 
-		for(int i = 0; i < regions.size(); i++)
-		{
-			for(L2Object _object : regions.get(i).getVisibleObjects())
-			{
-				if(_object == null)
-				{
+		for (int i = 0; i < regions.size(); i++) {
+			for (L2Object _object : regions.get(i).getVisibleObjects()) {
+				if (_object == null) {
 					continue;
 				}
 
-				if(_object.equals(object))
-				{
+				if (_object.equals(object)) {
 					continue;
 				}
 
@@ -484,8 +410,7 @@ public final class L2World
 				long dy = y1 - y;
 				long dz = z1 - z;
 
-				if(dx * dx + dy * dy + dz * dz < sqRadius)
-				{
+				if (dx * dx + dy * dy + dz * dz < sqRadius) {
 					result.add(_object);
 				}
 			}
@@ -493,12 +418,10 @@ public final class L2World
 		return result;
 	}
 
-	public FastList<L2Playable> getVisiblePlayable(L2Object object)
-	{
+	public FastList<L2Playable> getVisiblePlayable(L2Object object) {
 		L2WorldRegion reg = object.getWorldRegion();
 
-		if(reg == null)
-		{
+		if (reg == null) {
 			return null;
 		}
 
@@ -506,26 +429,21 @@ public final class L2World
 
 		FastList<L2WorldRegion> regions = reg.getSurroundingRegions();
 
-		for(int i = 0; i < regions.size(); i++)
-		{
+		for (int i = 0; i < regions.size(); i++) {
 			Iterator<L2Playable> playables = regions.get(i).iterateAllPlayers();
 
-			while(playables.hasNext())
-			{
+			while (playables.hasNext()) {
 				L2Playable _object = playables.next();
 
-				if(_object == null)
-				{
+				if (_object == null) {
 					continue;
 				}
 
-				if(_object.equals(object))
-				{
+				if (_object.equals(object)) {
 					continue;
 				}
 
-				if(!_object.isVisible())
-				{
+				if (!_object.isVisible()) {
 					continue;
 				}
 
@@ -539,48 +457,36 @@ public final class L2World
 		return result;
 	}
 
-	public L2WorldRegion getRegion(Point3D point)
-	{
+	public L2WorldRegion getRegion(Point3D point) {
 		return _worldRegions[(point.getX() >> SHIFT_BY) + OFFSET_X][(point.getY() >> SHIFT_BY) + OFFSET_Y];
 	}
 
-	public L2WorldRegion getRegion(int x, int y)
-	{
+	public L2WorldRegion getRegion(int x, int y) {
 		return _worldRegions[(x >> SHIFT_BY) + OFFSET_X][(y >> SHIFT_BY) + OFFSET_Y];
 	}
 
-	public L2WorldRegion[][] getAllWorldRegions()
-	{
+	public L2WorldRegion[][] getAllWorldRegions() {
 		return _worldRegions;
 	}
 
-	private boolean validRegion(int x, int y)
-	{
+	private boolean validRegion(int x, int y) {
 		return x >= 0 && x <= REGIONS_X && y >= 0 && y <= REGIONS_Y;
 	}
 
-	private void initRegions()
-	{
+	private void initRegions() {
 		_worldRegions = new L2WorldRegion[REGIONS_X + 1][REGIONS_Y + 1];
 
-		for(int i = 0; i <= REGIONS_X; i++)
-		{
-			for(int j = 0; j <= REGIONS_Y; j++)
-			{
+		for (int i = 0; i <= REGIONS_X; i++) {
+			for (int j = 0; j <= REGIONS_Y; j++) {
 				_worldRegions[i][j] = new L2WorldRegion(i, j);
 			}
 		}
 
-		for(int x = 0; x <= REGIONS_X; x++)
-		{
-			for(int y = 0; y <= REGIONS_Y; y++)
-			{
-				for(int a = -1; a <= 1; a++)
-				{
-					for(int b = -1; b <= 1; b++)
-					{
-						if(validRegion(x + a, y + b))
-						{
+		for (int x = 0; x <= REGIONS_X; x++) {
+			for (int y = 0; y <= REGIONS_Y; y++) {
+				for (int a = -1; a <= 1; a++) {
+					for (int b = -1; b <= 1; b++) {
+						if (validRegion(x + a, y + b)) {
 							_worldRegions[x + a][y + b].addSurroundingRegion(_worldRegions[x][y]);
 						}
 					}
@@ -591,28 +497,22 @@ public final class L2World
 		_log.info("L2World: (" + REGIONS_X + " by " + REGIONS_Y + ") World Region Grid set up.");
 	}
 
-	public synchronized void deleteVisibleNpcSpawns()
-	{
+	public synchronized void deleteVisibleNpcSpawns() {
 		_log.info("Deleting all visible NPC's.");
 
-		for(int i = 0; i <= REGIONS_X; i++)
-		{
-			for(int j = 0; j <= REGIONS_Y; j++)
-			{
+		for (int i = 0; i <= REGIONS_X; i++) {
+			for (int j = 0; j <= REGIONS_Y; j++) {
 				_worldRegions[i][j].deleteVisibleNpcSpawns();
 			}
 		}
 		_log.info("All visible NPC's deleted.");
 	}
 
-	public FastList<L2PcInstance> getAccountPlayers(String account_name)
-	{
+	public FastList<L2PcInstance> getAccountPlayers(String account_name) {
 		FastList<L2PcInstance> players_for_account = new FastList<L2PcInstance>();
 
-		for(L2PcInstance actual:_allPlayers.values())
-		{
-			if(actual.getAccountName().equals(account_name))
-			{
+		for (L2PcInstance actual : _allPlayers.values()) {
+			if (actual.getAccountName().equals(account_name)) {
 				players_for_account.add(actual);
 			}
 		}

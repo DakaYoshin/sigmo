@@ -69,6 +69,24 @@ STATUS: COMPLETED (All Fixes Applied)
         *   Fixed incorrect Map removal (tried to remove by value, now removing by key).
      *  `RequestAuthLogin.java`:
         *   Replaced deprecated `Runtime.exec(String)` with `Runtime.exec(String[])`.
+     *  `Hero.java`:
+        *   Fixed incorrect Map removal (tried to remove by value, now removing by key).
+        *   Fixed incorrect Collection check (was `List<int[]>.contains(int)`, now `List<Integer>.contains(int)`).
+        *   Removed unused import `java.util.Arrays`.
+     *  `L2World.java`:
+        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `QuestTimer.java`:
+        *   Removed dead code `if(this == null)`.
+     *  `AutoSpawn.java`:
+        *   Fixed incorrect Map removal (tried to remove by value, now removing by key).
+     *  `L2GameClient.java`:
+        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `SystemMessage.java`:
+        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `SelectorThread.java`:
+        *   Suppressed future-deprecation warning for `Thread.getId()` (required for Java 17).
+     *  `L2HashMap.java`:
+        *   Removed redundant `implements Serializable` from `Segment` inner class.
 
 4.  **Scripts Updated**:
     *   All `.bat` files updated for Java 17 flags.

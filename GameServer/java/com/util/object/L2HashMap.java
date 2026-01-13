@@ -29,11 +29,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V>, Serializable
-{
+public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V>, Serializable {
     private static final long serialVersionUID = 7249069246763182397L;
 
-     /**
+    /**
      * The default initial capacity for this table,
      * used when not otherwise specified in a constructor.
      */
@@ -53,7 +52,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 
     /**
      * The maximum capacity, used if a higher value is implicitly
-     * specified by either of the constructors with arguments.  MUST
+     * specified by either of the constructors with arguments. MUST
      * be a power of two <= 1<<30 to ensure that entries are indexable
      * using ints.
      */
@@ -87,15 +86,15 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     /**
      * The segments, each of which is a specialized hash table
      */
-    final Segment<K,V>[] segments;
+    final Segment<K, V>[] segments;
 
     transient Set<K> keySet;
-    transient Set<Map.Entry<K,V>> entrySet;
+    transient Set<Map.Entry<K, V>> entrySet;
     transient Collection<V> values;
 
     /**
      * Applies a supplemental hash function to a given hashCode, which
-     * defends against poor quality hash functions.  This is critical
+     * defends against poor quality hash functions. This is critical
      * because ConcurrentHashMap uses power-of-two length hash tables,
      * that otherwise encounter collisions for hashCodes that do not
      * differ in lower or upper bits.
@@ -103,20 +102,21 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     private static int hash(int h) {
         // Spread bits to regularize both segment and index locations,
         // using variant of single-word Wang/Jenkins hash.
-        h += (h <<  15) ^ 0xffffcd7d;
+        h += (h << 15) ^ 0xffffcd7d;
         h ^= (h >>> 10);
-        h += (h <<   3);
-        h ^= (h >>>  6);
-        h += (h <<   2) + (h << 14);
+        h += (h << 3);
+        h ^= (h >>> 6);
+        h += (h << 2) + (h << 14);
         return h ^ (h >>> 16);
     }
 
     /**
      * Returns the segment that should be used for key with given hash
+     * 
      * @param hash the hash code for the key
      * @return the segment
      */
-    final Segment<K,V> segmentFor(int hash) {
+    final Segment<K, V> segmentFor(int hash) {
         return segments[(hash >>> segmentShift) & segmentMask];
     }
 
@@ -128,19 +128,19 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      *
      * Because the value field is volatile, not final, it is legal wrt
      * the Java Memory Model for an unsynchronized reader to see null
-     * instead of initial value when read via a data race.  Although a
+     * instead of initial value when read via a data race. Although a
      * reordering leading to this is not likely to ever actually
      * occur, the Segment.readValueUnderLock method is used as a
      * backup in case a null (pre-initialized) value is ever seen in
      * an unsynchronized access method.
      */
-    static final class HashEntry<K,V> {
+    static final class HashEntry<K, V> {
         final K key;
         final int hash;
         volatile V value;
-        final HashEntry<K,V> next;
+        final HashEntry<K, V> next;
 
-        HashEntry(K key, int hash, HashEntry<K,V> next, V value) {
+        HashEntry(K key, int hash, HashEntry<K, V> next, V value) {
             this.key = key;
             this.hash = hash;
             this.next = next;
@@ -148,21 +148,21 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
         }
 
         @SuppressWarnings("unchecked")
-        static final <K,V> HashEntry<K,V>[] newArray(int i) {
-        	return new HashEntry[i];
+        static final <K, V> HashEntry<K, V>[] newArray(int i) {
+            return new HashEntry[i];
         }
     }
 
     /**
-     * Segments are specialized versions of hash tables.  This
+     * Segments are specialized versions of hash tables. This
      * subclasses from ReentrantLock opportunistically, just to
      * simplify some locking and avoid separate construction.
      */
-    static final class Segment<K,V> extends ReentrantLock implements Serializable {
+    static final class Segment<K, V> extends ReentrantLock {
         /*
          * Segments maintain a table of entry lists that are ALWAYS
          * kept in a consistent state, so can be read without locking.
-         * Next fields of nodes are immutable (final).  All list
+         * Next fields of nodes are immutable (final). All list
          * additions are performed at the front of each bin. This
          * makes it easy to check changes, and also fast to traverse.
          * When nodes would otherwise be changed, new nodes are
@@ -175,22 +175,22 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
          * write operations performed by other threads are
          * noticed. For most purposes, the "count" field, tracking the
          * number of elements, serves as that volatile variable
-         * ensuring visibility.  This is convenient because this field
+         * ensuring visibility. This is convenient because this field
          * needs to be read in many read operations anyway:
          *
-         *   - All (unsynchronized) read operations must first read the
-         *     "count" field, and should not look at table entries if
-         *     it is 0.
+         * - All (unsynchronized) read operations must first read the
+         * "count" field, and should not look at table entries if
+         * it is 0.
          *
-         *   - All (synchronized) write operations should write to
-         *     the "count" field after structurally changing any bin.
-         *     The operations must not take any action that could even
-         *     momentarily cause a concurrent read operation to see
-         *     inconsistent data. This is made easier by the nature of
-         *     the read operations in Map. For example, no operation
-         *     can reveal that the table has grown but the threshold
-         *     has not yet been updated, so there are no atomicity
-         *     requirements for this with respect to reads.
+         * - All (synchronized) write operations should write to
+         * the "count" field after structurally changing any bin.
+         * The operations must not take any action that could even
+         * momentarily cause a concurrent read operation to see
+         * inconsistent data. This is made easier by the nature of
+         * the read operations in Map. For example, no operation
+         * can reveal that the table has grown but the threshold
+         * has not yet been updated, so there are no atomicity
+         * requirements for this with respect to reads.
          *
          * As a guide, all critical volatile reads and writes to the
          * count field are marked in code comments.
@@ -223,40 +223,41 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
         /**
          * The per-segment table.
          */
-        transient volatile HashEntry<K,V>[] table;
+        transient volatile HashEntry<K, V>[] table;
 
         /**
-         * The load factor for the hash table.  Even though this value
+         * The load factor for the hash table. Even though this value
          * is same for all segments, it is replicated to avoid needing
          * links to outer object.
+         * 
          * @serial
          */
         final float loadFactor;
 
         Segment(int initialCapacity, float lf) {
             loadFactor = lf;
-            setTable(HashEntry.<K,V>newArray(initialCapacity));
+            setTable(HashEntry.<K, V>newArray(initialCapacity));
         }
 
         @SuppressWarnings("unchecked")
-        static final <K,V> Segment<K,V>[] newArray(int i) {
-	    	return new Segment[i];
+        static final <K, V> Segment<K, V>[] newArray(int i) {
+            return new Segment[i];
         }
 
         /**
          * Sets table to new HashEntry array.
          * Call only while holding lock or in constructor.
          */
-        void setTable(HashEntry<K,V>[] newTable) {
-            threshold = (int)(newTable.length * loadFactor);
+        void setTable(HashEntry<K, V>[] newTable) {
+            threshold = (int) (newTable.length * loadFactor);
             table = newTable;
         }
 
         /**
          * Returns properly casted first entry of bin for given hash.
          */
-        HashEntry<K,V> getFirst(int hash) {
-            HashEntry<K,V>[] tab = table;
+        HashEntry<K, V> getFirst(int hash) {
+            HashEntry<K, V>[] tab = table;
             return tab[hash & (tab.length - 1)];
         }
 
@@ -267,7 +268,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
          * its table assignment, which is legal under memory model
          * but is not known to ever occur.
          */
-        V readValueUnderLock(HashEntry<K,V> e) {
+        V readValueUnderLock(HashEntry<K, V> e) {
             lock();
             try {
                 return e.value;
@@ -280,7 +281,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 
         V get(Object key, int hash) {
             if (count != 0) { // read-volatile
-                HashEntry<K,V> e = getFirst(hash);
+                HashEntry<K, V> e = getFirst(hash);
                 while (e != null) {
                     if (e.hash == hash && key.equals(e.key)) {
                         V v = e.value;
@@ -296,7 +297,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 
         boolean containsKey(Object key, int hash) {
             if (count != 0) { // read-volatile
-                HashEntry<K,V> e = getFirst(hash);
+                HashEntry<K, V> e = getFirst(hash);
                 while (e != null) {
                     if (e.hash == hash && key.equals(e.key))
                         return true;
@@ -308,10 +309,10 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 
         boolean containsValue(Object value) {
             if (count != 0) { // read-volatile
-                HashEntry<K,V>[] tab = table;
+                HashEntry<K, V>[] tab = table;
                 int len = tab.length;
-                for (int i = 0 ; i < len; i++) {
-                    for (HashEntry<K,V> e = tab[i]; e != null; e = e.next) {
+                for (int i = 0; i < len; i++) {
+                    for (HashEntry<K, V> e = tab[i]; e != null; e = e.next) {
                         V v = e.value;
                         if (v == null) // recheck
                             v = readValueUnderLock(e);
@@ -326,7 +327,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
         boolean replace(K key, int hash, V oldValue, V newValue) {
             lock();
             try {
-                HashEntry<K,V> e = getFirst(hash);
+                HashEntry<K, V> e = getFirst(hash);
                 while (e != null && (e.hash != hash || !key.equals(e.key)))
                     e = e.next;
 
@@ -344,7 +345,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
         V replace(K key, int hash, V newValue) {
             lock();
             try {
-                HashEntry<K,V> e = getFirst(hash);
+                HashEntry<K, V> e = getFirst(hash);
                 while (e != null && (e.hash != hash || !key.equals(e.key)))
                     e = e.next;
 
@@ -359,17 +360,16 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
             }
         }
 
-
         V put(K key, int hash, V value, boolean onlyIfAbsent) {
             lock();
             try {
                 int c = count;
                 if (c++ > threshold) // ensure capacity
                     rehash();
-                HashEntry<K,V>[] tab = table;
+                HashEntry<K, V>[] tab = table;
                 int index = hash & (tab.length - 1);
-                HashEntry<K,V> first = tab[index];
-                HashEntry<K,V> e = first;
+                HashEntry<K, V> first = tab[index];
+                HashEntry<K, V> e = first;
                 while (e != null && (e.hash != hash || !key.equals(e.key)))
                     e = e.next;
 
@@ -378,11 +378,10 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
                     oldValue = e.value;
                     if (!onlyIfAbsent)
                         e.value = value;
-                }
-                else {
+                } else {
                     oldValue = null;
                     ++modCount;
-                    tab[index] = new HashEntry<K,V>(key, hash, first, value);
+                    tab[index] = new HashEntry<K, V>(key, hash, first, value);
                     count = c; // write-volatile
                 }
                 return oldValue;
@@ -392,13 +391,13 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
         }
 
         void rehash() {
-            HashEntry<K,V>[] oldTable = table;
+            HashEntry<K, V>[] oldTable = table;
             int oldCapacity = oldTable.length;
             if (oldCapacity >= MAXIMUM_CAPACITY)
                 return;
 
             /*
-             * Reclassify nodes in each list to new Map.  Because we are
+             * Reclassify nodes in each list to new Map. Because we are
              * using power-of-two expansion, the elements from each bin
              * must either stay at same index, or move with a power of two
              * offset. We eliminate unnecessary node creation by catching
@@ -411,29 +410,27 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
              * right now.
              */
 
-            HashEntry<K,V>[] newTable = HashEntry.newArray(oldCapacity<<1);
-            threshold = (int)(newTable.length * loadFactor);
+            HashEntry<K, V>[] newTable = HashEntry.newArray(oldCapacity << 1);
+            threshold = (int) (newTable.length * loadFactor);
             int sizeMask = newTable.length - 1;
-            for (int i = 0; i < oldCapacity ; i++) {
+            for (int i = 0; i < oldCapacity; i++) {
                 // We need to guarantee that any existing reads of old Map can
-                //  proceed. So we cannot yet null out each bin.
-                HashEntry<K,V> e = oldTable[i];
+                // proceed. So we cannot yet null out each bin.
+                HashEntry<K, V> e = oldTable[i];
 
                 if (e != null) {
-                    HashEntry<K,V> next = e.next;
+                    HashEntry<K, V> next = e.next;
                     int idx = e.hash & sizeMask;
 
-                    //  Single node on list
+                    // Single node on list
                     if (next == null)
                         newTable[idx] = e;
 
                     else {
                         // Reuse trailing consecutive sequence at same slot
-                        HashEntry<K,V> lastRun = e;
+                        HashEntry<K, V> lastRun = e;
                         int lastIdx = idx;
-                        for (HashEntry<K,V> last = next;
-                             last != null;
-                             last = last.next) {
+                        for (HashEntry<K, V> last = next; last != null; last = last.next) {
                             int k = last.hash & sizeMask;
                             if (k != lastIdx) {
                                 lastIdx = k;
@@ -443,11 +440,11 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
                         newTable[lastIdx] = lastRun;
 
                         // Clone all remaining nodes
-                        for (HashEntry<K,V> p = e; p != lastRun; p = p.next) {
+                        for (HashEntry<K, V> p = e; p != lastRun; p = p.next) {
                             int k = p.hash & sizeMask;
-                            HashEntry<K,V> n = newTable[k];
-                            newTable[k] = new HashEntry<K,V>(p.key, p.hash,
-                                                             n, p.value);
+                            HashEntry<K, V> n = newTable[k];
+                            newTable[k] = new HashEntry<K, V>(p.key, p.hash,
+                                    n, p.value);
                         }
                     }
                 }
@@ -462,10 +459,10 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
             lock();
             try {
                 int c = count - 1;
-                HashEntry<K,V>[] tab = table;
+                HashEntry<K, V>[] tab = table;
                 int index = hash & (tab.length - 1);
-                HashEntry<K,V> first = tab[index];
-                HashEntry<K,V> e = first;
+                HashEntry<K, V> first = tab[index];
+                HashEntry<K, V> e = first;
                 while (e != null && (e.hash != hash || !key.equals(e.key)))
                     e = e.next;
 
@@ -478,10 +475,10 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
                         // in list, but all preceding ones need to be
                         // cloned.
                         ++modCount;
-                        HashEntry<K,V> newFirst = e.next;
-                        for (HashEntry<K,V> p = first; p != e; p = p.next)
-                            newFirst = new HashEntry<K,V>(p.key, p.hash,
-                                                          newFirst, p.value);
+                        HashEntry<K, V> newFirst = e.next;
+                        for (HashEntry<K, V> p = first; p != e; p = p.next)
+                            newFirst = new HashEntry<K, V>(p.key, p.hash,
+                                    newFirst, p.value);
                         tab[index] = newFirst;
                         count = c; // write-volatile
                     }
@@ -496,8 +493,8 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
             if (count != 0) {
                 lock();
                 try {
-                    HashEntry<K,V>[] tab = table;
-                    for (int i = 0; i < tab.length ; i++)
+                    HashEntry<K, V>[] tab = table;
+                    for (int i = 0; i < tab.length; i++)
                         tab[i] = null;
                     ++modCount;
                     count = 0; // write-volatile
@@ -508,25 +505,27 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
         }
     }
 
-
-
     /* ---------------- Public operations -------------- */
 
     /**
      * Creates a new, empty map with the specified initial
      * capacity, load factor and concurrency level.
      *
-     * @param initialCapacity the initial capacity. The implementation
-     * performs internal sizing to accommodate this many elements.
-     * @param loadFactor  the load factor threshold, used to control resizing.
-     * Resizing may be performed when the average number of elements per
-     * bin exceeds this threshold.
+     * @param initialCapacity  the initial capacity. The implementation
+     *                         performs internal sizing to accommodate this many
+     *                         elements.
+     * @param loadFactor       the load factor threshold, used to control resizing.
+     *                         Resizing may be performed when the average number of
+     *                         elements per
+     *                         bin exceeds this threshold.
      * @param concurrencyLevel the estimated number of concurrently
-     * updating threads. The implementation performs internal sizing
-     * to try to accommodate this many threads.
+     *                         updating threads. The implementation performs
+     *                         internal sizing
+     *                         to try to accommodate this many threads.
      * @throws IllegalArgumentException if the initial capacity is
-     * negative or the load factor or concurrencyLevel are
-     * nonpositive.
+     *                                  negative or the load factor or
+     *                                  concurrencyLevel are
+     *                                  nonpositive.
      */
     public L2HashMap(int initialCapacity, float loadFactor, int concurrencyLevel) {
         if (!(loadFactor > 0) || initialCapacity < 0 || concurrencyLevel <= 0)
@@ -556,7 +555,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
             cap <<= 1;
 
         for (int i = 0; i < this.segments.length; ++i)
-            this.segments[i] = new Segment<K,V>(cap, loadFactor);
+            this.segments[i] = new Segment<K, V>(cap, loadFactor);
     }
 
     /**
@@ -564,12 +563,14 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * and load factor and with the default concurrencyLevel (16).
      *
      * @param initialCapacity The implementation performs internal
-     * sizing to accommodate this many elements.
-     * @param loadFactor  the load factor threshold, used to control resizing.
-     * Resizing may be performed when the average number of elements per
-     * bin exceeds this threshold.
+     *                        sizing to accommodate this many elements.
+     * @param loadFactor      the load factor threshold, used to control resizing.
+     *                        Resizing may be performed when the average number of
+     *                        elements per
+     *                        bin exceeds this threshold.
      * @throws IllegalArgumentException if the initial capacity of
-     * elements is negative or the load factor is nonpositive
+     *                                  elements is negative or the load factor is
+     *                                  nonpositive
      *
      * @since 1.6
      */
@@ -582,9 +583,10 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * and with default load factor (0.75) and concurrencyLevel (16).
      *
      * @param initialCapacity the initial capacity. The implementation
-     * performs internal sizing to accommodate this many elements.
+     *                        performs internal sizing to accommodate this many
+     *                        elements.
      * @throws IllegalArgumentException if the initial capacity of
-     * elements is negative.
+     *                                  elements is negative.
      */
     public L2HashMap(int initialCapacity) {
         this(initialCapacity, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
@@ -608,8 +610,8 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      */
     public L2HashMap(Map<? extends K, ? extends V> m) {
         this(Math.max((int) (m.size() / DEFAULT_LOAD_FACTOR) + 1,
-                      DEFAULT_INITIAL_CAPACITY),
-             DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
+                DEFAULT_INITIAL_CAPACITY),
+                DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
         putAll(m);
     }
 
@@ -619,8 +621,8 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * @return <tt>true</tt> if this map contains no key-value mappings
      */
     @Override
-	public boolean isEmpty() {
-        final Segment<K,V>[] segments = this.segments;
+    public boolean isEmpty() {
+        final Segment<K, V>[] segments = this.segments;
         /*
          * We keep track of per-segment modCounts to avoid ABA
          * problems in which an element in one segment was added and
@@ -639,12 +641,12 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
                 mcsum += mc[i] = segments[i].modCount;
         }
         // If mcsum happens to be zero, then we know we got a snapshot
-        // before any modifications at all were made.  This is
+        // before any modifications at all were made. This is
         // probably common enough to bother tracking.
         if (mcsum != 0) {
             for (int i = 0; i < segments.length; ++i) {
                 if (segments[i].count != 0 ||
-                    mc[i] != segments[i].modCount)
+                        mc[i] != segments[i].modCount)
                     return false;
             }
         }
@@ -652,15 +654,15 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     }
 
     /**
-     * Returns the number of key-value mappings in this map.  If the
+     * Returns the number of key-value mappings in this map. If the
      * map contains more than <tt>Integer.MAX_VALUE</tt> elements, returns
      * <tt>Integer.MAX_VALUE</tt>.
      *
      * @return the number of key-value mappings in this map
      */
     @Override
-	public int size() {
-        final Segment<K,V>[] segments = this.segments;
+    public int size() {
+        final Segment<K, V>[] segments = this.segments;
         long sum = 0;
         long check = 0;
         int[] mc = new int[segments.length];
@@ -698,22 +700,23 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
         if (sum > Integer.MAX_VALUE)
             return Integer.MAX_VALUE;
         else
-            return (int)sum;
+            return (int) sum;
     }
 
     /**
      * Returns the value to which the specified key is mapped,
      * or {@code null} if this map contains no mapping for the key.
      *
-     * <p>More formally, if this map contains a mapping from a key
+     * <p>
+     * More formally, if this map contains a mapping from a key
      * {@code k} to a value {@code v} such that {@code key.equals(k)},
      * then this method returns {@code v}; otherwise it returns
-     * {@code null}.  (There can be at most one such mapping.)
+     * {@code null}. (There can be at most one such mapping.)
      *
      * @throws NullPointerException if the specified key is null
      */
     @Override
-	public V get(Object key) {
+    public V get(Object key) {
         int hash = hash(key.hashCode());
         return segmentFor(hash).get(key, hash);
     }
@@ -721,14 +724,14 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     /**
      * Tests if the specified object is a key in this table.
      *
-     * @param  key   possible key
+     * @param key possible key
      * @return <tt>true</tt> if and only if the specified object
      *         is a key in this table, as determined by the
      *         <tt>equals</tt> method; <tt>false</tt> otherwise.
      * @throws NullPointerException if the specified key is null
      */
     @Override
-	public boolean containsKey(Object key) {
+    public boolean containsKey(Object key) {
         int hash = hash(key.hashCode());
         return segmentFor(hash).containsKey(key, hash);
     }
@@ -745,13 +748,13 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * @throws NullPointerException if the specified value is null
      */
     @Override
-	public boolean containsValue(Object value) {
+    public boolean containsValue(Object value) {
         if (value == null)
             throw new NullPointerException();
 
         // See explanation of modCount use above
 
-        final Segment<K,V>[] segments = this.segments;
+        final Segment<K, V>[] segments = this.segments;
         int[] mc = new int[segments.length];
 
         // Try a few times without locking
@@ -794,13 +797,13 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 
     /**
      * Legacy method testing if some key maps into the specified value
-     * in this table.  This method is identical in functionality to
+     * in this table. This method is identical in functionality to
      * {@link #containsValue}, and exists solely to ensure
      * full compatibility with class {@link java.util.Hashtable},
      * which supported this method prior to introduction of the
      * Java Collections framework.
-
-     * @param  value a value to search for
+     * 
+     * @param value a value to search for
      * @return <tt>true</tt> if and only if some key maps to the
      *         <tt>value</tt> argument in this table as
      *         determined by the <tt>equals</tt> method;
@@ -815,17 +818,18 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * Maps the specified key to the specified value in this table.
      * Key can be null.
      *
-     * <p> The value can be retrieved by calling the <tt>get</tt> method
+     * <p>
+     * The value can be retrieved by calling the <tt>get</tt> method
      * with a key that is equal to the original key.
      *
-     * @param key key with which the specified value is to be associated
+     * @param key   key with which the specified value is to be associated
      * @param value value to be associated with the specified key
      * @return the previous value associated with <tt>key</tt>, or
      *         <tt>null</tt> if there was no mapping for <tt>key</tt>
      * @throws NullPointerException if the specified key is null
      */
     @Override
-	public V put(K key, V value) {
+    public V put(K key, V value) {
         int hash = hash(key.hashCode());
         return segmentFor(hash).put(key, hash, value, false);
     }
@@ -838,7 +842,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * @throws NullPointerException if the specified key or value is null
      */
     @Override
-	public V putIfAbsent(K key, V value) {
+    public V putIfAbsent(K key, V value) {
         int hash = hash(key.hashCode());
         return segmentFor(hash).put(key, hash, value, true);
     }
@@ -851,7 +855,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * @param m mappings to be stored in this map
      */
     @Override
-	public void putAll(Map<? extends K, ? extends V> m) {
+    public void putAll(Map<? extends K, ? extends V> m) {
         for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
             put(e.getKey(), e.getValue());
     }
@@ -860,16 +864,16 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * Removes the key (and its corresponding value) from this map.
      * This method does nothing if the key is not in the map.
      *
-     * @param  key the key that needs to be removed
+     * @param key the key that needs to be removed
      * @return the previous value associated with <tt>key</tt>, or
      *         <tt>null</tt> if there was no mapping for <tt>key</tt>
      * @throws NullPointerException if the specified key is null
      */
     @Override
-	public V remove(Object key) {
-    	if(key == null)
-    		throw new NullPointerException();
-    	int hash = hash(key.hashCode());
+    public V remove(Object key) {
+        if (key == null)
+            throw new NullPointerException();
+        int hash = hash(key.hashCode());
         return segmentFor(hash).remove(key, hash, null);
     }
 
@@ -879,8 +883,8 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * @throws NullPointerException if the specified key is null
      */
     @Override
-	public boolean remove(Object key, Object value) {
-    	if (key == null)
+    public boolean remove(Object key, Object value) {
+        if (key == null)
             return false;
         int hash = hash(key.hashCode());
         return segmentFor(hash).remove(key, hash, value) != null;
@@ -892,7 +896,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * @throws NullPointerException if any of the arguments are null
      */
     @Override
-	public boolean replace(K key, V oldValue, V newValue) {
+    public boolean replace(K key, V oldValue, V newValue) {
         if (key == null)
             throw new NullPointerException();
         int hash = hash(key.hashCode());
@@ -907,7 +911,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * @throws NullPointerException if the specified key or value is null
      */
     @Override
-	public V replace(K key, V value) {
+    public V replace(K key, V value) {
         if (key == null)
             throw new NullPointerException();
         int hash = hash(key.hashCode());
@@ -918,7 +922,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * Removes all of the mappings from this map.
      */
     @Override
-	public void clear() {
+    public void clear() {
         for (int i = 0; i < segments.length; ++i)
             segments[i].clear();
     }
@@ -926,21 +930,22 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     /**
      * Returns a {@link Set} view of the keys contained in this map.
      * The set is backed by the map, so changes to the map are
-     * reflected in the set, and vice-versa.  The set supports element
+     * reflected in the set, and vice-versa. The set supports element
      * removal, which removes the corresponding mapping from this map,
      * via the <tt>Iterator.remove</tt>, <tt>Set.remove</tt>,
      * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt>
-     * operations.  It does not support the <tt>add</tt> or
+     * operations. It does not support the <tt>add</tt> or
      * <tt>addAll</tt> operations.
      *
-     * <p>The view's <tt>iterator</tt> is a "weakly consistent" iterator
+     * <p>
+     * The view's <tt>iterator</tt> is a "weakly consistent" iterator
      * that will never throw {@link ConcurrentModificationException},
      * and guarantees to traverse elements as they existed upon
      * construction of the iterator, and may (but is not guaranteed to)
      * reflect any modifications subsequent to construction.
      */
     @Override
-	public Set<K> keySet() {
+    public Set<K> keySet() {
         Set<K> ks = keySet;
         return (ks != null) ? ks : (keySet = new KeySet());
     }
@@ -948,21 +953,22 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     /**
      * Returns a {@link Collection} view of the values contained in this map.
      * The collection is backed by the map, so changes to the map are
-     * reflected in the collection, and vice-versa.  The collection
+     * reflected in the collection, and vice-versa. The collection
      * supports element removal, which removes the corresponding
      * mapping from this map, via the <tt>Iterator.remove</tt>,
      * <tt>Collection.remove</tt>, <tt>removeAll</tt>,
-     * <tt>retainAll</tt>, and <tt>clear</tt> operations.  It does not
+     * <tt>retainAll</tt>, and <tt>clear</tt> operations. It does not
      * support the <tt>add</tt> or <tt>addAll</tt> operations.
      *
-     * <p>The view's <tt>iterator</tt> is a "weakly consistent" iterator
+     * <p>
+     * The view's <tt>iterator</tt> is a "weakly consistent" iterator
      * that will never throw {@link ConcurrentModificationException},
      * and guarantees to traverse elements as they existed upon
      * construction of the iterator, and may (but is not guaranteed to)
      * reflect any modifications subsequent to construction.
      */
     @Override
-	public Collection<V> values() {
+    public Collection<V> values() {
         Collection<V> vs = values;
         return (vs != null) ? vs : (values = new Values());
     }
@@ -970,22 +976,23 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     /**
      * Returns a {@link Set} view of the mappings contained in this map.
      * The set is backed by the map, so changes to the map are
-     * reflected in the set, and vice-versa.  The set supports element
+     * reflected in the set, and vice-versa. The set supports element
      * removal, which removes the corresponding mapping from the map,
      * via the <tt>Iterator.remove</tt>, <tt>Set.remove</tt>,
      * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt>
-     * operations.  It does not support the <tt>add</tt> or
+     * operations. It does not support the <tt>add</tt> or
      * <tt>addAll</tt> operations.
      *
-     * <p>The view's <tt>iterator</tt> is a "weakly consistent" iterator
+     * <p>
+     * The view's <tt>iterator</tt> is a "weakly consistent" iterator
      * that will never throw {@link ConcurrentModificationException},
      * and guarantees to traverse elements as they existed upon
      * construction of the iterator, and may (but is not guaranteed to)
      * reflect any modifications subsequent to construction.
      */
     @Override
-	public Set<Map.Entry<K,V>> entrySet() {
-        Set<Map.Entry<K,V>> es = entrySet;
+    public Set<Map.Entry<K, V>> entrySet() {
+        Set<Map.Entry<K, V>> es = entrySet;
         return (es != null) ? es : (entrySet = new EntrySet());
     }
 
@@ -1014,7 +1021,7 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     abstract class HashIterator {
         int nextSegmentIndex;
         int nextTableIndex;
-        HashEntry<K,V>[] currentTable;
+        HashEntry<K, V>[] currentTable;
         HashEntry<K, V> nextEntry;
         HashEntry<K, V> lastReturned;
 
@@ -1024,23 +1031,25 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
             advance();
         }
 
-        public boolean hasMoreElements() { return hasNext(); }
+        public boolean hasMoreElements() {
+            return hasNext();
+        }
 
         final void advance() {
             if (nextEntry != null && (nextEntry = nextEntry.next) != null)
                 return;
 
             while (nextTableIndex >= 0) {
-                if ( (nextEntry = currentTable[nextTableIndex--]) != null)
+                if ((nextEntry = currentTable[nextTableIndex--]) != null)
                     return;
             }
 
             while (nextSegmentIndex >= 0) {
-                Segment<K,V> seg = segments[nextSegmentIndex--];
+                Segment<K, V> seg = segments[nextSegmentIndex--];
                 if (seg.count != 0) {
                     currentTable = seg.table;
                     for (int j = currentTable.length - 1; j >= 0; --j) {
-                        if ( (nextEntry = currentTable[j]) != null) {
+                        if ((nextEntry = currentTable[j]) != null) {
                             nextTableIndex = j - 1;
                             return;
                         }
@@ -1049,9 +1058,11 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
             }
         }
 
-        public boolean hasNext() { return nextEntry != null; }
+        public boolean hasNext() {
+            return nextEntry != null;
+        }
 
-        HashEntry<K,V> nextEntry() {
+        HashEntry<K, V> nextEntry() {
             if (nextEntry == null)
                 throw new NoSuchElementException();
             lastReturned = nextEntry;
@@ -1067,20 +1078,28 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
         }
     }
 
-    final class KeyIterator extends HashIterator implements Iterator<K>, Enumeration<K>
-    {
+    final class KeyIterator extends HashIterator implements Iterator<K>, Enumeration<K> {
         @Override
-		public K next()        { return super.nextEntry().key; }
+        public K next() {
+            return super.nextEntry().key;
+        }
+
         @Override
-		public K nextElement() { return super.nextEntry().key; }
+        public K nextElement() {
+            return super.nextEntry().key;
+        }
     }
 
-    final class ValueIterator extends HashIterator implements Iterator<V>, Enumeration<V>
-    {
+    final class ValueIterator extends HashIterator implements Iterator<V>, Enumeration<V> {
         @Override
-		public V next()        { return super.nextEntry().value; }
+        public V next() {
+            return super.nextEntry().value;
+        }
+
         @Override
-		public V nextElement() { return super.nextEntry().value; }
+        public V nextElement() {
+            return super.nextEntry().value;
+        }
     }
 
     /**
@@ -1088,10 +1107,9 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * setValue changes to the underlying map.
      */
     @SuppressWarnings("serial")
-	final class WriteThroughEntry extends AbstractMap.SimpleEntry<K,V>
-    {
+    final class WriteThroughEntry extends AbstractMap.SimpleEntry<K, V> {
         WriteThroughEntry(K k, V v) {
-            super(k,v);
+            super(k, v);
         }
 
         /**
@@ -1104,93 +1122,102 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
          * and cannot guarantee more.
          */
         @Override
-		public V setValue(V value) {
-            if (value == null) throw new NullPointerException();
+        public V setValue(V value) {
+            if (value == null)
+                throw new NullPointerException();
             V v = super.setValue(value);
             L2HashMap.this.put(getKey(), value);
             return v;
         }
     }
 
-    final class EntryIterator extends HashIterator implements Iterator<Entry<K,V>>
-    {
+    final class EntryIterator extends HashIterator implements Iterator<Entry<K, V>> {
         @Override
-		public Map.Entry<K,V> next() {
-            HashEntry<K,V> e = super.nextEntry();
+        public Map.Entry<K, V> next() {
+            HashEntry<K, V> e = super.nextEntry();
             return new WriteThroughEntry(e.key, e.value);
         }
     }
 
     final class KeySet extends AbstractSet<K> {
         @Override
-		public Iterator<K> iterator() {
+        public Iterator<K> iterator() {
             return new KeyIterator();
         }
+
         @Override
-		public int size() {
+        public int size() {
             return L2HashMap.this.size();
         }
+
         @Override
-		public boolean contains(Object o) {
+        public boolean contains(Object o) {
             return L2HashMap.this.containsKey(o);
         }
+
         @Override
-		public boolean remove(Object o) {
+        public boolean remove(Object o) {
             return L2HashMap.this.remove(o) != null;
         }
+
         @Override
-		public void clear() {
+        public void clear() {
             L2HashMap.this.clear();
         }
     }
 
     final class Values extends AbstractCollection<V> {
         @Override
-		public Iterator<V> iterator() {
+        public Iterator<V> iterator() {
             return new ValueIterator();
         }
+
         @Override
-		public int size() {
+        public int size() {
             return L2HashMap.this.size();
         }
+
         @Override
-		public boolean contains(Object o) {
+        public boolean contains(Object o) {
             return L2HashMap.this.containsValue(o);
         }
+
         @Override
-		public void clear() {
+        public void clear() {
             L2HashMap.this.clear();
         }
     }
 
-    final class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+    final class EntrySet extends AbstractSet<Map.Entry<K, V>> {
         @Override
-		public Iterator<Map.Entry<K,V>> iterator() {
+        public Iterator<Map.Entry<K, V>> iterator() {
             return new EntryIterator();
         }
 
-		@Override
-		public boolean contains(Object o) {
+        @Override
+        public boolean contains(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
-            Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+            Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
             V v = L2HashMap.this.get(e.getKey());
             return v != null && v.equals(e.getValue());
         }
 
-		@Override
-		public boolean remove(Object o) {
+        @Override
+        public boolean remove(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
-            Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+            Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
             return L2HashMap.this.remove(e.getKey(), e.getValue());
         }
+
         @Override
-		public int size() {
+        public int size() {
             return L2HashMap.this.size();
         }
+
         @Override
-		public void clear() {
+        public void clear() {
             L2HashMap.this.clear();
         }
     }
@@ -1198,22 +1225,23 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     /**
      * Save the state of the <tt>ConcurrentHashMap</tt> instance to a
      * stream (i.e., serialize it).
+     * 
      * @param s the stream
      * @serialData
-     * the key (Object) and value (Object)
-     * for each key-value mapping, followed by a null pair.
-     * The key-value mappings are emitted in no particular order.
+     *             the key (Object) and value (Object)
+     *             for each key-value mapping, followed by a null pair.
+     *             The key-value mappings are emitted in no particular order.
      */
-    private void writeObject(ObjectOutputStream s) throws IOException  {
+    private void writeObject(ObjectOutputStream s) throws IOException {
         s.defaultWriteObject();
 
         for (int k = 0; k < segments.length; ++k) {
-            Segment<K,V> seg = segments[k];
+            Segment<K, V> seg = segments[k];
             seg.lock();
             try {
-                HashEntry<K,V>[] tab = seg.table;
+                HashEntry<K, V>[] tab = seg.table;
                 for (int i = 0; i < tab.length; ++i) {
-                    for (HashEntry<K,V> e = tab[i]; e != null; e = e.next) {
+                    for (HashEntry<K, V> e = tab[i]; e != null; e = e.next) {
                         s.writeObject(e.key);
                         s.writeObject(e.value);
                     }
@@ -1229,11 +1257,12 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
     /**
      * Reconstitute the <tt>ConcurrentHashMap</tt> instance from a
      * stream (i.e., deserialize it).
+     * 
      * @param s the stream
      */
     @SuppressWarnings("unchecked")
-	private void readObject(ObjectInputStream s)
-        throws IOException, ClassNotFoundException  {
+    private void readObject(ObjectInputStream s)
+            throws IOException, ClassNotFoundException {
         s.defaultReadObject();
 
         // Initialize each segment to be minimally sized, and let grow.
