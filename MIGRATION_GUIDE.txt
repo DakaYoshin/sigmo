@@ -40,6 +40,18 @@ STATUS: COMPLETED (All Fixes Applied)
         *   Replaced deprecated `new Integer(int).toString()` with `String.valueOf(int)`.
      *  `L2Character.java`:
         *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `ConditionInventory.java`:
+        *   Removed redundant `implements ConditionListener` (inherited from superclass).
+     *  `TaskCleanUp.java`:
+        *   Removed deprecated `System.runFinalization()` call.
+     *  `L2NpcTemplate.java`:
+        *   Replaced deprecated `new Double(double)` with `Double.valueOf(double)`.
+     *  `DeadlockDetector.java`:
+        *   Suppressed future-deprecation warning for `Thread.getId()` (required for Java 17).
+     *  `AutoChatHandler.java`:
+        *   Fixed incorrect Map removal (tried to remove by value, now removing by key).
+     *  `GameServerRegister.java`:
+        *   Replaced deprecated `new Integer(String)` with `Integer.parseInt(String)`.
 
 4.  **Scripts Updated**:
     *   All `.bat` files updated for Java 17 flags.

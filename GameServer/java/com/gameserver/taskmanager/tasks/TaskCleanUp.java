@@ -21,20 +21,17 @@ package com.gameserver.taskmanager.tasks;
 import com.gameserver.taskmanager.Task;
 import com.gameserver.taskmanager.TaskManager.ExecutedTask;
 
-public final class TaskCleanUp extends Task
-{
+public final class TaskCleanUp extends Task {
 	public static final String NAME = "CleanUp";
 
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return NAME;
 	}
 
 	@Override
-	public void onTimeElapsed(ExecutedTask task)
-	{
-		System.runFinalization();
+	public void onTimeElapsed(ExecutedTask task) {
+
 		System.gc();
 	}
 

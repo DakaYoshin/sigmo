@@ -31,56 +31,45 @@ import org.apache.commons.logging.LogFactory;
 import com.gameserver.thread.L2Thread;
 import com.util.Util;
 
-public final class DeadlockDetector implements Runnable
-{
+public final class DeadlockDetector implements Runnable {
 	private static final Log _log = LogFactory.getLog(DeadlockDetector.class);
 	private final Set<Long> _logged = new FastSet<Long>();
 
 	private static DeadlockDetector _instance;
 
-	public static DeadlockDetector getInstance()
-	{
-		if(_instance == null)
-		{
+	public static DeadlockDetector getInstance() {
+		if (_instance == null) {
 			_instance = new DeadlockDetector();
 		}
 
 		return _instance;
 	}
 
-	private DeadlockDetector()
-	{
+	private DeadlockDetector() {
 		_log.info("DeadlockDetector daemon started.");
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		long[] ids = findDeadlockedThreadIDs();
 
-		if(ids == null)
-		{
+		if (ids == null) {
 			return;
 		}
 
 		List<Thread> deadlocked = new ArrayList<Thread>();
 
-		for(long id : ids)
-		{
-			if(_logged.add(id))
-			{
+		for (long id : ids) {
+			if (_logged.add(id)) {
 				deadlocked.add(findThreadById(id));
 			}
 		}
 
-		if(!deadlocked.isEmpty())
-		{
+		if (!deadlocked.isEmpty()) {
 			Util.printSection("Deadlocked Thread(s)");
 
-			for(Thread thread : deadlocked)
-			{
-				for(String line : L2Thread.getStats(thread))
-				{
+			for (Thread thread : deadlocked) {
+				for (String line : L2Thread.getStats(thread)) {
 					_log.fatal(line);
 				}
 			}
@@ -89,24 +78,18 @@ public final class DeadlockDetector implements Runnable
 		}
 	}
 
-	private long[] findDeadlockedThreadIDs()
-	{
-		if(ManagementFactory.getThreadMXBean().isSynchronizerUsageSupported())
-		{
+	private long[] findDeadlockedThreadIDs() {
+		if (ManagementFactory.getThreadMXBean().isSynchronizerUsageSupported()) {
 			return ManagementFactory.getThreadMXBean().findDeadlockedThreads();
-		}
-		else
-		{
+		} else {
 			return ManagementFactory.getThreadMXBean().findMonitorDeadlockedThreads();
 		}
 	}
 
-	private Thread findThreadById(long id)
-	{
-		for(Thread thread : Thread.getAllStackTraces().keySet())
-		{
-			if(thread.getId() == id)
-			{
+	@SuppressWarnings("deprecation")
+	private Thread findThreadById(long id) {
+		for (Thread thread : Thread.getAllStackTraces().keySet()) {
+			if (thread.getId() == id) {
 				return thread;
 			}
 		}

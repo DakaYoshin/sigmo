@@ -20,12 +20,10 @@ package com.gameserver.skills.conditions;
 
 import com.gameserver.skills.Env;
 
-public abstract class ConditionInventory extends Condition implements ConditionListener
-{
+public abstract class ConditionInventory extends Condition {
 	protected final int _slot;
 
-	public ConditionInventory(int slot)
-	{
+	public ConditionInventory(int slot) {
 		_slot = slot;
 	}
 
