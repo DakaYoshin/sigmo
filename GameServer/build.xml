@@ -28,7 +28,7 @@
 	</target>
 
 	<target name="compile" depends="init" description="Compile the source.">
-		<javac destdir="${build.classes}" optimize="on" compiler="javac1.7" debug="true" debuglevel="lines,vars,source" includeantruntime="false" source="1.7" target="1.7" encoding="utf-8" nowarn="off">
+		<javac destdir="${build.classes}" optimize="on" compiler="modern" debug="true" debuglevel="lines,vars,source" includeantruntime="false" source="17" target="17" encoding="utf-8" nowarn="off">
 			<src path="${src}"/>
 			<classpath refid="classpath"/>   
 		</javac>
@@ -37,19 +37,19 @@
 
 	<target name="jar" depends="compile" description="Create the jar file">
 
-        <jar destfile="${build}/l2L2jSigmo.jar">
+        <jar destfile="${build}/L2jSigmo.jar">
             <fileset dir="${build.classes}"/>
         </jar>
 
     	<copy todir="${build.dist.login.lib}">
             <fileset dir="${build}">
-                <include name="l2L2jSigmo.jar"/>
+                <include name="L2jSigmo.jar"/>
 			</fileset>
         </copy>
 
     	<copy todir="${build.dist.game.lib}">
             <fileset dir="${build}">
-                <include name="l2L2jSigmo.jar"/>
+                <include name="L2jSigmo.jar"/>
 			</fileset>
         </copy>
 
@@ -67,7 +67,7 @@
 			<fileset dir="${src}/../lib">
 				<include name="c3p0-0.9.1.2.jar"/>
 				<include name="commons-logging-1.1.jar"/>
-				<include name="mysql-connector-java-5.1.18-bin.jar"/>
+				<include name="mariadb-java-client-3.3.3.jar"/>
 				<include name="javolution-5.5.1.jar"/>
 			</fileset>
 		</copy>
@@ -120,8 +120,8 @@
 	<target name="checkRequirements" description="Check requirements.">
 			
 			<echo>Verification of your JDK version.</echo>
-			<available classname="java.lang.AutoCloseable" property="JDK7.present" />
-			<fail unless="JDK7.present" message="Java 1.7 is required, but your version is Java ${ant.java.version}. Install latest JDK." />
+			<available classname="java.lang.Record" property="JDK17.present" />
+			<fail unless="JDK17.present" message="Java 17 is required, but your version is Java ${ant.java.version}. Install latest JDK." />
 		
 		</target>
 

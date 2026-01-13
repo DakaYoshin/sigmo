@@ -29,25 +29,22 @@ import com.gameserver.model.L2World;
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.model.entity.Announcements;
 
-public class AdminAnnouncements implements IAdminCommandHandler
-{
-	private static final String[] ADMIN_COMMANDS =
-	{
-		"admin_list_announcements",
-		"admin_reload_announcements",
-		"admin_announce_announcements",
-		"admin_add_announcement",
-		"admin_del_announcement",
-		"admin_announce",
-		"admin_announce_menu",
-		"admin_list_autoannouncements",
-		"admin_add_autoannouncement",
-		"admin_del_autoannouncement",
-		"admin_autoannounce"
+public class AdminAnnouncements implements IAdminCommandHandler {
+	private static final String[] ADMIN_COMMANDS = {
+			"admin_list_announcements",
+			"admin_reload_announcements",
+			"admin_announce_announcements",
+			"admin_add_announcement",
+			"admin_del_announcement",
+			"admin_announce",
+			"admin_announce_menu",
+			"admin_list_autoannouncements",
+			"admin_add_autoannouncement",
+			"admin_del_autoannouncement",
+			"admin_autoannounce"
 	};
 
-	private enum CommandEnum
-	{
+	private enum CommandEnum {
 		admin_list_announcements,
 		admin_reload_announcements,
 		admin_announce_announcements,
@@ -61,28 +58,24 @@ public class AdminAnnouncements implements IAdminCommandHandler
 		admin_autoannounce
 	}
 
-	public boolean useAdminCommand(String command, L2PcInstance activeChar)
-	{
+	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
 		AdminCommandAccessRights.getInstance().hasAccess(command, activeChar.getAccessLevel());
 
-		GMAudit.auditGMAction(activeChar.getName(), command, (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target"), "");
+		GMAudit.auditGMAction(activeChar.getName(), command,
+				(activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target"), "");
 
 		String[] wordList = command.split(" ");
 		CommandEnum comm;
 
-		try
-		{
+		try {
 			comm = CommandEnum.valueOf(wordList[0]);
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			return false;
 		}
 
 		CommandEnum commandEnum = comm;
 
-		switch(commandEnum)
-		{
+		switch (commandEnum) {
 			case admin_list_announcements:
 				Announcements.getInstance().listAnnouncements(activeChar);
 				break;
@@ -99,8 +92,7 @@ public class AdminAnnouncements implements IAdminCommandHandler
 				break;
 
 			case admin_announce_announcements:
-				for(L2PcInstance player : L2World.getInstance().getAllPlayers())
-				{
+				for (L2PcInstance player : L2World.getInstance().getAllPlayers()) {
 					Announcements.getInstance().showAnnouncements(player);
 				}
 
@@ -108,35 +100,27 @@ public class AdminAnnouncements implements IAdminCommandHandler
 				break;
 
 			case admin_add_announcement:
-				if(!command.equals("admin_add_announcement"))
-				{
-					try
-					{
+				if (!command.equals("admin_add_announcement")) {
+					try {
 						String val = command.substring(23);
 						Announcements.getInstance().addAnnouncement(val);
 						Announcements.getInstance().listAnnouncements(activeChar);
-					}
-					catch(StringIndexOutOfBoundsException e)
-					{
+					} catch (StringIndexOutOfBoundsException e) {
 					}
 				}
 				break;
 
 			case admin_del_announcement:
-				try
-				{
-					int val = new Integer(command.substring(23)).intValue();
+				try {
+					int val = Integer.parseInt(command.substring(23));
 					Announcements.getInstance().delAnnouncement(val);
 					Announcements.getInstance().listAnnouncements(activeChar);
-				}
-				catch(StringIndexOutOfBoundsException e)
-				{
+				} catch (StringIndexOutOfBoundsException e) {
 				}
 				break;
 
 			case admin_announce:
-				if(Config.GM_ANNOUNCER_NAME)
-				{
+				if (Config.GM_ANNOUNCER_NAME) {
 					command = command + " [ " + activeChar.getName() + " ]";
 				}
 
@@ -148,40 +132,32 @@ public class AdminAnnouncements implements IAdminCommandHandler
 				break;
 
 			case admin_add_autoannouncement:
-				if(!command.equals("admin_add_autoannouncement"))
-				{
-					try
-					{
+				if (!command.equals("admin_add_autoannouncement")) {
+					try {
 						StringTokenizer st = new StringTokenizer(command.substring(27));
 						int delay = Integer.parseInt(st.nextToken().trim());
 						String autoAnnounce = st.nextToken();
 
-						if(delay > 30)
-						{
-							while(st.hasMoreTokens())
-							{
+						if (delay > 30) {
+							while (st.hasMoreTokens()) {
 								autoAnnounce = autoAnnounce + " " + st.nextToken();
-							};
+							}
+							;
 
 							AutoAnnouncementHandler.getInstance().registerAnnouncment(autoAnnounce, delay);
 							AutoAnnouncementHandler.getInstance().listAutoAnnouncements(activeChar);
 						}
-					}
-					catch(StringIndexOutOfBoundsException e)
-					{
+					} catch (StringIndexOutOfBoundsException e) {
 					}
 				}
 				break;
 
 			case admin_del_autoannouncement:
-				try
-				{
-					int val = new Integer(command.substring(27)).intValue();
+				try {
+					int val = Integer.parseInt(command.substring(27));
 					AutoAnnouncementHandler.getInstance().removeAnnouncement(val);
 					AutoAnnouncementHandler.getInstance().listAutoAnnouncements(activeChar);
-				}
-				catch(StringIndexOutOfBoundsException e)
-				{
+				} catch (StringIndexOutOfBoundsException e) {
 				}
 				break;
 
@@ -192,8 +168,7 @@ public class AdminAnnouncements implements IAdminCommandHandler
 		return true;
 	}
 
-	public String[] getAdminCommandList()
-	{
+	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
 	}
 }

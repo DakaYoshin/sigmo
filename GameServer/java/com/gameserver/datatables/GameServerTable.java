@@ -48,8 +48,7 @@ import com.loginserver.network.gameserverpackets.ServerStatus;
 import com.util.database.L2DatabaseFactory;
 import com.util.random.Rnd;
 
-public class GameServerTable
-{
+public class GameServerTable {
 	private static Log _log = LogFactory.getLog(GameServerTable.class);
 
 	private static GameServerTable _instance;
@@ -61,25 +60,19 @@ public class GameServerTable
 	private static final int KEYS_SIZE = 10;
 	private KeyPair[] _keyPairs;
 
-	public static void load() throws SQLException, GeneralSecurityException
-	{
-		if(_instance == null)
-		{
+	public static void load() throws SQLException, GeneralSecurityException {
+		if (_instance == null) {
 			_instance = new GameServerTable();
-		}
-		else
-		{
+		} else {
 			throw new IllegalStateException("Load can only be invoked a single time.");
 		}
 	}
 
-	public static GameServerTable getInstance()
-	{
+	public static GameServerTable getInstance() {
 		return _instance;
 	}
 
-	public GameServerTable() throws SQLException, NoSuchAlgorithmException, InvalidAlgorithmParameterException
-	{
+	public GameServerTable() throws SQLException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		loadServerNames();
 		_log.info("Loaded " + _serverNames.size() + " server names");
 
@@ -90,65 +83,48 @@ public class GameServerTable
 		_log.info("Cached " + _keyPairs.length + " RSA keys for Game Server communication.");
 	}
 
-	private void loadRSAKeys() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException
-	{
+	private void loadRSAKeys() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 		RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(512, RSAKeyGenParameterSpec.F4);
 		keyGen.initialize(spec);
 
 		_keyPairs = new KeyPair[KEYS_SIZE];
-		for(int i = 0; i < KEYS_SIZE; i++)
-		{
+		for (int i = 0; i < KEYS_SIZE; i++) {
 			_keyPairs[i] = keyGen.genKeyPair();
 		}
 	}
 
 	@SuppressWarnings("resource")
-	private void loadServerNames()
-	{
+	private void loadServerNames() {
 		InputStream in = null;
-		try
-		{
+		try {
 			in = new FileInputStream("config/other/servername.xml");
 			XMLStreamReaderImpl xpp = new XMLStreamReaderImpl();
 			xpp.setInput(new UTF8StreamReader().setInput(in));
 
-			for(int e = xpp.getEventType(); e != XMLStreamConstants.END_DOCUMENT; e = xpp.next())
-			{
-				if(e == XMLStreamConstants.START_ELEMENT)
-				{
-					if(xpp.getLocalName().toString().equals("server"))
-					{
-						Integer id = new Integer(xpp.getAttributeValue(null, "id").toString());
+			for (int e = xpp.getEventType(); e != XMLStreamConstants.END_DOCUMENT; e = xpp.next()) {
+				if (e == XMLStreamConstants.START_ELEMENT) {
+					if (xpp.getLocalName().toString().equals("server")) {
+						Integer id = Integer.parseInt(xpp.getAttributeValue(null, "id").toString());
 						String name = xpp.getAttributeValue(null, "name").toString();
 						_serverNames.put(id, name);
 					}
 				}
 			}
-		}
-		catch(FileNotFoundException e)
-		{
+		} catch (FileNotFoundException e) {
 			_log.warn("servername.xml could not be loaded: file not found");
-		}
-		catch(XMLStreamException xppe)
-		{
+		} catch (XMLStreamException xppe) {
 			_log.error("", xppe);
-		}
-		finally
-		{
-			try
-			{
+		} finally {
+			try {
 				in.close();
-			}
-			catch(Exception e)
-			{
-				
+			} catch (Exception e) {
+
 			}
 		}
 	}
 
-	private void loadRegisteredGameServers() throws SQLException
-	{
+	private void loadRegisteredGameServers() throws SQLException {
 		Connection con = null;
 		PreparedStatement statement = null;
 
@@ -158,8 +134,7 @@ public class GameServerTable
 		ResultSet rset = statement.executeQuery();
 		GameServerInfo gsi;
 
-		while(rset.next())
-		{
+		while (rset.next()) {
 			id = rset.getInt("server_id");
 			gsi = new GameServerInfo(id, stringToHex(rset.getString("hexid")));
 			_gameServerTable.put(id, gsi);
@@ -167,39 +142,29 @@ public class GameServerTable
 
 		rset.close();
 		statement.close();
-		try
-		{ 
+		try {
 			con.close();
-		} 
-		catch(Exception e)
-		{ 
-			
+		} catch (Exception e) {
+
 		}
 	}
 
-	public Map<Integer, GameServerInfo> getRegisteredGameServers()
-	{
+	public Map<Integer, GameServerInfo> getRegisteredGameServers() {
 		return _gameServerTable;
 	}
 
-	public GameServerInfo getRegisteredGameServerById(int id)
-	{
+	public GameServerInfo getRegisteredGameServerById(int id) {
 		return _gameServerTable.get(id);
 	}
 
-	public boolean hasRegisteredGameServerOnId(int id)
-	{
+	public boolean hasRegisteredGameServerOnId(int id) {
 		return _gameServerTable.containsKey(id);
 	}
 
-	public boolean registerWithFirstAvaliableId(GameServerInfo gsi)
-	{
-		synchronized (_gameServerTable)
-		{
-			for(Entry<Integer, String> entry : _serverNames.entrySet())
-			{
-				if(!_gameServerTable.containsKey(entry.getKey()))
-				{
+	public boolean registerWithFirstAvaliableId(GameServerInfo gsi) {
+		synchronized (_gameServerTable) {
+			for (Entry<Integer, String> entry : _serverNames.entrySet()) {
+				if (!_gameServerTable.containsKey(entry.getKey())) {
 					_gameServerTable.put(entry.getKey(), gsi);
 					gsi.setId(entry.getKey());
 					return true;
@@ -209,12 +174,9 @@ public class GameServerTable
 		return false;
 	}
 
-	public boolean register(int id, GameServerInfo gsi)
-	{
-		synchronized (_gameServerTable)
-		{
-			if(!_gameServerTable.containsKey(id))
-			{
+	public boolean register(int id, GameServerInfo gsi) {
+		synchronized (_gameServerTable) {
+			if (!_gameServerTable.containsKey(id)) {
 				_gameServerTable.put(id, gsi);
 				gsi.setId(id);
 				return true;
@@ -223,79 +185,60 @@ public class GameServerTable
 		return false;
 	}
 
-	public void registerServerOnDB(GameServerInfo gsi)
-	{
+	public void registerServerOnDB(GameServerInfo gsi) {
 		this.registerServerOnDB(gsi.getHexId(), gsi.getId(), gsi.getExternalHost());
 	}
 
-	public void registerServerOnDB(byte[] hexId, int id, String externalHost)
-	{
+	public void registerServerOnDB(byte[] hexId, int id, String externalHost) {
 		Connection con = null;
 		PreparedStatement statement = null;
-		try
-		{
+		try {
 			con = L2DatabaseFactory.getInstance().getConnection();
 			statement = con.prepareStatement("INSERT INTO gameservers (hexid, server_id, host) VALUES (?, ?, ?)");
 			statement.setString(1, hexToString(hexId));
 			statement.setInt(2, id);
 			statement.setString(3, externalHost);
 			statement.executeUpdate();
-		}
-		catch(SQLException e)
-		{
+		} catch (SQLException e) {
 			_log.warn("SQL error while saving gameserver: " + e);
-		}
-		finally
-		{
-			try
-			{
+		} finally {
+			try {
 				statement.close();
+			} catch (SQLException e) {
+
 			}
-			catch(SQLException e)
-			{
-				
-			}
-			try
-			{ 
+			try {
 				con.close();
-			} 
-			catch(Exception e)
-			{ 
-				
+			} catch (Exception e) {
+
 			}
 		}
 	}
 
-	public String getServerNameById(int id)
-	{
+	public String getServerNameById(int id) {
 		return getServerNames().get(id);
 	}
 
-	public Map<Integer, String> getServerNames()
-	{
+	public Map<Integer, String> getServerNames() {
 		return _serverNames;
 	}
 
-	public KeyPair getKeyPair()
-	{
+	public KeyPair getKeyPair() {
 		return _keyPairs[Rnd.nextInt(10)];
 	}
 
-	private byte[] stringToHex(String string)
-	{
+	private byte[] stringToHex(String string) {
 		return new BigInteger(string, 16).toByteArray();
 	}
 
-	private String hexToString(byte[] hex)
-	{
-		if(hex == null)
+	private String hexToString(byte[] hex) {
+		if (hex == null)
 			return "null";
 
 		return new BigInteger(hex).toString(16);
 	}
 
-	public static class GameServerInfo
-	{
+	public static class GameServerInfo {
 		private int _id;
 		private byte[] _hexId;
 		private boolean _isAuthed;
@@ -314,161 +257,130 @@ public class GameServerTable
 		private boolean _isShowingBrackets;
 		private int _maxPlayers;
 
-		public GameServerInfo(int id, byte[] hexId, GameServerThread gst)
-		{
+		public GameServerInfo(int id, byte[] hexId, GameServerThread gst) {
 			_id = id;
 			_hexId = hexId;
 			_gst = gst;
 			_status = ServerStatus.STATUS_DOWN;
 		}
 
-		public GameServerInfo(int id, byte[] hexId)
-		{
+		public GameServerInfo(int id, byte[] hexId) {
 			this(id, hexId, null);
 		}
 
-		public void setId(int id)
-		{
+		public void setId(int id) {
 			_id = id;
 		}
 
-		public int getId()
-		{
+		public int getId() {
 			return _id;
 		}
 
-		public byte[] getHexId()
-		{
+		public byte[] getHexId() {
 			return _hexId;
 		}
 
-		public void setAuthed(boolean isAuthed)
-		{
+		public void setAuthed(boolean isAuthed) {
 			_isAuthed = isAuthed;
 		}
 
-		public boolean isAuthed()
-		{
+		public boolean isAuthed() {
 			return _isAuthed;
 		}
 
-		public void setGameServerThread(GameServerThread gst)
-		{
+		public void setGameServerThread(GameServerThread gst) {
 			_gst = gst;
 		}
 
-		public GameServerThread getGameServerThread()
-		{
+		public GameServerThread getGameServerThread() {
 			return _gst;
 		}
 
-		public void setStatus(int status)
-		{
+		public void setStatus(int status) {
 			_status = status;
 		}
 
-		public int getStatus()
-		{
+		public int getStatus() {
 			return _status;
 		}
 
-		public int getCurrentPlayerCount()
-		{
-			if(_gst == null)
-			{
+		public int getCurrentPlayerCount() {
+			if (_gst == null) {
 				return 0;
 			}
 
 			return _gst.getPlayerCount();
 		}
 
-		public void setInternalIp(String internalIp)
-		{
+		public void setInternalIp(String internalIp) {
 			_internalIp = internalIp;
 		}
 
-		public String getInternalHost()
-		{
+		public String getInternalHost() {
 			return _internalIp;
 		}
 
-		public void setExternalIp(String externalIp)
-		{
+		public void setExternalIp(String externalIp) {
 			_externalIp = externalIp;
 		}
 
-		public String getExternalIp()
-		{
+		public String getExternalIp() {
 			return _externalIp;
 		}
 
-		public void setExternalHost(String externalHost)
-		{
+		public void setExternalHost(String externalHost) {
 			_externalHost = externalHost;
 		}
 
-		public String getExternalHost()
-		{
+		public String getExternalHost() {
 			return _externalHost;
 		}
 
-		public int getPort()
-		{
+		public int getPort() {
 			return _port;
 		}
 
-		public void setPort(int port)
-		{
+		public void setPort(int port) {
 			_port = port;
 		}
 
-		public void setMaxPlayers(int maxPlayers)
-		{
+		public void setMaxPlayers(int maxPlayers) {
 			_maxPlayers = maxPlayers;
 		}
 
-		public int getMaxPlayers()
-		{
+		public int getMaxPlayers() {
 			return _maxPlayers;
 		}
 
-		public boolean isPvp()
-		{
+		public boolean isPvp() {
 			return _isPvp;
 		}
 
-		public void setTestServer(boolean val)
-		{
+		public void setTestServer(boolean val) {
 			_isTestServer = val;
 		}
 
-		public boolean isTestServer()
-		{
+		public boolean isTestServer() {
 			return _isTestServer;
 		}
 
-		public void setShowingClock(boolean clock)
-		{
+		public void setShowingClock(boolean clock) {
 			_isShowingClock = clock;
 		}
 
-		public boolean isShowingClock()
-		{
+		public boolean isShowingClock() {
 			return _isShowingClock;
 		}
 
-		public void setShowingBrackets(boolean val)
-		{
+		public void setShowingBrackets(boolean val) {
 			_isShowingBrackets = val;
 		}
 
-		public boolean isShowingBrackets()
-		{
+		public boolean isShowingBrackets() {
 			return _isShowingBrackets;
 		}
 
-		public void setDown()
-		{
+		public void setDown() {
 			setAuthed(false);
 			setPort(0);
 			setGameServerThread(null);

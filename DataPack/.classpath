@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry including="**/*.java" kind="src" path="data/scripts"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/L2jSigmo_GameServer"/>
-	<classpathentry kind="lib" path="/L2jSigmo_GameServer/lib/javolution-5.5.1.jar"/>
-	<classpathentry kind="lib" path="/L2jSigmo_GameServer/lib/trove-3.0.2.jar"/>
-	<classpathentry kind="lib" path="/L2jSigmo_GameServer/lib/commons-logging-1.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GameServer"/>
+	<classpathentry kind="lib" path="/GameServer/lib/javolution-5.5.1.jar"/>
+	<classpathentry kind="lib" path="/GameServer/lib/trove-3.0.2.jar"/>
+	<classpathentry kind="lib" path="/GameServer/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

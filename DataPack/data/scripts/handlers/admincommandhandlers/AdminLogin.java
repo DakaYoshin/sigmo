@@ -29,100 +29,74 @@ import com.gameserver.network.gameserverpackets.ServerStatus;
 import com.gameserver.network.serverpackets.NpcHtmlMessage;
 import com.gameserver.thread.LoginServerThread;
 
-public class AdminLogin implements IAdminCommandHandler
-{
-	private static final String[] ADMIN_COMMANDS =
-	{
-		"admin_server_gm_only",
-		"admin_server_all",
-		"admin_server_max_player",
-		"admin_server_list_clock",
-		"admin_server_login"
+public class AdminLogin implements IAdminCommandHandler {
+	private static final String[] ADMIN_COMMANDS = {
+			"admin_server_gm_only",
+			"admin_server_all",
+			"admin_server_max_player",
+			"admin_server_list_clock",
+			"admin_server_login"
 	};
 
-	public boolean useAdminCommand(String command, L2PcInstance activeChar)
-	{
+	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
 		AdminCommandAccessRights.getInstance().hasAccess(command, activeChar.getAccessLevel());
 
-		GMAudit.auditGMAction(activeChar.getName(), command, (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target"), "");
+		GMAudit.auditGMAction(activeChar.getName(), command,
+				(activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target"), "");
 
-		if(command.equals("admin_server_gm_only"))
-		{
+		if (command.equals("admin_server_gm_only")) {
 			gmOnly();
 			activeChar.sendChatMessage(0, 0, "SYS", "Server is now GM only");
 			showMainPage(activeChar);
-		}
-		else if(command.equals("admin_server_all"))
-		{
+		} else if (command.equals("admin_server_all")) {
 			allowToAll();
 			activeChar.sendChatMessage(0, 0, "SYS", "Server is not GM only anymore");
 			showMainPage(activeChar);
-		}
-		else if(command.startsWith("admin_server_max_player"))
-		{
+		} else if (command.startsWith("admin_server_max_player")) {
 			StringTokenizer st = new StringTokenizer(command);
-			if(st.countTokens() > 1)
-			{
+			if (st.countTokens() > 1) {
 				st.nextToken();
 				String number = st.nextToken();
-				try
-				{
-					LoginServerThread.getInstance().setMaxPlayer(new Integer(number).intValue());
-					activeChar.sendChatMessage(0, 0, "SYS", "maxPlayer set to " + new Integer(number).intValue());
+				try {
+					LoginServerThread.getInstance().setMaxPlayer(Integer.parseInt(number));
+					activeChar.sendChatMessage(0, 0, "SYS", "maxPlayer set to " + Integer.parseInt(number));
 					showMainPage(activeChar);
-				}
-				catch(NumberFormatException e)
-				{
+				} catch (NumberFormatException e) {
 					activeChar.sendChatMessage(0, 0, "SYS", "Max players must be a number.");
 				}
-			}
-			else
-			{
+			} else {
 				activeChar.sendChatMessage(0, 0, "SYS", "Format is server_max_player <max>");
 			}
-		}
-		else if(command.startsWith("admin_server_list_clock"))
-		{
+		} else if (command.startsWith("admin_server_list_clock")) {
 			StringTokenizer st = new StringTokenizer(command);
 
-			if(st.countTokens() > 1)
-			{
+			if (st.countTokens() > 1) {
 				st.nextToken();
 				String mode = st.nextToken();
 
-				if(mode.equals("on"))
-				{
+				if (mode.equals("on")) {
 					LoginServerThread.getInstance().sendServerStatus(ServerStatus.SERVER_LIST_CLOCK, ServerStatus.ON);
 					activeChar.sendChatMessage(0, 0, "SYS", "A clock will now be displayed next to the server name");
 					Config.SERVER_LIST_CLOCK = true;
 					showMainPage(activeChar);
-				}
-				else if(mode.equals("off"))
-				{
+				} else if (mode.equals("off")) {
 					LoginServerThread.getInstance().sendServerStatus(ServerStatus.SERVER_LIST_CLOCK, ServerStatus.OFF);
 					Config.SERVER_LIST_CLOCK = false;
 					activeChar.sendChatMessage(0, 0, "SYS", "The clock will not be displayed");
 					showMainPage(activeChar);
-				}
-				else
-				{
+				} else {
 					activeChar.sendChatMessage(0, 0, "SYS", "Format is server_list_clock <on/off>");
 				}
-			}
-			else
-			{
+			} else {
 				activeChar.sendChatMessage(0, 0, "SYS", "Format is server_list_clock <on/off>");
 			}
-		}
-		else if(command.equals("admin_server_login"))
-		{
+		} else if (command.equals("admin_server_login")) {
 			showMainPage(activeChar);
 		}
 		return true;
 	}
 
-	private void showMainPage(L2PcInstance activeChar)
-	{
+	private void showMainPage(L2PcInstance activeChar) {
 		NpcHtmlMessage html = new NpcHtmlMessage(1);
 		html.setFile("data/html/admin/gm/login.htm");
 		html.replace("%server_name%", LoginServerThread.getInstance().getServerName());
@@ -133,20 +107,17 @@ public class AdminLogin implements IAdminCommandHandler
 		activeChar.sendPacket(html);
 	}
 
-	private void allowToAll()
-	{
+	private void allowToAll() {
 		LoginServerThread.getInstance().setServerStatus(ServerStatus.STATUS_AUTO);
 		Config.SERVER_GMONLY = false;
 	}
 
-	private void gmOnly()
-	{
+	private void gmOnly() {
 		LoginServerThread.getInstance().setServerStatus(ServerStatus.STATUS_GM_ONLY);
 		Config.SERVER_GMONLY = true;
 	}
 
-	public String[] getAdminCommandList()
-	{
+	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
 	}
 }

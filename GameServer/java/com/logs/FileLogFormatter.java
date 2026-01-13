@@ -25,18 +25,18 @@ import java.util.logging.LogRecord;
 
 import javolution.text.TextBuilder;
 
-public class FileLogFormatter extends Formatter
-{
+public class FileLogFormatter extends Formatter {
 	private static final String CRLF = "\r\n";
-	private static final String _ = "\t";
+	private static final String TAB = "\t";
 	private SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss,SSS");
 
 	@Override
-	public String format(LogRecord record)
-	{
+	public String format(LogRecord record) {
 		TextBuilder output = new TextBuilder();
 
-		return output.append(dateFmt.format(new Date(record.getMillis()))).append(_).append(record.getLevel().getName()).append(_).append(record.getThreadID()).append(_).append(record.getLoggerName()).append(_).append(record.getMessage()).append(CRLF).toString();
+		return output.append(dateFmt.format(new Date(record.getMillis()))).append(TAB)
+				.append(record.getLevel().getName()).append(TAB).append(record.getLongThreadID()).append(TAB)
+				.append(record.getLoggerName()).append(TAB).append(record.getMessage()).append(CRLF).toString();
 	}
 
 }

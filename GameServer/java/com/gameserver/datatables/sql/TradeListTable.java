@@ -35,75 +35,62 @@ import com.gameserver.thread.ThreadPoolManager;
 import com.util.ResourceUtil;
 import com.util.database.L2DatabaseFactory;
 
-public class TradeListTable
-{
+public class TradeListTable {
 	private final static Log _log = LogFactory.getLog(TradeListTable.class.getName());
 	private static TradeListTable _instance;
 
 	private int _nextListId;
 	private FastMap<Integer, L2TradeList> _lists;
 
-	public class RestoreCount implements Runnable
-	{
+	public class RestoreCount implements Runnable {
 		private int timer;
 
-		public RestoreCount(int time)
-		{
+		public RestoreCount(int time) {
 			timer = time;
 		}
 
 		@Override
-		public void run()
-		{
-			try
-			{
+		public void run() {
+			try {
 				restoreCount(timer);
 				dataTimerSave(timer);
 				ThreadPoolManager.getInstance().scheduleGeneral(new RestoreCount(timer), (long) timer * 60 * 60 * 1000);
-			}
-			catch(Throwable t)
-			{
+			} catch (Throwable t) {
 			}
 		}
 	}
 
-	public static TradeListTable getInstance()
-	{
-		if(_instance == null)
-		{
+	public static TradeListTable getInstance() {
+		if (_instance == null) {
 			_instance = new TradeListTable();
 		}
 
 		return _instance;
 	}
 
-	private TradeListTable()
-	{
+	private TradeListTable() {
 		_lists = new FastMap<Integer, L2TradeList>();
 		load();
 	}
 
-	private void load(boolean custom)
-	{
+	private void load(boolean custom) {
 		Connection con = null;
-		try
-		{
+		try {
 			con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement1 = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[]
-			{
-					"shop_id", "npc_id"
-			}) + " FROM " + (custom ? "custom_merchant_shopids" : "merchant_shopids"));
+			PreparedStatement statement1 = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance()
+					.safetyString(new String[] {
+							"shop_id", "npc_id"
+					}) + " FROM " + (custom ? "custom_merchant_shopids" : "merchant_shopids"));
 			ResultSet rset1 = statement1.executeQuery();
 
-			while(rset1.next())
-			{
-				PreparedStatement statement = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[]
-				{
-						"item_id", "price", "shop_id", "order", "count", "time", "currentCount"
-				}) + " FROM " + (custom ? "custom_merchant_buylists" : "merchant_buylists") + " WHERE shop_id=? ORDER BY " + L2DatabaseFactory.getInstance().safetyString(new String[]
-				{
-					"order"
-				}) + " ASC");
+			while (rset1.next()) {
+				PreparedStatement statement = con.prepareStatement("SELECT "
+						+ L2DatabaseFactory.getInstance().safetyString(new String[] {
+								"item_id", "price", "shop_id", "order", "count", "time", "currentCount"
+						}) + " FROM " + (custom ? "custom_merchant_buylists" : "merchant_buylists")
+						+ " WHERE shop_id=? ORDER BY " + L2DatabaseFactory.getInstance().safetyString(new String[] {
+								"order"
+						}) + " ASC");
 				statement.setString(1, String.valueOf(rset1.getInt("shop_id")));
 				ResultSet rset = statement.executeQuery();
 
@@ -114,15 +101,13 @@ public class TradeListTable
 				int _itemCount = 0;
 				int _price = 0;
 
-				if(!buylist.isGm() && NpcTable.getInstance().getTemplate(rset1.getInt("npc_id")) == null)
-				{
-					_log.warn("TradeListTable: Merchant id " + rset1.getString("npc_id") + " with " + (custom ? "custom " : "") + "buylist " + buylist.getListId() + " not exist.");
+				if (!buylist.isGm() && NpcTable.getInstance().getTemplate(rset1.getInt("npc_id")) == null) {
+					_log.warn("TradeListTable: Merchant id " + rset1.getString("npc_id") + " with "
+							+ (custom ? "custom " : "") + "buylist " + buylist.getListId() + " not exist.");
 				}
 
-				try
-				{
-					while(rset.next())
-					{
+				try {
+					while (rset.next()) {
 						_itemId = rset.getInt("item_id");
 						_price = rset.getInt("price");
 						int count = rset.getInt("count");
@@ -131,51 +116,44 @@ public class TradeListTable
 
 						L2ItemInstance buyItem = ItemTable.getInstance().createDummyItem(_itemId);
 
-						if(buyItem == null)
-						{
+						if (buyItem == null) {
 							continue;
 						}
 
 						_itemCount++;
 
-						if(count > -1)
-						{
+						if (count > -1) {
 							buyItem.setCountDecrease(true);
 						}
 						buyItem.setPriceToSell(_price);
 						buyItem.setTime(time);
 						buyItem.setInitCount(count);
 
-						if(currentCount > -1)
-						{
+						if (currentCount > -1) {
 							buyItem.setCount(currentCount);
-						}
-						else
-						{
+						} else {
 							buyItem.setCount(count);
 						}
 
 						buylist.addItem(buyItem);
 
-						if(!buylist.isGm() && buyItem.getReferencePrice() > _price)
-						{
-							_log.warn("TradeListTable: Reference price of item " + _itemId + " in  " + (custom ? "custom " : "") + "buylist " + buylist.getListId() + " higher then sell price.");
+						if (!buylist.isGm() && buyItem.getReferencePrice() > _price) {
+							_log.warn("TradeListTable: Reference price of item " + _itemId + " in  "
+									+ (custom ? "custom " : "") + "buylist " + buylist.getListId()
+									+ " higher then sell price.");
 						}
 					}
-				}
-				catch(Exception e)
-				{
-					_log.warn("TradeListTable: Problem with " + (custom ? "custom " : "") + "buylist " + buylist.getListId() + " item " + _itemId + ".");
+				} catch (Exception e) {
+					_log.warn("TradeListTable: Problem with " + (custom ? "custom " : "") + "buylist "
+							+ buylist.getListId() + " item " + _itemId + ".");
 				}
 
-				if(_itemCount > 0)
-				{
-					_lists.put(new Integer(buylist.getListId()), buylist);
+				if (_itemCount > 0) {
+					_lists.put(Integer.valueOf(buylist.getListId()), buylist);
 					_nextListId = Math.max(_nextListId, buylist.getListId() + 1);
-				}
-				else
-				{
-					_log.warn("TradeListTable: Empty " + (custom ? "custom " : "") + " buylist " + buylist.getListId() + ".");
+				} else {
+					_log.warn("TradeListTable: Empty " + (custom ? "custom " : "") + " buylist " + buylist.getListId()
+							+ ".");
 				}
 
 				statement.close();
@@ -191,24 +169,21 @@ public class TradeListTable
 			statement1 = null;
 
 			_log.info("TradeListTable: Loaded " + _lists.size() + (custom ? "custom " : "") + " Buylists.");
-			try
-			{
+			try {
 				int time = 0;
 				long savetimer = 0;
 				long currentMillis = System.currentTimeMillis();
-				PreparedStatement statement2 = con.prepareStatement("SELECT DISTINCT time, savetimer FROM " + (custom ? "merchant_buylists" : "merchant_buylists") + " WHERE time <> 0 ORDER BY time");
+				PreparedStatement statement2 = con.prepareStatement("SELECT DISTINCT time, savetimer FROM "
+						+ (custom ? "merchant_buylists" : "merchant_buylists") + " WHERE time <> 0 ORDER BY time");
 				ResultSet rset2 = statement2.executeQuery();
 
-				while(rset2.next())
-				{
+				while (rset2.next()) {
 					time = rset2.getInt("time");
 					savetimer = rset2.getLong("savetimer");
-					if(savetimer - currentMillis > 0)
-					{
-						ThreadPoolManager.getInstance().scheduleGeneral(new RestoreCount(time), savetimer - System.currentTimeMillis());
-					}
-					else
-					{
+					if (savetimer - currentMillis > 0) {
+						ThreadPoolManager.getInstance().scheduleGeneral(new RestoreCount(time),
+								savetimer - System.currentTimeMillis());
+					} else {
 						ThreadPoolManager.getInstance().scheduleGeneral(new RestoreCount(time), 0);
 					}
 				}
@@ -217,54 +192,41 @@ public class TradeListTable
 				rset2 = null;
 				statement2.close();
 				statement2 = null;
-			}
-			catch(Exception e)
-			{
+			} catch (Exception e) {
 				_log.warn("TradeController: " + (custom ? "custom " : "") + "Could not restore Timer for Item count.");
 				_log.error("", e);
 			}
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.warn("TradeListTable: " + (custom ? "custom " : "") + "Buylists could not be initialized.", e);
-		}
-		finally
-		{
-			ResourceUtil.closeConnection(con); 
+		} finally {
+			ResourceUtil.closeConnection(con);
 		}
 	}
 
-	public void load()
-	{
+	public void load() {
 		load(false);
 		load(true);
 	}
 
-	public void reloadAll()
-	{
+	public void reloadAll() {
 		_lists.clear();
 
 		load();
 	}
 
-	public L2TradeList getBuyList(int listId)
-	{
-		if(_lists.containsKey(listId))
-		{
+	public L2TradeList getBuyList(int listId) {
+		if (_lists.containsKey(listId)) {
 			return _lists.get(listId);
 		}
 
 		return null;
 	}
 
-	public FastList<L2TradeList> getBuyListByNpcId(int npcId)
-	{
+	public FastList<L2TradeList> getBuyListByNpcId(int npcId) {
 		FastList<L2TradeList> lists = new FastList<L2TradeList>();
 
-		for(L2TradeList list : _lists.values())
-		{
-			if(list.isGm())
-			{
+		for (L2TradeList list : _lists.values()) {
+			if (list.isGm()) {
 				continue;
 			}
 			lists.add(list);
@@ -273,74 +235,60 @@ public class TradeListTable
 		return lists;
 	}
 
-	protected void restoreCount(int time)
-	{
-		if(_lists == null)
-		{
+	protected void restoreCount(int time) {
+		if (_lists == null) {
 			return;
 		}
 
-		for(L2TradeList list : _lists.values())
-		{
+		for (L2TradeList list : _lists.values()) {
 			list.restoreCount(time);
 		}
 	}
 
-	protected void dataTimerSave(int time)
-	{
+	protected void dataTimerSave(int time) {
 		Connection con = null;
 		long timerSave = System.currentTimeMillis() + (long) time * 3600000;
 
-		try
-		{
+		try {
 			con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("UPDATE merchant_buylists SET savetimer = ? WHERE time = ?");
+			PreparedStatement statement = con
+					.prepareStatement("UPDATE merchant_buylists SET savetimer = ? WHERE time = ?");
 			statement.setLong(1, timerSave);
 			statement.setInt(2, time);
 			statement.executeUpdate();
 			statement.close();
 			statement = null;
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.fatal("TradeController: Could not update Timer save in Buylist");
-		}
-		finally
-		{
-			ResourceUtil.closeConnection(con); 
+		} finally {
+			ResourceUtil.closeConnection(con);
 		}
 	}
 
-	public void dataCountStore()
-	{
+	public void dataCountStore() {
 		Connection con = null;
 		PreparedStatement statement;
 
 		int listId;
 
-		if(_lists == null)
-		{
+		if (_lists == null) {
 			return;
 		}
 
-		try
-		{
+		try {
 			con = L2DatabaseFactory.getInstance().getConnection();
 
-			for(L2TradeList list : _lists.values())
-			{
-				if(list == null)
-				{
+			for (L2TradeList list : _lists.values()) {
+				if (list == null) {
 					continue;
 				}
 
 				listId = list.getListId();
 
-				for(L2ItemInstance Item : list.getItems())
-				{
-					if(Item.getCount() < Item.getInitCount())
-					{
-						statement = con.prepareStatement("UPDATE merchant_buylists SET currentCount = ? WHERE item_id = ? AND shop_id = ?");
+				for (L2ItemInstance Item : list.getItems()) {
+					if (Item.getCount() < Item.getInitCount()) {
+						statement = con.prepareStatement(
+								"UPDATE merchant_buylists SET currentCount = ? WHERE item_id = ? AND shop_id = ?");
 						statement.setInt(1, Item.getCount());
 						statement.setInt(2, Item.getItemId());
 						statement.setInt(3, listId);
@@ -350,14 +298,10 @@ public class TradeListTable
 					}
 				}
 			}
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.fatal("TradeController: Could not store Count Item");
-		}
-		finally
-		{
-			ResourceUtil.closeConnection(con); 
+		} finally {
+			ResourceUtil.closeConnection(con);
 		}
 	}
 }

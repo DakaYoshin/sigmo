@@ -7,7 +7,7 @@ REM -------------------------------------
 REM Default parameters for a basic server.
 REM -------------------------------------
 
-java -Xmx1g -XX:+AggressiveOpts -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:+CMSIncrementalPacing -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError -cp ./lib/*;L2L2jSigmo.jar com.gameserver.GameServer
+java -Xmx1g -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -cp ./lib/*;L2jSigmo.jar com.gameserver.GameServer
 
 
 if ERRORLEVEL 7 goto telldown
