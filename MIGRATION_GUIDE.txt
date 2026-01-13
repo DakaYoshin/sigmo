@@ -52,6 +52,23 @@ STATUS: COMPLETED (All Fixes Applied)
         *   Fixed incorrect Map removal (tried to remove by value, now removing by key).
      *  `GameServerRegister.java`:
         *   Replaced deprecated `new Integer(String)` with `Integer.parseInt(String)`.
+     *  `FaenorInterface.java`:
+        *   Replaced deprecated `new Double(double)` with `Double.valueOf(double)`.
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `Shutdown.java`:
+        *   Removed deprecated `System.runFinalization()` call.
+     *  `L2Thread.java`:
+        *   Suppressed future-deprecation warning for `Thread.getId()` (required for Java 17).
+     *  `RecipeController.java`:
+        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `TradeController.java`:
+        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `MultiSort.java`:
+        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `FloodProtectedListener.java`:
+        *   Fixed incorrect Map removal (tried to remove by value, now removing by key).
+     *  `RequestAuthLogin.java`:
+        *   Replaced deprecated `Runtime.exec(String)` with `Runtime.exec(String[])`.
 
 4.  **Scripts Updated**:
     *   All `.bat` files updated for Java 17 flags.

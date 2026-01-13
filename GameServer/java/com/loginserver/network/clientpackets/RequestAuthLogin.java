@@ -39,8 +39,7 @@ import com.loginserver.network.serverpackets.LoginFail.LoginFailReason;
 import com.loginserver.network.serverpackets.LoginOk;
 import com.loginserver.network.serverpackets.ServerList;
 
-public class RequestAuthLogin extends L2LoginClientPacket
-{
+public class RequestAuthLogin extends L2LoginClientPacket {
 	private static final Log _log = LogFactory.getLog(RequestAuthLogin.class);
 
 	private byte[] _raw = new byte[128];
@@ -49,48 +48,37 @@ public class RequestAuthLogin extends L2LoginClientPacket
 	private String _password;
 	private int _ncotp;
 
-	public String getPassword()
-	{
+	public String getPassword() {
 		return _password;
 	}
 
-	public String getUser()
-	{
+	public String getUser() {
 		return _user;
 	}
 
-	public int getOneTimePassword()
-	{
+	public int getOneTimePassword() {
 		return _ncotp;
 	}
 
 	@Override
-	public boolean readImpl()
-	{
-		if(super._buf.remaining() >= 128)
-		{
+	public boolean readImpl() {
+		if (super._buf.remaining() >= 128) {
 			readB(_raw);
 			return true;
-		}
-		else
-		{
+		} else {
 			return false;
 		}
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		byte[] decrypted = null;
-		try
-		{
+		try {
 			Cipher rsaCipher = Cipher.getInstance("RSA/ECB/nopadding");
 			rsaCipher.init(Cipher.DECRYPT_MODE, getClient().getRSAPrivateKey());
 			decrypted = rsaCipher.doFinal(_raw, 0x00, 0x80);
 			rsaCipher = null;
-		}
-		catch(GeneralSecurityException e)
-		{
+		} catch (GeneralSecurityException e) {
 			_log.error("", e);
 			return;
 		}
@@ -106,49 +94,38 @@ public class RequestAuthLogin extends L2LoginClientPacket
 		LoginController lc = LoginController.getInstance();
 		L2LoginClient client = getClient();
 		InetAddress address = getClient().getConnection().getInetAddress();
-		if(address == null)
-		{
+		if (address == null) {
 			_log.warn("Socket is not connected: " + client.getAccount());
 			client.close(LoginFailReason.REASON_SYSTEM_ERROR);
 			return;
 		}
 		String addhost = address.getHostAddress();
-		try
-		{
+		try {
 			AuthLoginResult result = lc.tryAuthLogin(_user, _password, getClient());
 
-			switch(result)
-			{
+			switch (result) {
 				case AUTH_SUCCESS:
 					client.setAccount(_user);
 					client.setState(LoginClientState.AUTHED_LOGIN);
 					client.setSessionKey(lc.assignSessionKeyToClient(_user, client));
-					if(Config.SHOW_LICENCE)
-					{
+					if (Config.SHOW_LICENCE) {
 						client.sendPacket(new LoginOk(getClient().getSessionKey()));
-					}
-					else
-					{
+					} else {
 						getClient().sendPacket(new ServerList(getClient()));
 					}
-					
-					if(Config.ENABLE_DDOS_PROTECTION_SYSTEM)
-					{
-					String deny_comms = Config.DDOS_COMMAND_BLOCK;
-					deny_comms = deny_comms.replace("$IP", addhost);
-						try
-						{
-							Runtime.getRuntime().exec(deny_comms);
-							if(Config.ENABLE_DEBUG_DDOS_PROTECTION_SYSTEM)
-							{
-								_log.info("Accepted IP access GS by "+addhost);
-								_log.info("Command is"+deny_comms);
+
+					if (Config.ENABLE_DDOS_PROTECTION_SYSTEM) {
+						String deny_comms = Config.DDOS_COMMAND_BLOCK;
+						deny_comms = deny_comms.replace("$IP", addhost);
+						try {
+							Runtime.getRuntime().exec(deny_comms.split("\\s+"));
+							if (Config.ENABLE_DEBUG_DDOS_PROTECTION_SYSTEM) {
+								_log.info("Accepted IP access GS by " + addhost);
+								_log.info("Command is" + deny_comms);
 							}
-						}
-						catch(Exception e)
-						{
-							_log.warn("Accepts by ip "+addhost+" no allowed");
-							_log.warn("Command is"+deny_comms);
+						} catch (Exception e) {
+							_log.warn("Accepts by ip " + addhost + " no allowed");
+							_log.warn("Command is" + deny_comms);
 						}
 					}
 					break;
@@ -160,8 +137,7 @@ public class RequestAuthLogin extends L2LoginClientPacket
 					break;
 				case ALREADY_ON_LS:
 					L2LoginClient oldClient;
-					if((oldClient = lc.getAuthedClient(_user)) != null)
-					{
+					if ((oldClient = lc.getAuthedClient(_user)) != null) {
 						oldClient.close(LoginFailReason.REASON_ACCOUNT_IN_USE);
 						lc.removeAuthedLoginClient(_user);
 					}
@@ -169,12 +145,10 @@ public class RequestAuthLogin extends L2LoginClientPacket
 					break;
 				case ALREADY_ON_GS:
 					GameServerInfo gsi;
-					if((gsi = lc.getAccountOnGameServer(_user)) != null)
-					{
+					if ((gsi = lc.getAccountOnGameServer(_user)) != null) {
 						client.close(LoginFailReason.REASON_ACCOUNT_IN_USE);
 
-						if(gsi.isAuthed())
-						{
+						if (gsi.isAuthed()) {
 							gsi.getGameServerThread().kickPlayer(_user);
 						}
 					}
@@ -183,11 +157,10 @@ public class RequestAuthLogin extends L2LoginClientPacket
 			}
 
 			result = null;
-		}
-		catch(HackingException e)
-		{
+		} catch (HackingException e) {
 			lc.addBanForAddress(address, Config.LOGIN_BLOCK_AFTER_BAN * 1000);
-			_log.warn("Banned (" + address + ") for " + Config.LOGIN_BLOCK_AFTER_BAN + " seconds, due to " + e.getConnects() + " incorrect login attempts.");
+			_log.warn("Banned (" + address + ") for " + Config.LOGIN_BLOCK_AFTER_BAN + " seconds, due to "
+					+ e.getConnects() + " incorrect login attempts.");
 		}
 
 		decrypted = null;

@@ -37,29 +37,24 @@ import com.gameserver.script.EventDroplist;
 import com.gameserver.script.Expression;
 import com.gameserver.templates.chars.L2NpcTemplate;
 
-public class FaenorInterface implements EngineInterface
-{
+public class FaenorInterface implements EngineInterface {
 	protected static final Logger _log = Logger.getLogger(FaenorInterface.class.getName());
 
-	public static FaenorInterface getInstance()
-	{
+	public static FaenorInterface getInstance() {
 		return SingletonHolder._instance;
 	}
 
-	private FaenorInterface()
-	{}
+	private FaenorInterface() {
+	}
 
-	public List<?> getAllPlayers()
-	{
+	public List<?> getAllPlayers() {
 		return null;
 	}
 
 	@Override
-	public void addQuestDrop(int npcID, int itemID, int min, int max, int chance, String questID, String[] states)
-	{
+	public void addQuestDrop(int npcID, int itemID, int min, int max, int chance, String questID, String[] states) {
 		L2NpcTemplate npc = npcTable.getTemplate(npcID);
-		if(npc == null)
-		{
+		if (npc == null) {
 			throw new NullPointerException();
 		}
 		L2DropData drop = new L2DropData();
@@ -72,11 +67,10 @@ public class FaenorInterface implements EngineInterface
 		addDrop(npc, drop, false);
 	}
 
-	public void addDrop(int npcID, int itemID, int min, int max, boolean sweep, int chance) throws NullPointerException
-	{
+	public void addDrop(int npcID, int itemID, int min, int max, boolean sweep, int chance)
+			throws NullPointerException {
 		L2NpcTemplate npc = npcTable.getTemplate(npcID);
-		if(npc == null)
-		{
+		if (npc == null) {
 			throw new NullPointerException();
 		}
 		L2DropData drop = new L2DropData();
@@ -88,22 +82,15 @@ public class FaenorInterface implements EngineInterface
 		addDrop(npc, drop, sweep);
 	}
 
-	public void addDrop(L2NpcTemplate npc, L2DropData drop, boolean sweep)
-	{
-		if(sweep)
-		{
+	public void addDrop(L2NpcTemplate npc, L2DropData drop, boolean sweep) {
+		if (sweep) {
 			addDrop(npc, drop, -1);
-		}
-		else
-		{
+		} else {
 			int maxCategory = -1;
 
-			if(npc.getDropData() != null)
-			{
-				for(L2DropCategory cat : npc.getDropData())
-				{
-					if(maxCategory < cat.getCategoryType())
-					{
+			if (npc.getDropData() != null) {
+				for (L2DropCategory cat : npc.getDropData()) {
+					if (maxCategory < cat.getCategoryType()) {
 						maxCategory = cat.getCategoryType();
 					}
 				}
@@ -113,27 +100,20 @@ public class FaenorInterface implements EngineInterface
 		}
 	}
 
-	public void addDrop(L2NpcTemplate npc, L2DropData drop, int category)
-	{
+	public void addDrop(L2NpcTemplate npc, L2DropData drop, int category) {
 		npc.addDropData(drop, category);
 	}
 
-	public List<L2DropData> getQuestDrops(int npcID)
-	{
+	public List<L2DropData> getQuestDrops(int npcID) {
 		L2NpcTemplate npc = npcTable.getTemplate(npcID);
-		if(npc == null)
-		{
+		if (npc == null) {
 			return null;
 		}
 		List<L2DropData> questDrops = new FastList<L2DropData>();
-		if(npc.getDropData() != null)
-		{
-			for(L2DropCategory cat : npc.getDropData())
-			{
-				for(L2DropData drop : cat.getAllDrops())
-				{
-					if(drop.getQuestID() != null)
-					{
+		if (npc.getDropData() != null) {
+			for (L2DropCategory cat : npc.getDropData()) {
+				for (L2DropData drop : cat.getAllDrops()) {
+					if (drop.getQuestID() != null) {
 						questDrops.add(drop);
 					}
 				}
@@ -143,30 +123,26 @@ public class FaenorInterface implements EngineInterface
 	}
 
 	@Override
-	public void addEventDrop(int[] items, int[] count, double chance, DateRange range)
-	{
+	public void addEventDrop(int[] items, int[] count, double chance, DateRange range) {
 		EventDroplist.getInstance().addGlobalDrop(items, count, (int) (chance * L2DropData.MAX_CHANCE), range);
 	}
 
 	@Override
-	public void onPlayerLogin(String[] message, DateRange validDateRange)
-	{
+	public void onPlayerLogin(String[] message, DateRange validDateRange) {
 		Announcements.getInstance().addEventAnnouncement(validDateRange, message);
 	}
 
-	public void addPetData(ScriptContext context, int petID, int levelStart, int levelEnd, Map<String, String> stats) throws ScriptException
-	{
+	public void addPetData(ScriptContext context, int petID, int levelStart, int levelEnd, Map<String, String> stats)
+			throws ScriptException {
 		L2PetData[] petData = new L2PetData[levelEnd - levelStart + 1];
 		int value = 0;
-		for(int level = levelStart; level <= levelEnd; level++)
-		{
+		for (int level = levelStart; level <= levelEnd; level++) {
 			petData[level - 1] = new L2PetData();
 			petData[level - 1].setPetID(petID);
 			petData[level - 1].setPetLevel(level);
 
-			context.setAttribute("level", new Double(level), ScriptContext.ENGINE_SCOPE);
-			for(String stat : stats.keySet())
-			{
+			context.setAttribute("level", Double.valueOf(level), ScriptContext.ENGINE_SCOPE);
+			for (String stat : stats.keySet()) {
 				value = ((Number) Expression.eval(context, "beanshell", stats.get(stat))).intValue();
 				petData[level - 1].setStat(stat, value);
 			}
@@ -174,9 +150,7 @@ public class FaenorInterface implements EngineInterface
 		}
 	}
 
-	@SuppressWarnings("synthetic-access")
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final FaenorInterface _instance = new FaenorInterface();
 	}
 

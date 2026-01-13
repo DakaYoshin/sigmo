@@ -29,66 +29,53 @@ import javolution.util.FastList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public abstract class L2Thread extends Thread
-{
+public abstract class L2Thread extends Thread {
 	private static final Log _log = LogFactory.getLog(L2Thread.class);
 
 	protected abstract void runTurn();
+
 	protected abstract void sleepTurn() throws InterruptedException;
 
 	private volatile boolean _isAlive = true;
 
-	protected L2Thread()
-	{
+	protected L2Thread() {
 		super();
 	}
 
-	protected L2Thread(String name)
-	{
+	protected L2Thread(String name) {
 		super(name);
 	}
 
-	public final void shutdown() throws InterruptedException
-	{
+	public final void shutdown() throws InterruptedException {
 		_isAlive = false;
 
 		join();
 	}
 
 	@Override
-	public final void run()
-	{
-		try
-		{
-			while(_isAlive)
-			{
+	public final void run() {
+		try {
+			while (_isAlive) {
 				final long begin = System.nanoTime();
 
-				try
-				{
+				try {
 					runTurn();
-				}
-				finally
-				{
+				} finally {
 					RunnableStatsManager.handleStats(getClass(), System.nanoTime() - begin);
 				}
 
-				try
-				{
+				try {
 					sleepTurn();
-				}
-				catch(InterruptedException e)
-				{
+				} catch (InterruptedException e) {
 					_log.error("", e);
 				}
 			}
+		} finally {
 		}
-		finally
-		{}
 	}
 
-	public static List<String> getStats(Thread t)
-	{
+	@SuppressWarnings("deprecation")
+	public static List<String> getStats(Thread t) {
 		List<String> list = new FastList<String>();
 
 		list.add(t.toString() + " - ID: " + t.getId());
@@ -96,27 +83,22 @@ public abstract class L2Thread extends Thread
 		list.add(" * Alive: " + t.isAlive());
 		list.add(" * Daemon: " + t.isDaemon());
 		list.add(" * Interrupted: " + t.isInterrupted());
-		for(ThreadInfo info : ManagementFactory.getThreadMXBean().getThreadInfo(new long[]
-		{
-			t.getId()
-		}, true, true))
-		{
-			for(MonitorInfo monitorInfo : info.getLockedMonitors())
-			{
+		for (ThreadInfo info : ManagementFactory.getThreadMXBean().getThreadInfo(new long[] {
+				t.getId()
+		}, true, true)) {
+			for (MonitorInfo monitorInfo : info.getLockedMonitors()) {
 				list.add("==========");
 				list.add(" * Locked monitor: " + monitorInfo);
 				list.add("\t[" + monitorInfo.getLockedStackDepth() + ".]: at " + monitorInfo.getLockedStackFrame());
 			}
 
-			for(LockInfo lockInfo : info.getLockedSynchronizers())
-			{
+			for (LockInfo lockInfo : info.getLockedSynchronizers()) {
 				list.add("==========");
 				list.add(" * Locked synchronizer: " + lockInfo);
 			}
 
 			list.add("==========");
-			for(StackTraceElement trace : info.getStackTrace())
-			{
+			for (StackTraceElement trace : info.getStackTrace()) {
 				list.add("\tat " + trace);
 			}
 		}

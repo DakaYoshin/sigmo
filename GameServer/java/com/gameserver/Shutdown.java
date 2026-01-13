@@ -48,10 +48,8 @@ import com.gameserver.util.sql.SQLQueue;
 import com.util.database.L2DatabaseFactory;
 import com.util.database.SqlUtils;
 
-public class Shutdown extends Thread
-{
-	public enum ShutdownModeType1
-	{
+public class Shutdown extends Thread {
+	public enum ShutdownModeType1 {
 		SIGTERM("Terminating"),
 		SHUTDOWN("Shutting down"),
 		RESTART("Restarting"),
@@ -63,13 +61,11 @@ public class Shutdown extends Thread
 
 		private final String _modeText;
 
-		ShutdownModeType1(String modeText)
-		{
+		ShutdownModeType1(String modeText) {
 			_modeText = modeText;
 		}
 
-		public String getText()
-		{
+		public String getText() {
 			return _modeText;
 		}
 	}
@@ -89,39 +85,33 @@ public class Shutdown extends Thread
 	public static final int TELL_SHUTDOWN = 6;
 	public static final int TELL_RESTART = 7;
 
-	private static final String[] MODE_TEXT =
-	{
-		"SIGTERM", "shutting down", "restarting", "aborting",
-		"shutting down",
-		"restarting",
-		"shutting down",
-		"restarting"
+	private static final String[] MODE_TEXT = {
+			"SIGTERM", "shutting down", "restarting", "aborting",
+			"shutting down",
+			"restarting",
+			"shutting down",
+			"restarting"
 	};
 
-	private void SendServerQuit(int seconds)
-	{
-		Broadcast.toAllOnlinePlayers(new SystemMessage(SystemMessageId.THE_SERVER_WILL_BE_COMING_DOWN_IN_S1_SECONDS).addNumber(seconds));
+	private void SendServerQuit(int seconds) {
+		Broadcast.toAllOnlinePlayers(
+				new SystemMessage(SystemMessageId.THE_SERVER_WILL_BE_COMING_DOWN_IN_S1_SECONDS).addNumber(seconds));
 	}
 
-	public void startTelnetShutdown(String IP, int seconds, boolean restart)
-	{
+	public void startTelnetShutdown(String IP, int seconds, boolean restart) {
 		Announcements _an = Announcements.getInstance();
-		_log.warn("IP: " + IP + " issued shutdown command. " + MODE_TEXT[_shutdownMode] + " in " + seconds + " seconds!");
+		_log.warn(
+				"IP: " + IP + " issued shutdown command. " + MODE_TEXT[_shutdownMode] + " in " + seconds + " seconds!");
 		_an.announceToAll("Server is " + MODE_TEXT[_shutdownMode] + " in " + seconds + " seconds!");
 
-		if(restart)
-		{
+		if (restart) {
 			_shutdownMode = TELL_RESTART;
-		}
-		else
-		{
+		} else {
 			_shutdownMode = TELL_SHUTDOWN;
 		}
 
-		if(_shutdownMode > 0)
-		{
-			switch(seconds)
-			{
+		if (_shutdownMode > 0) {
+			switch (seconds) {
 				case 540:
 				case 480:
 				case 420:
@@ -144,187 +134,133 @@ public class Shutdown extends Thread
 			}
 		}
 
-		if(_counterInstance != null)
-		{
+		if (_counterInstance != null) {
 			_counterInstance._abort();
 		}
 		_counterInstance = new Shutdown(seconds, restart, false, true);
 		_counterInstance.start();
 	}
 
-	public void telnetAbort(String IP)
-	{
+	public void telnetAbort(String IP) {
 		Announcements _an = Announcements.getInstance();
 		_log.warn("IP: " + IP + " issued shutdown ABORT. " + MODE_TEXT[_shutdownMode] + " has been stopped!");
 		_an.announceToAll("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!");
 		_an = null;
 
-		if(_counterInstance != null)
-		{
+		if (_counterInstance != null) {
 			_counterInstance._abort();
 		}
 	}
 
-	public Shutdown()
-	{
+	public Shutdown() {
 		_secondsShut = -1;
 		_shutdownMode = SIGTERM;
 	}
 
-	public void autoRestart(int time)
-	{
+	public void autoRestart(int time) {
 		_secondsShut = time;
-		
+
 		countdown();
-		
+
 		_shutdownMode = GM_RESTART;
-		
+
 		_instance.setMode(GM_RESTART);
 		System.exit(2);
 	}
 
-	public Shutdown(int seconds, boolean restart, boolean task, boolean telnet)
-	{
-		if(seconds < 0)
-		{
+	public Shutdown(int seconds, boolean restart, boolean task, boolean telnet) {
+		if (seconds < 0) {
 			seconds = 0;
 		}
 		_secondsShut = seconds;
-		if(restart)
-		{
-			if(!task)
-			{
+		if (restart) {
+			if (!task) {
 				_shutdownMode = GM_RESTART;
-			}
-			else if(telnet)
-			{
+			} else if (telnet) {
 				_shutdownMode = TELL_RESTART;
-			}
-			else
-			{
+			} else {
 				_shutdownMode = TASK_RESTART;
 			}
-		}
-		else
-		{
-			if(!task)
-			{
+		} else {
+			if (!task) {
 				_shutdownMode = GM_SHUTDOWN;
-			}
-			else if(telnet)
-			{
+			} else if (telnet) {
 				_shutdownMode = TELL_SHUTDOWN;
-			}
-			else
-			{
+			} else {
 				_shutdownMode = TASK_SHUTDOWN;
 			}
 		}
 	}
 
-	public static Shutdown getInstance()
-	{
-		if(_instance == null)
-		{
+	public static Shutdown getInstance() {
+		if (_instance == null) {
 			_instance = new Shutdown();
 		}
 		return _instance;
 	}
 
-	public static Shutdown getCounterInstance()
-	{
+	public static Shutdown getCounterInstance() {
 		return _counterInstance;
 	}
 
 	@Override
-	public void run()
-	{
-		if(this == _instance)
-		{
-			try
-			{
+	public void run() {
+		if (this == _instance) {
+			try {
 				LoginServerThread.getInstance().interrupt();
-			}
-			catch(Throwable t)
-			{
+			} catch (Throwable t) {
 			}
 
 			SQLQueue.getInstance().shutdown();
 
 			saveData();
 
-			try
-			{
+			try {
 				GameTimeController.getInstance().stopTimer();
-			}
-			catch(Throwable t)
-			{
+			} catch (Throwable t) {
 			}
 
-			try
-			{
+			try {
 				GameServer.getSelectorThread().shutdown();
+			} catch (Throwable t) {
 			}
-			catch(Throwable t)
-			{}
 
-			try
-			{
+			try {
 				GameServer.getSelectorThread().setDaemon(true);
 				ThreadPoolManager.getInstance().shutdown();
+			} catch (Throwable t) {
 			}
-			catch(Throwable t)
-			{}
 
-			try
-			{
+			try {
 				SqlUtils.OpzGame();
+			} catch (Throwable t) {
 			}
-			catch(Throwable t)
-			{}
 
-			try
-			{
+			try {
 				L2DatabaseFactory.getInstance().shutdown();
+			} catch (Throwable t) {
 			}
-			catch(Throwable t)
-			{}
 
-			System.runFinalization();
 			System.gc();
 
-			if(_instance._shutdownMode == GM_RESTART)
-			{
+			if (_instance._shutdownMode == GM_RESTART) {
 				Runtime.getRuntime().halt(2);
-			}
-			else if(_instance._shutdownMode == TASK_RESTART)
-			{
+			} else if (_instance._shutdownMode == TASK_RESTART) {
 				Runtime.getRuntime().halt(5);
-			}
-			else if(_instance._shutdownMode == TASK_SHUTDOWN)
-			{
+			} else if (_instance._shutdownMode == TASK_SHUTDOWN) {
 				Runtime.getRuntime().halt(4);
-			}
-			else if(_instance._shutdownMode == TELL_RESTART)
-			{
+			} else if (_instance._shutdownMode == TELL_RESTART) {
 				Runtime.getRuntime().halt(7);
-			}
-			else if(_instance._shutdownMode == TELL_SHUTDOWN)
-			{
+			} else if (_instance._shutdownMode == TELL_SHUTDOWN) {
 				Runtime.getRuntime().halt(6);
-			}
-			else
-			{
+			} else {
 				Runtime.getRuntime().halt(0);
 			}
-		}
-		else
-		{
+		} else {
 			countdown();
 
 			_log.warn("GM shutdown countdown is over. " + MODE_TEXT[_shutdownMode] + " NOW!");
-			switch(_shutdownMode)
-			{
+			switch (_shutdownMode) {
 				case GM_SHUTDOWN:
 					_instance.setMode(GM_SHUTDOWN);
 					System.exit(0);
@@ -358,25 +294,20 @@ public class Shutdown extends Thread
 		}
 	}
 
-	public void startShutdown(L2PcInstance activeChar, int seconds, boolean restart)
-	{
+	public void startShutdown(L2PcInstance activeChar, int seconds, boolean restart) {
 		Announcements _an = Announcements.getInstance();
-		_log.warn("GM: " + activeChar.getName() + "(" + activeChar.getObjectId() + ") issued shutdown command. " + MODE_TEXT[_shutdownMode] + " in " + seconds + " seconds!");
+		_log.warn("GM: " + activeChar.getName() + "(" + activeChar.getObjectId() + ") issued shutdown command. "
+				+ MODE_TEXT[_shutdownMode] + " in " + seconds + " seconds!");
 
-		if(restart)
-		{
+		if (restart) {
 			_shutdownMode = GM_RESTART;
-		}
-		else
-		{
+		} else {
 			_shutdownMode = GM_SHUTDOWN;
 		}
 
-		if(_shutdownMode > 0)
-		{
+		if (_shutdownMode > 0) {
 			_an.announceToAll("Server is " + MODE_TEXT[_shutdownMode] + " in " + seconds + " seconds!");
-			switch(seconds)
-			{
+			switch (seconds) {
 				case 540:
 				case 480:
 				case 420:
@@ -399,8 +330,7 @@ public class Shutdown extends Thread
 			}
 		}
 
-		if(_counterInstance != null)
-		{
+		if (_counterInstance != null) {
 			_counterInstance._abort();
 		}
 
@@ -408,43 +338,35 @@ public class Shutdown extends Thread
 		_counterInstance.start();
 	}
 
-	public int getCountdown()
-	{
+	public int getCountdown() {
 		return _secondsShut;
 	}
 
-	public void abort(L2PcInstance activeChar)
-	{
+	public void abort(L2PcInstance activeChar) {
 		Announcements _an = Announcements.getInstance();
-		_log.warn("GM: " + activeChar.getName() + "(" + activeChar.getObjectId() + ") issued shutdown ABORT. " + MODE_TEXT[_shutdownMode] + " has been stopped!");
+		_log.warn("GM: " + activeChar.getName() + "(" + activeChar.getObjectId() + ") issued shutdown ABORT. "
+				+ MODE_TEXT[_shutdownMode] + " has been stopped!");
 		_an.announceToAll("Server aborts " + MODE_TEXT[_shutdownMode] + " and continues normal operation!");
 		_an = null;
 
-		if(_counterInstance != null)
-		{
+		if (_counterInstance != null) {
 			_counterInstance._abort();
 		}
 	}
 
-	private void setMode(int mode)
-	{
+	private void setMode(int mode) {
 		_shutdownMode = mode;
 	}
 
-	private void _abort()
-	{
+	private void _abort() {
 		_shutdownMode = ABORT;
 	}
 
-	private void countdown()
-	{
-		try
-		{
-			while(_secondsShut > 0)
-			{
+	private void countdown() {
+		try {
+			while (_secondsShut > 0) {
 
-				switch(_secondsShut)
-				{
+				switch (_secondsShut) {
 					case 540:
 						SendServerQuit(540);
 						break;
@@ -501,21 +423,17 @@ public class Shutdown extends Thread
 				int delay = 1000;
 				Thread.sleep(delay);
 
-				if(_shutdownMode == ABORT)
-				{
+				if (_shutdownMode == ABORT) {
 					break;
 				}
 			}
+		} catch (InterruptedException e) {
 		}
-		catch(InterruptedException e)
-		{}
 	}
 
-	private synchronized void saveData()
-	{
+	private synchronized void saveData() {
 		Announcements _an = Announcements.getInstance();
-		switch(_shutdownMode)
-		{
+		switch (_shutdownMode) {
 			case SIGTERM:
 				System.err.println("SIGTERM received. Shutting down NOW!");
 				break;
@@ -544,65 +462,48 @@ public class Shutdown extends Thread
 				System.err.println("Telnet restart received. Restarting NOW!");
 				break;
 		}
-		try
-		{
+		try {
 			_an.announceToAll("Server is " + MODE_TEXT[_shutdownMode] + " NOW!");
 			_an = null;
-		}
-		catch(Throwable t)
-		{
+		} catch (Throwable t) {
 			_log.error("", t);
 		}
-		try
-		{
-			if((Config.OFFLINE_TRADE_ENABLE || Config.OFFLINE_CRAFT_ENABLE) && Config.OFFLINE_RESTORE)
-			{
+		try {
+			if ((Config.OFFLINE_TRADE_ENABLE || Config.OFFLINE_CRAFT_ENABLE) && Config.OFFLINE_RESTORE) {
 				OfflineTradersTable.storeOffliners();
 			}
-		}
-		catch(Throwable t)
-		{
-			_log.error("Error saving offline shops.",t);
+		} catch (Throwable t) {
+			_log.error("Error saving offline shops.", t);
 		}
 
 		// disconnect players
-		try
-		{
+		try {
 			disconnectAllCharacters();
 			System.err.println("All players have been disconnected.");
-		}
-		catch (Throwable t)
-		{
+		} catch (Throwable t) {
 		}
 
-		try
-		{
+		try {
 			Thread.sleep(5000);
-		}
-		catch(InterruptedException e1)
-		{
+		} catch (InterruptedException e1) {
 		}
 
-		if(!SevenSigns.getInstance().isSealValidationPeriod())
-		{
+		if (!SevenSigns.getInstance().isSealValidationPeriod()) {
 			SevenSignsFestival.getInstance().saveFestivalData(false);
 		}
 		SevenSigns.getInstance().saveSevenSignsData(null, true);
 		System.err.println("Seven Signs Festival, general data && status have been saved.");
 		FourSepulchersManager.getInstance().stop();
-		
+
 		RaidBossSpawnManager.getInstance().cleanUp();
 		System.err.println("RaidBossSpawnManager: All Raid Boss info saved!!");
 		GrandBossManager.getInstance().cleanUp();
 		System.err.println("GrandBossManager: All Grand Boss info saved!!");
 		TradeController.getInstance().dataCountStore();
 		System.err.println("TradeController: All count Item Saved");
-		try
-		{
+		try {
 			Olympiad.getInstance().save();
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.err.println("Olympiad System: Data saved!!");
@@ -615,64 +516,50 @@ public class Shutdown extends Thread
 		System.err.println("Global quests have been saved.");
 		NpcTable.getInstance().saveNpc(null);
 
-		if(Config.SAVE_DROPPED_ITEM)
-		{
+		if (Config.SAVE_DROPPED_ITEM) {
 			ItemsOnGroundManager.getInstance().saveInDb();
 			ItemsOnGroundManager.getInstance().cleanUp();
 			System.err.println("ItemsOnGroundManager: All items on ground saved!!");
 		}
 		System.err.println("Data saved. All players disconnected, shutting down.");
 
-		try
-		{
+		try {
 			int delay = 10000;
 			Thread.sleep(delay);
+		} catch (InterruptedException e) {
 		}
-		catch(InterruptedException e)
-		{}
 	}
 
-	private void disconnectAllCharacters()
-	{
-		for(L2PcInstance player : L2World.getInstance().getAllPlayers())
-		{
+	private void disconnectAllCharacters() {
+		for (L2PcInstance player : L2World.getInstance().getAllPlayers()) {
 			if (player == null)
 				continue;
-			
-			try
-			{
+
+			try {
 				player.store();
-				if(player.getClient() != null)
-				{
+				if (player.getClient() != null) {
 					player.getClient().sendPacket(ServerClose.STATIC_PACKET);
 					player.getClient().setActiveChar(null);
 					player.setClient(null);
 				}
 				player.deleteMe();
+			} catch (Throwable t) {
 			}
-			catch(Throwable t)
-			{}
 		}
 
 		_log.info("Players: All players save to disk");
 
-		try
-		{
+		try {
 			Thread.sleep(10000);
-		}
-		catch(Throwable t)
-		{
+		} catch (Throwable t) {
 			_log.error("", t);
 		}
 
-		for(L2PcInstance player : L2World.getInstance().getAllPlayers())
-		{
-			try
-			{
+		for (L2PcInstance player : L2World.getInstance().getAllPlayers()) {
+			try {
 				player.closeNetConnection();
+			} catch (Throwable t) {
 			}
-			catch(Throwable t)
-			{}
 		}
 	}
 
