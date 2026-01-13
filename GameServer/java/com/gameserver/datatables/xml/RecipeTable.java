@@ -41,79 +41,64 @@ import com.gameserver.RecipeController;
 import com.gameserver.model.L2RecipeList;
 import com.gameserver.model.actor.instance.L2RecipeInstance;
 
-public class RecipeTable extends RecipeController
-{
-	private static final Log _log = LogFactory.getLog(RecipeTable.class.getName());
+public class RecipeTable extends RecipeController {
+    private static final Log _log = LogFactory.getLog(RecipeTable.class.getName());
 
-	private Map<Integer, L2RecipeList> _lists;
+    private Map<Integer, L2RecipeList> _lists;
 
-	private static RecipeTable instance;
+    private static RecipeTable instance;
 
-	public static RecipeTable getInstance()
-	{
-		if(instance == null)
-		{
-			instance = new RecipeTable();
-		}
+    public static RecipeTable getInstance() {
+        if (instance == null) {
+            instance = new RecipeTable();
+        }
 
-		return instance;
-	}
+        return instance;
+    }
 
-	private RecipeTable() 
-	{
-		_lists = new FastMap<Integer, L2RecipeList>();
+    private RecipeTable() {
+        _lists = new FastMap<Integer, L2RecipeList>();
 
-		try
-		{
-			this.ParseXML();
-			_log.info("RecipeTable: Loaded " + _lists.size() + " recipes.");
-		}
-		catch (Exception e)
-		{
-			_log.error("RecipeTable: Failed loading recipe list", e);
-		}
-	}
+        try {
+            this.ParseXML();
+            _log.info("RecipeTable: Loaded " + _lists.size() + " recipes.");
+        } catch (Exception e) {
+            _log.error("RecipeTable: Failed loading recipe list", e);
+        }
+    }
 
-    private void ParseXML() throws SAXException, IOException, ParserConfigurationException
-    {
+    private void ParseXML() throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(false);
         factory.setIgnoringComments(true);
         File file = new File(Config.DATAPACK_ROOT + "/data/xml/recipes.xml");
-        if (file.exists())
-        {
+        if (file.exists()) {
             Document doc = factory.newDocumentBuilder().parse(file);
             List<L2RecipeInstance> recipePartList = new FastList<L2RecipeInstance>();
-            
-            for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-            {
-                if ("list".equalsIgnoreCase(n.getNodeName()))
-                {
+
+            for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+                if ("list".equalsIgnoreCase(n.getNodeName())) {
                     String recipeName;
                     int id;
-                    for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-                    {
-                        if ("item".equalsIgnoreCase(d.getNodeName()))
-                        {
+                    for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+                        if ("item".equalsIgnoreCase(d.getNodeName())) {
                             recipePartList.clear();
                             NamedNodeMap attrs = d.getAttributes();
                             Node att;
                             att = attrs.getNamedItem("id");
-                            if (att == null)
-                            {
+                            if (att == null) {
                                 _log.error("RecipeTable: Missing id for recipe item, skipping");
                                 continue;
                             }
                             id = Integer.parseInt(att.getNodeValue());
-                            
+
                             att = attrs.getNamedItem("name");
-                            if (att == null)
-                            {
-                                _log.error("RecipeTable: Missing name for recipe item id: "+id+", skipping");
+                            if (att == null) {
+                                _log.error("RecipeTable: Missing name for recipe item id: " + id + ", skipping");
                                 continue;
                             }
                             recipeName = att.getNodeValue();
-                            
+
                             int recipeId = -1;
                             int level = -1;
                             boolean isDwarvenRecipe = true;
@@ -121,85 +106,69 @@ public class RecipeTable extends RecipeController
                             int successRate = -1;
                             int prodId = -1;
                             int count = -1;
-                            for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling())
-                            {
-                                if ("recipe".equalsIgnoreCase(c.getNodeName()))
-                                {
+                            for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling()) {
+                                if ("recipe".equalsIgnoreCase(c.getNodeName())) {
                                     NamedNodeMap atts = c.getAttributes();
-                                    
+
                                     recipeId = Integer.parseInt(atts.getNamedItem("id").getNodeValue());
                                     level = Integer.parseInt(atts.getNamedItem("level").getNodeValue());
-                                    isDwarvenRecipe = atts.getNamedItem("type").getNodeValue().equalsIgnoreCase("dwarven");
-                                }
-                                else if ("mpCost".equalsIgnoreCase(c.getNodeName()))
-                                {
+                                    isDwarvenRecipe = atts.getNamedItem("type").getNodeValue()
+                                            .equalsIgnoreCase("dwarven");
+                                } else if ("mpCost".equalsIgnoreCase(c.getNodeName())) {
                                     mpCost = Integer.parseInt(c.getTextContent());
-                                }
-                                else if ("successRate".equalsIgnoreCase(c.getNodeName()))
-                                {
+                                } else if ("successRate".equalsIgnoreCase(c.getNodeName())) {
                                     successRate = Integer.parseInt(c.getTextContent());
-                                }
-                                else if ("ingredient".equalsIgnoreCase(c.getNodeName()))
-                                {
+                                } else if ("ingredient".equalsIgnoreCase(c.getNodeName())) {
                                     int ingId = Integer.parseInt(c.getAttributes().getNamedItem("id").getNodeValue());
-                                    int ingCount = Integer.parseInt(c.getAttributes().getNamedItem("count").getNodeValue());
+                                    int ingCount = Integer
+                                            .parseInt(c.getAttributes().getNamedItem("count").getNodeValue());
                                     recipePartList.add(new L2RecipeInstance(ingId, ingCount));
-                                }
-                                else if ("production".equalsIgnoreCase(c.getNodeName()))
-                                {
+                                } else if ("production".equalsIgnoreCase(c.getNodeName())) {
                                     prodId = Integer.parseInt(c.getAttributes().getNamedItem("id").getNodeValue());
                                     count = Integer.parseInt(c.getAttributes().getNamedItem("count").getNodeValue());
                                 }
                             }
-                            L2RecipeList recipeList = new L2RecipeList(id, level, recipeId, recipeName, successRate, mpCost, prodId, count, isDwarvenRecipe);
+                            L2RecipeList recipeList = new L2RecipeList(id, level, recipeId, recipeName, successRate,
+                                    mpCost, prodId, count, isDwarvenRecipe);
                             for (L2RecipeInstance recipePart : recipePartList)
                                 recipeList.addRecipe(recipePart);
-                            
+
                             _lists.put(_lists.size(), recipeList);
                         }
                     }
                 }
             }
-        }
-        else
+        } else
             _log.error("RecipeTable: recipes.xml is missing in data folder.");
     }
 
-	public int getRecipesCount()
-	{
-		return _lists.size();
-	}
+    public int getRecipesCount() {
+        return _lists.size();
+    }
 
-	public L2RecipeList getRecipeList(int listId)
-	{
-		return _lists.get(listId);
-	}
+    public L2RecipeList getRecipeList(int listId) {
+        return _lists.get(listId);
+    }
 
-	@Override
-	public L2RecipeList getRecipeByItemId(int itemId)
-	{
-		for(int i = 0; i < _lists.size(); i++)
-		{
-			L2RecipeList find = _lists.get(new Integer(i));
-			if(find.getRecipeId() == itemId)
-			{
-				return find;
-			}
-		}
-		return null;
-	}
+    @Override
+    public L2RecipeList getRecipeByItemId(int itemId) {
+        for (int i = 0; i < _lists.size(); i++) {
+            L2RecipeList find = _lists.get(Integer.valueOf(i));
+            if (find.getRecipeId() == itemId) {
+                return find;
+            }
+        }
+        return null;
+    }
 
-	public L2RecipeList getRecipeById(int recId)
-	{
-		for(int i = 0; i < _lists.size(); i++)
-		{
-			L2RecipeList find = _lists.get(new Integer(i));
-			if(find.getId() == recId)
-			{
-				return find;
-			}
-		}
-		return null;
-	}
+    public L2RecipeList getRecipeById(int recId) {
+        for (int i = 0; i < _lists.size(); i++) {
+            L2RecipeList find = _lists.get(Integer.valueOf(i));
+            if (find.getId() == recId) {
+                return find;
+            }
+        }
+        return null;
+    }
 
 }

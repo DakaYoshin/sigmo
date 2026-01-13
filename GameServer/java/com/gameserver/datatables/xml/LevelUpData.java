@@ -34,8 +34,7 @@ import com.Config;
 import com.gameserver.model.L2LvlupData;
 import com.gameserver.model.base.ClassId;
 
-public class LevelUpData
-{
+public class LevelUpData {
 	private static final Log _log = LogFactory.getLog(LevelUpData.class.getName());
 
 	private static final String CLASS_LVL = "class_lvl", CLASS_ID = "classid";
@@ -47,42 +46,33 @@ public class LevelUpData
 
 	private Map<Integer, L2LvlupData> _lvlTable;
 
-	public static LevelUpData getInstance()
-	{
-		if(_instance == null)
-		{
+	public static LevelUpData getInstance() {
+		if (_instance == null) {
 			_instance = new LevelUpData();
 		}
 
 		return _instance;
 	}
 
-	private LevelUpData()
-	{
+	private LevelUpData() {
 		_lvlTable = new FastMap<Integer, L2LvlupData>();
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(false);
 		factory.setIgnoringComments(true);
 		File f = new File(Config.DATAPACK_ROOT + "/data/xml/lvl_up_data.xml");
-		if(!f.exists())
-		{
+		if (!f.exists()) {
 			_log.warn("lvl_up_data.xml could not be loaded: file not found");
 			return;
 		}
-		try
-		{
+		try {
 			InputSource in = new InputSource(new InputStreamReader(new FileInputStream(f), "UTF-8"));
 			in.setEncoding("UTF-8");
 			Document doc = factory.newDocumentBuilder().parse(in);
 			L2LvlupData lvlDat;
-			for(Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-			{
-				if(n.getNodeName().equalsIgnoreCase("list"))
-				{
-					for(Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-					{
-						if(d.getNodeName().equalsIgnoreCase("lvlup"))
-						{
+			for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+				if (n.getNodeName().equalsIgnoreCase("list")) {
+					for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+						if (d.getNodeName().equalsIgnoreCase("lvlup")) {
 							lvlDat = new L2LvlupData();
 							int CLASS1_ID = Integer.valueOf(d.getAttributes().getNamedItem(CLASS_ID).getNodeValue());
 							int CLASS1_LVL = Integer.valueOf(d.getAttributes().getNamedItem(CLASS_LVL).getNodeValue());
@@ -108,7 +98,7 @@ public class LevelUpData
 							lvlDat.setClassMpAdd(MP_ADD1);
 							lvlDat.setClassMpModifier(MP_MOD1);
 
-							_lvlTable.put(new Integer(lvlDat.getClassid()), lvlDat);
+							_lvlTable.put(Integer.valueOf(lvlDat.getClassid()), lvlDat);
 						}
 					}
 				}
@@ -116,28 +106,20 @@ public class LevelUpData
 			lvlDat = null;
 
 			_log.info("LevelUpData: Loaded " + _lvlTable.size() + " character level up templates.");
-		}
-		catch(SAXException e)
-		{
+		} catch (SAXException e) {
 			_log.error("Error while creating table", e);
-		}
-		catch(IOException e)
-		{
+		} catch (IOException e) {
 			_log.error("Error while creating table", e);
-		}
-		catch(ParserConfigurationException e)
-		{
+		} catch (ParserConfigurationException e) {
 			_log.error("Error while creating table", e);
 		}
 	}
 
-	public L2LvlupData getTemplate(int classId)
-	{
+	public L2LvlupData getTemplate(int classId) {
 		return _lvlTable.get(classId);
 	}
 
-	public L2LvlupData getTemplate(ClassId classId)
-	{
+	public L2LvlupData getTemplate(ClassId classId) {
 		return _lvlTable.get(classId.getId());
 	}
 }

@@ -33,69 +33,57 @@ import com.Config;
 import com.gameserver.TradeController;
 import com.gameserver.model.L2Territory;
 
-public class TerritoryTable
-{
+public class TerritoryTable {
 	private static final Log _log = LogFactory.getLog(TradeController.class.getName());
 
 	private static final TerritoryTable _instance = new TerritoryTable();
 	private static Map<String, L2Territory> _territory;
 
-	public static TerritoryTable getInstance()
-	{
+	public static TerritoryTable getInstance() {
 		return _instance;
 	}
 
-	private TerritoryTable()
-	{
+	private TerritoryTable() {
 		_territory = new HashMap<String, L2Territory>();
 		// load all data at server start
 		reload_data();
 	}
 
-	public int[] getRandomPoint(int terr)
-	{
-		return _territory.get(terr).getRandomPoint();
+	public int[] getRandomPoint(int terr) {
+		return _territory.get("sql_terr_" + terr).getRandomPoint();
 	}
 
-	public int getProcMax(int terr)
-	{
-		return _territory.get(terr).getProcMax();
+	public int getProcMax(int terr) {
+		return _territory.get("sql_terr_" + terr).getProcMax();
 	}
 
-	public void reload_data()
-	{
+	public void reload_data() {
 		_territory.clear();
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(false);
 		factory.setIgnoringComments(true);
 		File f = new File(Config.DATAPACK_ROOT + "/data/xml/location.xml");
-		if(!f.exists())
-		{
+		if (!f.exists()) {
 			_log.warn("location.xml could not be loaded: file not found");
 			return;
 		}
-		try
-		{
+		try {
 			InputSource in = new InputSource(new InputStreamReader(new FileInputStream(f), "UTF-8"));
 			in.setEncoding("UTF-8");
 			Document doc = factory.newDocumentBuilder().parse(in);
-			for(Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-			{
-				if(n.getNodeName().equalsIgnoreCase("list"))
-				{
-					for(Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-					{
-						if(d.getNodeName().equalsIgnoreCase("loc"))
-						{
-							String terr = "sql_terr_" + String.valueOf(d.getAttributes().getNamedItem("id").getNodeValue());
+			for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+				if (n.getNodeName().equalsIgnoreCase("list")) {
+					for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+						if (d.getNodeName().equalsIgnoreCase("loc")) {
+							String terr = "sql_terr_"
+									+ String.valueOf(d.getAttributes().getNamedItem("id").getNodeValue());
 							int loc_x = Integer.valueOf(d.getAttributes().getNamedItem("x").getNodeValue());
 							int loc_y = Integer.valueOf(d.getAttributes().getNamedItem("y").getNodeValue());
 							int loc_zmin = Integer.valueOf(d.getAttributes().getNamedItem("Zmin").getNodeValue());
 							int loc_zmax = Integer.valueOf(d.getAttributes().getNamedItem("Zmax").getNodeValue());
 							int proc = Integer.valueOf(d.getAttributes().getNamedItem("proc").getNodeValue());
 
-							if(_territory.get(terr) == null)
-							{
+							if (_territory.get(terr) == null) {
 								L2Territory t = new L2Territory();
 								_territory.put(terr, t);
 							}
@@ -106,17 +94,11 @@ public class TerritoryTable
 					}
 				}
 			}
-		}
-		catch(SAXException e)
-		{
+		} catch (SAXException e) {
 			_log.error("Error while creating table", e);
-		}
-		catch(IOException e)
-		{
+		} catch (IOException e) {
 			_log.error("Error while creating table", e);
-		}
-		catch(ParserConfigurationException e)
-		{
+		} catch (ParserConfigurationException e) {
 			_log.error("Error while creating table", e);
 		}
 

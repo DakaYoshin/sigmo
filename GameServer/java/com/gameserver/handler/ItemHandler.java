@@ -21,44 +21,36 @@ package com.gameserver.handler;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class ItemHandler
-{
+public class ItemHandler {
 	private static ItemHandler _instance;
 
 	private Map<Integer, IItemHandler> _datatable;
 
-	public static ItemHandler getInstance()
-	{
-		if(_instance == null)
-		{
+	public static ItemHandler getInstance() {
+		if (_instance == null) {
 			_instance = new ItemHandler();
 		}
 
 		return _instance;
 	}
 
-	public int size()
-	{
+	public int size() {
 		return _datatable.size();
 	}
 
-	private ItemHandler()
-	{
+	private ItemHandler() {
 		_datatable = new TreeMap<Integer, IItemHandler>();
 	}
 
-	public void registerItemHandler(IItemHandler handler)
-	{
+	public void registerItemHandler(IItemHandler handler) {
 		int[] ids = handler.getItemIds();
 
-		for(int id : ids)
-		{
-			_datatable.put(new Integer(id), handler);
+		for (int id : ids) {
+			_datatable.put(Integer.valueOf(id), handler);
 		}
 	}
 
-	public IItemHandler getItemHandler(int itemId)
-	{
-		return _datatable.get(new Integer(itemId));
+	public IItemHandler getItemHandler(int itemId) {
+		return _datatable.get(Integer.valueOf(itemId));
 	}
 }

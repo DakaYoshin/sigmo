@@ -25,6 +25,19 @@ STATUS: COMPLETED (All Fixes Applied)
         *   Removed unnecessary `@SuppressWarnings("resource")`.
     *   `TradeListTable.java`:
         *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `LevelUpData.java`:
+        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `RecipeTable.java`:
+        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `TerritoryTable.java`:
+        *   Fixed incorrect Map key lookup (using `int` instead of `String` key).
+     *  `GeoEngine.java`:
+        *   Suppressed "resource leak" warning for intended long-lived stream.
+     *  `ItemHandler.java`:
+        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
+     *  `DimensionalRiftManager.java`:
+        *   Fixed Map key type mismatch (`int` loop variable vs `Byte` key).
+        *   Replaced deprecated `new Integer(int).toString()` with `String.valueOf(int)`.
 
 4.  **Scripts Updated**:
     *   All `.bat` files updated for Java 17 flags.
