@@ -135,6 +135,22 @@ STATUS: COMPLETED (All Fixes Applied)
      *  `L2CastleChamberlainInstance.java`:
         *   Updated `manor` command handling to use ID 1 instead of 4, consistent with HTML changes.
         *   Updated `manor.htm` and `manor_help001.htm` to use command ID 1 for manor help links.
+     *  `L2FlameTowerInstance.java`:
+        *   Resolved TODO in `doDie` by adding null checks for `getCastle()` before disabling traps.
+     *  `L2PcInstance.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")` in `HerbTask.run()`.
+     *  `LoginController.java`:
+        *   Refactored multiple database methods (`loginValid`, `isLoginPossible`, `setAccountAccessLevel`, `isGM`, `loginBanned`) to use try-with-resources.
+        *   Removed obsolete `@SuppressWarnings("resource")`.
+        *   Removed unused import `com.util.ResourceUtil`.
+     *  `L2SepulcherNpcInstance.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")` in `CloseNextDoor.run()`.
+     *  `PartyMatchRoomList.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")` from `SingletonHolder`.
+     *  `PartyMatchWaitingList.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")` from `SingletonHolder`.
+     *  `Quest.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")` from `tmpOnSkillSee`.
 
 4.  **Scripts Updated**:
     *   All `.bat` files updated for Java 17 flags.
