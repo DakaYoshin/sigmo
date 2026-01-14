@@ -28,8 +28,7 @@ import com.gameserver.model.actor.L2Character;
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.model.entity.siege.Castle;
 
-public class Die extends L2GameServerPacket
-{
+public class Die extends L2GameServerPacket {
 	private static final String _S__0B_DIE = "[S] 06 Die";
 
 	private int _charObjId;
@@ -43,46 +42,44 @@ public class Die extends L2GameServerPacket
 	private L2Clan _clan;
 	L2Character _activeChar;
 
-	public Die(L2Character cha)
-	{
+	public Die(L2Character cha) {
 		_activeChar = cha;
-		if(cha instanceof L2PcInstance)
-		{
+		if (cha instanceof L2PcInstance) {
 			L2PcInstance player = (L2PcInstance) cha;
 			_access = player.getAccessLevel();
 			_clan = player.getClan();
 			_canTeleport = !(player.isInFunEvent() || player.isPendingRevive());
+
+			if (player.isAutoFarm()) {
+				player.getBot().stop();
+				player.setAutoFarm(false);
+			}
 		}
 
 		_charObjId = cha.getObjectId();
 		_fake = !cha.isDead();
-		if(cha instanceof L2Attackable)
-		{
+		if (cha instanceof L2Attackable) {
 			_sweepable = ((L2Attackable) cha).isSweepActive();
 		}
 	}
 
 	@Override
-	protected final void writeImpl()
-	{
-		if(_fake || _inEventCTF || _inEventDM || _inEventTvT)
+	protected final void writeImpl() {
+		if (_fake || _inEventCTF || _inEventDM || _inEventTvT)
 			return;
 
 		writeC(0x06);
 		writeD(_charObjId);
 		writeD(_canTeleport ? 0x01 : 0);
 
-		if(_canTeleport && _clan != null)
-		{
+		if (_canTeleport && _clan != null) {
 			L2SiegeClan siegeClan = null;
 			Boolean isInDefense = false;
 			Castle castle = CastleManager.getInstance().getCastle(_activeChar);
 
-			if(castle != null && castle.getSiege().getIsInProgress())
-			{
+			if (castle != null && castle.getSiege().getIsInProgress()) {
 				siegeClan = castle.getSiege().getAttackerClan(_clan);
-				if(siegeClan == null && castle.getSiege().checkIsDefender(_clan))
-				{
+				if (siegeClan == null && castle.getSiege().checkIsDefender(_clan)) {
 					isInDefense = true;
 				}
 			}
@@ -90,21 +87,18 @@ public class Die extends L2GameServerPacket
 			writeD(_clan.getHasHideout() > 0 ? 0x01 : 0x00);
 			writeD(_clan.getHasCastle() > 0 || isInDefense ? 0x01 : 0x00);
 			writeD(siegeClan != null && !isInDefense && siegeClan.getFlag().size() > 0 ? 0x01 : 0x00);
-		}
-		else
-		{
+		} else {
 			writeD(0x00);
 			writeD(0x00);
 			writeD(0x00);
 		}
-		
+
 		writeD(_sweepable ? 0x01 : 0x00);
 		writeD(_access.allowFixedRes() ? 0x01 : 0x00);
 	}
 
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _S__0B_DIE;
 	}
 

@@ -1,0 +1,135 @@
+# ================================================================
+# Security System Configuration
+# ================================================================
+# This file contains all security-related settings for the server
+# ================================================================
+
+# ================================================================
+# Anti-Dupe System
+# ================================================================
+# Prevents item duplication exploits
+
+# Enable anti-dupe protection
+antidupe.enabled = true
+
+# Lock timeout in milliseconds (how long to wait for locks)
+antidupe.lock.timeout = 5000
+
+# Log all item operations (warning: generates lots of logs)
+antidupe.log.all.operations = false
+
+# ================================================================
+# Packet Firewall
+# ================================================================
+# Protects against packet flooding and injection attacks
+
+# Enable packet firewall
+firewall.enabled = true
+
+# Maximum packets per second by category
+firewall.rate.general = 100
+firewall.rate.movement = 20
+firewall.rate.action = 10
+firewall.rate.trade = 5
+
+# Auto-punish violators
+firewall.auto.punish = true
+
+# Violation thresholds
+firewall.warn.threshold = 3
+firewall.throttle.threshold = 5
+firewall.kick.threshold = 10
+firewall.ban.threshold = 15
+
+# ================================================================
+# Action Validator
+# ================================================================
+# Validates player actions against server calculations
+
+# Enable action validator
+validator.enabled = true
+
+# Tolerance percentage for timing variations (network latency)
+validator.tolerance.percent = 5
+
+# What to validate
+validator.check.attack.speed = true
+validator.check.move.speed = true
+validator.check.skill.reuse = true
+validator.check.cast.time = true
+
+# ================================================================
+# Bot Detector
+# ================================================================
+# Detects automated gameplay patterns
+
+# Enable bot detector
+botdetector.enabled = true
+
+# Bot score thresholds (0-100)
+botdetector.score.threshold.monitor = 31
+botdetector.score.threshold.flag = 61
+botdetector.score.threshold.kick = 81
+
+# Auto-kick suspected bots (WARNING: may cause false positives)
+botdetector.auto.kick = false
+
+# Scan interval in milliseconds
+botdetector.scan.interval = 60000
+
+# Pattern repetition threshold
+botdetector.pattern.threshold = 5
+
+# ================================================================
+# Security Audit
+# ================================================================
+# Logs security events for review
+
+# Enable security audit
+audit.enabled = true
+
+# Where to log
+audit.log.to.database = true
+audit.log.to.file = true
+
+# What to log
+audit.log.gm.commands = true
+audit.log.trades = true
+audit.log.warehouse = true
+
+# Log retention in days
+audit.retention.days = 90
+
+# Thresholds for logging (in adena)
+audit.trade.threshold = 1000000
+audit.warehouse.threshold = 5000000
+
+# ================================================================
+# Autofarm Integration
+# ================================================================
+# Integration with L2jMega autofarm system
+
+# Enable autofarm integration with security system
+autofarm.enabled = true
+
+# Exempt autofarm users from bot detector
+# If true, players using autofarm will not be tracked by bot detection
+# RECOMMENDED: true (prevents false positives)
+autofarm.exempt.from.botdetector = true
+
+# Exempt autofarm users from action validator
+# If true, players using autofarm will not have their actions validated
+# WARNING: Setting this to true may allow speed hacks during autofarm
+# RECOMMENDED: false (keeps speed hack protection)
+autofarm.exempt.from.validator = false
+
+# Minimum level required to use autofarm
+autofarm.min.level = 1
+
+# Allow autofarm in Olympiad
+# RECOMMENDED: false (prevents unfair advantages)
+autofarm.allow.in.olympiad = false
+
+# Allow autofarm in events
+# RECOMMENDED: false (prevents unfair advantages)
+autofarm.allow.in.events = false

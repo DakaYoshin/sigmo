@@ -40,6 +40,10 @@ import javolution.text.TextBuilder;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
+import java.util.ArrayList;
+import com.gameserver.model.autofarm.AutofarmPlayerRoutine;
+import com.gameserver.util.Util;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -224,7 +228,6 @@ import com.gameserver.thread.LoginServerThread;
 import com.gameserver.thread.ThreadPoolManager;
 import com.gameserver.util.Broadcast;
 import com.gameserver.util.IllegalPlayerAction;
-import com.gameserver.util.Util;
 import com.util.CloseUtil;
 import com.util.ResourceUtil;
 import com.util.database.L2DatabaseFactory;
@@ -11509,4 +11512,203 @@ public final class L2PcInstance extends L2Playable {
 		_lastAttackPacket = System.currentTimeMillis();
 	}
 
+	// ------------
+	// Autofarm
+	// ------------
+
+	private boolean _autoFarm;
+
+	public void setAutoFarm(boolean comm) {
+		_autoFarm = comm;
+	}
+
+	public boolean isAutoFarm() {
+		return _autoFarm;
+	}
+
+	private int autoFarmRadius = 1200;
+
+	public void setRadius(int value) {
+		autoFarmRadius = Util.limit(value, 200, 3000);
+	}
+
+	public int getRadius() {
+		return autoFarmRadius;
+	}
+
+	private int autoFarmShortCut = 9;
+
+	public void setPage(int value) {
+		autoFarmShortCut = Util.limit(value, 0, 9);
+	}
+
+	public int getPage() {
+		return autoFarmShortCut;
+	}
+
+	private int autoFarmHealPercente = 30;
+
+	public void setHealPercent(int value) {
+		autoFarmHealPercente = Util.limit(value, 20, 90);
+	}
+
+	public int getHealPercent() {
+		return autoFarmHealPercente;
+	}
+
+	private boolean autoFarmBuffProtection = false;
+
+	public void setNoBuffProtection(boolean val) {
+		autoFarmBuffProtection = val;
+	}
+
+	public boolean isNoBuffProtected() {
+		return autoFarmBuffProtection;
+	}
+
+	private boolean autoAntiKsProtection = false;
+
+	public void setAntiKsProtection(boolean val) {
+		autoAntiKsProtection = val;
+	}
+
+	public boolean isAntiKsProtected() {
+		return autoAntiKsProtection;
+	}
+
+	private boolean autoFarmSummonAttack = false;
+
+	public void setSummonAttack(boolean val) {
+		autoFarmSummonAttack = val;
+	}
+
+	public boolean isSummonAttack() {
+		return autoFarmSummonAttack;
+	}
+
+	private int autoFarmSummonSkillPercente = 0;
+
+	public void setSummonSkillPercent(int value) {
+		autoFarmSummonSkillPercente = Util.limit(value, 0, 90);
+	}
+
+	public int getSummonSkillPercent() {
+		return autoFarmSummonSkillPercente;
+	}
+
+	private int hpPotionPercent = 60;
+	private int mpPotionPercent = 60;
+
+	public void setHpPotionPercentage(int value) {
+		hpPotionPercent = Util.limit(value, 0, 100);
+	}
+
+	public int getHpPotionPercentage() {
+		return hpPotionPercent;
+	}
+
+	public void setMpPotionPercentage(int value) {
+		mpPotionPercent = Util.limit(value, 0, 100);
+	}
+
+	public int getMpPotionPercentage() {
+		return mpPotionPercent;
+	}
+
+	private List<Integer> _ignoredMonster = new ArrayList<>();
+
+	public void ignoredMonster(Integer npcId) {
+		_ignoredMonster.add(npcId);
+	}
+
+	public void activeMonster(Integer npcId) {
+		if (_ignoredMonster.contains(npcId))
+			_ignoredMonster.remove(npcId);
+	}
+
+	public boolean ignoredMonsterContain(int npcId) {
+		return _ignoredMonster.contains(npcId);
+	}
+
+	public List<Integer> getIgnoredMonsters() {
+		return _ignoredMonster;
+	}
+
+	// Security integration for Autofarm
+	private boolean _isAutoFarmActive = false;
+
+	public boolean isAutoFarmActive() {
+		return _isAutoFarmActive;
+	}
+
+	public void setAutoFarmActive(boolean active) {
+		_isAutoFarmActive = active;
+	}
+
+	private AutofarmPlayerRoutine _bot = new AutofarmPlayerRoutine(this);
+
+	public AutofarmPlayerRoutine getBot() {
+		if (_bot == null)
+			_bot = new AutofarmPlayerRoutine(this);
+
+		return _bot;
+	}
+
+	public void saveAutoFarmSettings() {
+		try (java.sql.Connection con = com.util.database.L2DatabaseFactory.getInstance().getConnection()) {
+			String updateSql = "REPLACE INTO character_autofarm (char_id, char_name,  radius, short_cut, heal_percent, buff_protection, anti_ks_protection, summon_attack, summon_skill_percent, hp_potion_percent, mp_potion_percent) VALUES (?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?)";
+			try (java.sql.PreparedStatement updateStatement = con.prepareStatement(updateSql)) {
+				updateStatement.setInt(1, getObjectId()); // char_id
+				updateStatement.setString(2, getName()); // char_name
+
+				updateStatement.setInt(3, autoFarmRadius);
+				updateStatement.setInt(4, autoFarmShortCut);
+				updateStatement.setInt(5, autoFarmHealPercente);
+				updateStatement.setBoolean(6, autoFarmBuffProtection);
+				updateStatement.setBoolean(7, autoAntiKsProtection);
+				updateStatement.setBoolean(8, autoFarmSummonAttack);
+				updateStatement.setInt(9, autoFarmSummonSkillPercente);
+				updateStatement.setInt(10, hpPotionPercent);
+				updateStatement.setInt(11, mpPotionPercent);
+				updateStatement.executeUpdate();
+			}
+		} catch (java.sql.SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void loadAutoFarmSettings() {
+		try (java.sql.Connection con = com.util.database.L2DatabaseFactory.getInstance().getConnection()) {
+			String selectSql = "SELECT * FROM character_autofarm WHERE char_id = ?";
+			try (java.sql.PreparedStatement selectStatement = con.prepareStatement(selectSql)) {
+				selectStatement.setInt(1, getObjectId()); // char_id
+				try (java.sql.ResultSet resultSet = selectStatement.executeQuery()) {
+					if (resultSet.next()) {
+
+						autoFarmRadius = resultSet.getInt("radius");
+						autoFarmShortCut = resultSet.getInt("short_cut");
+						autoFarmHealPercente = resultSet.getInt("heal_percent");
+						autoFarmBuffProtection = resultSet.getBoolean("buff_protection");
+						autoAntiKsProtection = resultSet.getBoolean("anti_ks_protection");
+						autoFarmSummonAttack = resultSet.getBoolean("summon_attack");
+						autoFarmSummonSkillPercente = resultSet.getInt("summon_skill_percent");
+						hpPotionPercent = resultSet.getInt("hp_potion_percent");
+						mpPotionPercent = resultSet.getInt("mp_potion_percent");
+					} else {
+						autoFarmRadius = 1200;
+						autoFarmShortCut = 9;
+						autoFarmHealPercente = 30;
+						autoFarmBuffProtection = false;
+						autoAntiKsProtection = false;
+						autoFarmSummonAttack = false;
+						autoFarmSummonSkillPercente = 0;
+						hpPotionPercent = 60;
+						mpPotionPercent = 60;
+					}
+				}
+			}
+		} catch (java.sql.SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

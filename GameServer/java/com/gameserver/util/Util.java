@@ -304,4 +304,8 @@ public final class Util {
 		}
 		return angle;
 	}
+
+	public static int limit(int val, int min, int max) {
+		return Math.min(Math.max(val, min), max);
+	}
 }

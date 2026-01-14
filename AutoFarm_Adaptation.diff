@@ -1,0 +1,770 @@
+
+===================================================================
+--- NEW FILE: java/com/gameserver/model/autofarm/AutofarmConstants.java
+===================================================================
+package com.gameserver.model.autofarm;
+
+public class AutofarmConstants {
+    public final static int[] ATTACK_SKILLS_SLOT = { 0, 3 };
+    public final static int[] CHANCE_SKILLS_SLOT = { 4, 7 };
+    public final static int[] LOW_LIFE_SKILLS_SLOT = { 8, 11 };
+}
+
+===================================================================
+--- NEW FILE: java/com/gameserver/model/autofarm/AutofarmSpellType.java
+===================================================================
+package com.gameserver.model.autofarm;
+
+public enum AutofarmSpellType {
+    ATTACK,
+    CHANCE,
+    LOW_LIFE
+}
+
+===================================================================
+--- NEW FILE: java/com/gameserver/model/autofarm/AutofarmSpell.java
+===================================================================
+package com.gameserver.model.autofarm;
+
+public class AutofarmSpell {
+        private final Integer _skillId;
+        private final AutofarmSpellType _spellType;
+
+        public AutofarmSpell(Integer skillId, AutofarmSpellType spellType){
+                _skillId = skillId;
+                _spellType = spellType;
+        }
+
+        public Integer getSkillId() {
+                return _skillId;
+        }
+
+        public AutofarmSpellType getSpellType() {
+                return _spellType;
+        }
+}
+
+===================================================================
+--- NEW FILE: java/handlers/voicedcommandhandlers/VoicedAutoFarm.java
+===================================================================
+package handlers.voicedcommandhandlers;
+
+import com.gameserver.model.actor.L2Character;
+import com.gameserver.handler.IVoicedCommandHandler;
+import com.gameserver.model.actor.instance.L2PcInstance;
+import com.gameserver.network.serverpackets.NpcHtmlMessage;
+
+public class VoicedAutoFarm implements IVoicedCommandHandler {
+    private static final String[] _voicedCommands = { "autofarm" };
+
+    @Override
+    public boolean useVoicedCommand(String command, L2PcInstance activeChar, String target) {
+        if (command.equalsIgnoreCase("autofarm")) {
+            showAutoFarm(activeChar);
+        }
+        return true;
+    }
+
+    public static void showAutoFarm(L2PcInstance player) {
+        NpcHtmlMessage html = new NpcHtmlMessage(0);
+        html.setFile("data/html/mods/menu/autofarm.htm");
+
+        html.replace("%radius%", String.valueOf(player.getRadius()));
+        html.replace("%page%", "F" + (player.getPage() + 1));
+        html.replace("%heal%", String.valueOf(player.getHealPercent()));
+        html.replace("%buffProtect%", player.isNoBuffProtected() ? "ON" : "OFF");
+        html.replace("%buffProtectColor%", player.isNoBuffProtected() ? "00FF00" : "FF0000");
+        html.replace("%antiKs%", player.isAntiKsProtected() ? "ON" : "OFF");
+        html.replace("%antiKsColor%", player.isAntiKsProtected() ? "00FF00" : "FF0000");
+        html.replace("%summonAttack%", player.isSummonAttack() ? "ON" : "OFF");
+        html.replace("%summonAttackColor%", player.isSummonAttack() ? "00FF00" : "FF0000");
+        html.replace("%summonSkill%", String.valueOf(player.getSummonSkillPercent()));
+        html.replace("%hpPotion%", String.valueOf(player.getHpPotionPercentage()));
+        html.replace("%mpPotion%", String.valueOf(player.getMpPotionPercentage()));
+        html.replace("%autofarm%", player.isAutoFarm() ? "STOP" : "START");
+        html.replace("%autofarmColor%", player.isAutoFarm() ? "FF0000" : "00FF00");
+
+        String targetName = "Nenhum";
+        String targetHp = "";
+        if (player.getTarget() != null && player.getTarget() instanceof L2Character) {
+            L2Character target = (L2Character) player.getTarget();
+            targetName = target.getName();
+            targetHp = " <font color=FF9999>(" + (int) target.getStatus().getCurrentHp() + ")</font>";
+        }
+        html.replace("%currentTarget%", targetName + targetHp);
+
+        StringBuilder ignoredList = new StringBuilder();
+        if (player.getIgnoredMonsters().isEmpty()) {
+            ignoredList.append("<tr><td align=center><font color=777777>Nenhum alvo ignorado</font></td></tr>");
+        } else {
+            int count = 0;
+            ignoredList.append("<tr><td>");
+            for (int npcId : player.getIgnoredMonsters()) {
+                if (count > 0)
+                    ignoredList.append(", ");
+                ignoredList.append(npcId);
+                count++;
+                if (count >= 10)
+                    break;
+            }
+            ignoredList.append("</td></tr>");
+            ignoredList.append(
+                    "<tr><td align=center><button value=\"Limpar Lista\" action=\"bypass -h _clearIgnoredAutoFarm\" width=100 height=21 back=\"L2UI_ch3.bigbutton2_down\" fore=\"L2UI_ch3.bigbutton2\"></td></tr>");
+        }
+        html.replace("%ignoredMonsters%", ignoredList.toString());
+
+        player.sendPacket(html);
+    }
+
+    @Override
+    public String[] getVoicedCommandList() {
+        return _voicedCommands;
+    }
+}
+
+===================================================================
+--- NEW FILE: java/com/gameserver/model/autofarm/AutofarmPlayerRoutine.java
+===================================================================
+package com.gameserver.model.autofarm;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.stream.Collectors;
+
+import com.Config;
+import com.gameserver.ai.CtrlIntention;
+import com.gameserver.geo.GeoData;
+import com.gameserver.handler.IItemHandler;
+import com.gameserver.handler.IVoicedCommandHandler;
+import com.gameserver.handler.ItemHandler;
+import com.gameserver.handler.VoicedCommandHandler;
+import com.gameserver.model.L2Object;
+import com.gameserver.model.L2ShortCut;
+import com.gameserver.model.L2Skill;
+import com.gameserver.model.L2WorldRegion;
+import com.gameserver.model.actor.L2Character;
+import com.gameserver.model.actor.L2Summon;
+import com.gameserver.model.actor.instance.L2ItemInstance;
+import com.gameserver.model.actor.instance.L2MonsterInstance;
+import com.gameserver.model.actor.instance.L2PcInstance;
+import com.gameserver.model.actor.instance.L2PetInstance;
+import com.gameserver.network.SystemMessageId;
+import com.gameserver.network.serverpackets.ActionFailed;
+import com.gameserver.network.serverpackets.ExShowScreenMessage;
+import com.gameserver.network.serverpackets.ExShowScreenMessage.SMPOS;
+import com.gameserver.network.serverpackets.StatusUpdate;
+import com.gameserver.network.serverpackets.SystemMessage;
+import com.gameserver.templates.skills.L2SkillType;
+import com.gameserver.thread.ThreadPoolManager;
+import com.gameserver.util.Util;
+import com.util.random.Rnd;
+
+public class AutofarmPlayerRoutine {
+    private final L2PcInstance _player;
+    private ScheduledFuture<?> _task;
+    private L2Character _committedTarget = null;
+
+    public AutofarmPlayerRoutine(L2PcInstance player) {
+        _player = player;
+    }
+
+    public void start() {
+        if (_task == null) {
+            _task = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(() -> executeRoutine(), 450, 450);
+
+            _player.sendPacket(new ExShowScreenMessage("Auto Farming Activated...", 5000, SMPOS.TOP_CENTER, false));
+            _player.sendPacket(new SystemMessage(SystemMessageId.AUTO_FARM_ACTIVATED));
+        }
+    }
+
+    public void stop() {
+        if (_task != null) {
+            _task.cancel(false);
+            _task = null;
+
+            _player.sendPacket(new ExShowScreenMessage("Auto Farming Deactivated...", 5000, SMPOS.TOP_CENTER, false));
+            _player.sendPacket(new SystemMessage(SystemMessageId.AUTO_FARM_DESACTIVATED));
+        }
+    }
+
+    public void executeRoutine() {
+        if (_player.isNoBuffProtected() && _player.getAllEffects().length <= 8) {
+            _player.sendMessage("You don't have buffs to use autofarm.");
+            _player.broadcastUserInfo();
+            stop();
+            _player.setAutoFarm(false);
+            IVoicedCommandHandler handler = VoicedCommandHandler.getInstance().getVoicedCommandHandler("autofarm");
+            if (handler != null)
+                handler.useVoicedCommand("autofarm", _player, null);
+            return;
+        }
+
+        calculatePotions();
+        checkSpoil();
+        targetEligibleCreature();
+        if (_player.isMageClass()) {
+            useAppropriateSpell();
+        } else if (shortcutsContainAttack()) {
+            attack();
+        } else {
+            useAppropriateSpell();
+        }
+        checkSpoil();
+        useAppropriateSpell();
+    }
+
+    private void attack() {
+        if (shortcutsContainAttack())
+            physicalAttack();
+    }
+
+    private void useAppropriateSpell() {
+        L2Skill chanceSkill = nextAvailableSkill(getChanceSpells(), AutofarmSpellType.CHANCE);
+
+        if (chanceSkill != null) {
+            useMagicSkill(chanceSkill, false);
+            return;
+        }
+
+        L2Skill lowLifeSkill = nextAvailableSkill(getLowLifeSpells(), AutofarmSpellType.LOW_LIFE);
+
+        if (lowLifeSkill != null) {
+            useMagicSkill(lowLifeSkill, true);
+            return;
+        }
+
+        L2Skill attackSkill = nextAvailableSkill(getAttackSpells(), AutofarmSpellType.ATTACK);
+
+        if (attackSkill != null) {
+            useMagicSkill(attackSkill, false);
+            return;
+        }
+    }
+
+    public L2Skill nextAvailableSkill(List<Integer> skillIds, AutofarmSpellType spellType) {
+        for (Integer skillId : skillIds) {
+            L2Skill skill = _player.getKnownSkill(skillId);
+
+            if (skill == null)
+                continue;
+
+            if (skill.getSkillType() == L2SkillType.SIGNET || skill.getSkillType() == L2SkillType.SIGNET_CASTTIME)
+                continue;
+
+            if (!_player.checkDoCastConditions(skill))
+                continue;
+
+            if (isSpoilSkill(skillId)) {
+                if (monsterIsAlreadySpoiled()) {
+                    continue;
+                }
+                return skill;
+            }
+
+            if (spellType == AutofarmSpellType.CHANCE && getMonsterTarget() != null) {
+                if (getMonsterTarget().getFirstEffect(skillId) == null)
+                    return skill;
+                continue;
+            }
+
+            if (spellType == AutofarmSpellType.LOW_LIFE && getHpPercentage() > _player.getHealPercent())
+                break;
+
+            return skill;
+        }
+
+        return null;
+    }
+
+    private void checkSpoil() {
+        if (canBeSweepedByMe() && getMonsterTarget().isDead()) {
+            L2Skill sweeper = _player.getKnownSkill(42);
+            if (sweeper == null)
+                return;
+
+            useMagicSkill(sweeper, false);
+        }
+    }
+
+    private double getHpPercentage() {
+        return _player.getCurrentHp() * 100.0 / _player.getMaxHp();
+    }
+
+    private double percentageMpIsLessThan() {
+        return _player.getCurrentMp() * 100.0 / _player.getMaxMp();
+    }
+
+    private double percentageHpIsLessThan() {
+        return _player.getCurrentHp() * 100.0 / _player.getMaxHp();
+    }
+
+    private List<Integer> getAttackSpells() {
+        return getSpellsInSlots(AutofarmConstants.ATTACK_SKILLS_SLOT);
+    }
+
+    private List<Integer> getSpellsInSlots(int[] attackSlots) {
+        List<Integer> slots = new ArrayList<>();
+        for (int i = attackSlots[0]; i <= attackSlots[1]; i++)
+            slots.add(i);
+
+        return Arrays.stream(_player.getShortCuts().getAllShortCuts())
+                .filter(shortcut -> shortcut.getPage() == _player.getPage()
+                        && shortcut.getType() == L2ShortCut.TYPE_SKILL && slots.contains(shortcut.getSlot()))
+                .map(L2ShortCut::getId)
+                .collect(Collectors.toList());
+    }
+
+    private List<Integer> getChanceSpells() {
+        return getSpellsInSlots(AutofarmConstants.CHANCE_SKILLS_SLOT);
+    }
+
+    private List<Integer> getLowLifeSpells() {
+        return getSpellsInSlots(AutofarmConstants.LOW_LIFE_SKILLS_SLOT);
+    }
+
+    private boolean shortcutsContainAttack() {
+        return Arrays.stream(_player.getShortCuts().getAllShortCuts())
+                .anyMatch(shortcut -> shortcut.getPage() == _player.getPage()
+                        && shortcut.getType() == L2ShortCut.TYPE_ACTION
+                        && (shortcut.getId() == 2 || _player.isSummonAttack() && shortcut.getId() == 22));
+    }
+
+    private boolean monsterIsAlreadySpoiled() {
+        return getMonsterTarget() != null && getMonsterTarget().getIsSpoiledBy() != 0;
+    }
+
+    private static boolean isSpoilSkill(int skillId) {
+        return skillId == 254 || skillId == 302;
+    }
+
+    private boolean canBeSweepedByMe() {
+        return getMonsterTarget() != null && getMonsterTarget().isDead()
+                && getMonsterTarget().getIsSpoiledBy() == _player.getObjectId();
+    }
+
+    private void castSpellWithAppropriateTarget(L2Skill skill, boolean forceOnSelf) {
+        if (forceOnSelf) {
+            L2Object oldTarget = _player.getTarget();
+            _player.setTarget(_player);
+            _player.useMagic(skill, false, false);
+            _player.setTarget(oldTarget);
+            return;
+        }
+
+        _player.useMagic(skill, false, false);
+    }
+
+    private void physicalAttack() {
+        if (!(_player.getTarget() instanceof L2MonsterInstance))
+            return;
+
+        L2MonsterInstance target = (L2MonsterInstance) _player.getTarget();
+
+        if (!_player.isMageClass()) {
+            if (target.isAutoAttackable(_player) && GeoData.getInstance().canSeeTarget(_player, target)) {
+                _player.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
+      
+                if (_player.isSummonAttack() && _player.getPet() != null) {
+                    if (_player.getPet().getNpcId() >= 14702 && _player.getPet().getNpcId() <= 14798
+                            || _player.getPet().getNpcId() >= 14839 && _player.getPet().getNpcId() <= 14869)
+                        return;
+
+                    L2Summon activeSummon = _player.getPet();
+                    activeSummon.setTarget(target);
+                    activeSummon.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
+
+                    int[] summonAttackSkills = { 4261, 4068, 4137, 4260, 4708, 4709, 4710, 4712, 5135, 5138, 5141, 5442,
+                            5444, 6095, 6096, 6041, 6044 };
+                    if (Rnd.get(100) < _player.getSummonSkillPercent()) {
+                        for (int skillId : summonAttackSkills) {
+                            useMagicSkillBySummon(skillId, target);
+                        }
+                    }
+                }
+            } else {
+                if (target.isAutoAttackable(_player) && GeoData.getInstance().canSeeTarget(_player, target))
+                    _player.getAI().setIntention(CtrlIntention.AI_INTENTION_FOLLOW, target);
+            }
+        } else {
+            if (_player.isSummonAttack() && _player.getPet() != null) {
+                if (_player.getPet().getNpcId() >= 14702 && _player.getPet().getNpcId() <= 14798
+                        || _player.getPet().getNpcId() >= 14839 && _player.getPet().getNpcId() <= 14869)
+                    return;
+
+                L2Summon activeSummon = _player.getPet();
+                activeSummon.setTarget(target);
+                activeSummon.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
+
+                int[] summonAttackSkills = { 4261, 4068, 4137, 4260, 4708, 4709, 4710, 4712, 5135, 5138, 5141, 5442,
+                        5444, 6095, 6096, 6041, 6044 };
+                if (Rnd.get(100) < _player.getSummonSkillPercent()) {
+                    for (int skillId : summonAttackSkills) {
+                        useMagicSkillBySummon(skillId, target);
+                    }
+                }
+            }
+        }
+    }
+
+    public void targetEligibleCreature() {
+        if (_player.getTarget() == null) {
+            selectNewTarget();
+            return;
+        }
+
+        if (_committedTarget != null) {
+            if (!_committedTarget.isDead() && GeoData.getInstance().canSeeTarget(_player, _committedTarget)) {
+                attack();
+                return;
+            } else if (!GeoData.getInstance().canSeeTarget(_player, _committedTarget)) {
+                _committedTarget = null;
+                selectNewTarget();
+                return;
+            }
+            _player.getAI().setIntention(CtrlIntention.AI_INTENTION_FOLLOW, _committedTarget);
+            _committedTarget = null;
+            _player.setTarget(null);
+        }
+
+        if (_committedTarget instanceof L2Summon)
+            return;
+
+        List<L2MonsterInstance> targets = getKnownMonstersInRadius(_player, _player.getRadius());
+
+        if (targets.isEmpty())
+            return;
+
+        L2MonsterInstance closestTarget = targets.stream()
+                .min((o1, o2) -> Double.compare(_player.getDistanceSq(o1), _player.getDistanceSq(o2))).get();
+
+        _committedTarget = closestTarget;
+        _player.setTarget(closestTarget);
+        
+        StatusUpdate su = new StatusUpdate(closestTarget);
+        su.addAttribute(StatusUpdate.CUR_HP, (int) closestTarget.getCurrentHp());
+        su.addAttribute(StatusUpdate.MAX_HP, closestTarget.getMaxHp());
+        _player.sendPacket(su);
+    }
+
+    private void selectNewTarget() {
+        List<L2MonsterInstance> targets = getKnownMonstersInRadius(_player, _player.getRadius());
+
+        if (targets.isEmpty())
+            return;
+
+        L2MonsterInstance closestTarget = targets.stream()
+                .min((o1, o2) -> Double.compare(_player.getDistanceSq(o1), _player.getDistanceSq(o2))).get();
+
+        _committedTarget = closestTarget;
+        _player.setTarget(closestTarget);
+        
+        StatusUpdate su = new StatusUpdate(closestTarget);
+        su.addAttribute(StatusUpdate.CUR_HP, (int) closestTarget.getCurrentHp());
+        su.addAttribute(StatusUpdate.MAX_HP, closestTarget.getMaxHp());
+        _player.sendPacket(su);
+    }
+
+    public final List<L2MonsterInstance> getKnownMonstersInRadius(L2PcInstance player, int radius) {
+        final L2WorldRegion region = player.getWorldRegion();
+        if (region == null)
+            return Collections.emptyList();
+
+        final List<L2MonsterInstance> result = new ArrayList<>();
+
+        for (L2WorldRegion reg : region.getSurroundingRegions()) {
+            for (L2Object obj : reg.getVisibleObjects()) {
+                if (!(obj instanceof L2MonsterInstance) || !Util.checkIfInRange(radius, player, obj, true))
+                    continue;
+
+                L2MonsterInstance monster = (L2MonsterInstance) obj;
+
+                if (player.ignoredMonsterContain(monster.getNpcId()) || monster.isRaid() || monster.isDead()
+                        || (player.isAntiKsProtected() && monster.getTarget() != null && monster.getTarget() != player
+                                && monster.getTarget() != player.getPet()))
+                    continue;
+
+                if (!GeoData.getInstance().canSeeTarget(player, monster))
+                    continue;
+
+                result.add(monster);
+            }
+        }
+
+        return result;
+    }
+
+    public L2MonsterInstance getMonsterTarget() {
+        if (!(_player.getTarget() instanceof L2MonsterInstance)) {
+            return null;
+        }
+
+        return (L2MonsterInstance) _player.getTarget();
+    }
+
+    private void useMagicSkill(L2Skill skill, boolean forceOnSelf) {
+        if (skill.getSkillType() == L2SkillType.RECALL && !Config.KARMA_PLAYER_CAN_TELEPORT && _player.getKarma() > 0) {
+            _player.sendPacket(ActionFailed.STATIC_PACKET);
+            return;
+        }
+
+        if (skill.isToggle() && _player.isMounted()) {
+            _player.sendPacket(ActionFailed.STATIC_PACKET);
+            return;
+        }
+
+        if (_player.isOutOfControl()) {
+            _player.sendPacket(ActionFailed.STATIC_PACKET);
+            return;
+        }
+
+        castSpellWithAppropriateTarget(skill, forceOnSelf);
+    }
+
+    private void useMagicSkillBySummon(int skillId, L2Object target) {
+        if (_player == null || _player.isInStoreMode())
+            return;
+
+        final L2Summon activeSummon = _player.getPet();
+        if (activeSummon == null)
+            return;
+
+        if (activeSummon instanceof L2PetInstance && activeSummon.getLevel() - _player.getLevel() > 20) {
+            _player.sendPacket(SystemMessageId.PET_TOO_HIGH_TO_CONTROL);
+            return;
+        }
+
+        if (activeSummon.isOutOfControl()) {
+            _player.sendPacket(SystemMessageId.PET_REFUSING_ORDER);
+            return;
+        }
+
+        final L2Skill skill = activeSummon.getKnownSkill(skillId);
+        if (skill == null)
+            return;
+
+        if (skill.isOffensive() && _player == target)
+            return;
+
+        activeSummon.setTarget(target);
+        activeSummon.useMagic(skill, false, false);
+    }
+
+    private void calculatePotions() {
+        if (percentageHpIsLessThan() < _player.getHpPotionPercentage())
+            forceUseItem(1539);
+
+        if (percentageMpIsLessThan() < _player.getMpPotionPercentage())
+            forceUseItem(728);
+    }
+
+    private void forceUseItem(int itemId) {
+        final L2ItemInstance potion = _player.getInventory().getItemByItemId(itemId);
+        if (potion == null)
+            return;
+
+        final IItemHandler handler = ItemHandler.getInstance().getItemHandler(potion.getItemId());
+        if (handler != null)
+            handler.useItem(_player, potion);
+    }
+}
+
+===================================================================
+--- MODIFIED FILE: java/com/gameserver/model/actor/instance/L2PcInstance.java
+===================================================================
+
+[Imports Added]
+import com.gameserver.model.autofarm.*;
+
+[Fields Added to L2PcInstance Class]
+	private boolean _autoFarm = false;
+	private int _radius = 1000;
+	private int _page = 0;
+	private boolean _noBuffProtection = false;
+	private int _hpPotionPercentage = 70;
+	private int _mpPotionPercentage = 50;
+	private int _healPercent = 60;
+	private boolean _antiKsProtected = false;
+	private boolean _summonAttack = false;
+	private int _summonSkillPercent = 10;
+	private List<Integer> _ignoredMonsters = new ArrayList<>();
+	private final AutofarmPlayerRoutine _bot = new AutofarmPlayerRoutine(this);
+
+[Methods Added to L2PcInstance Class]
+	public void loadAutoFarmSettings() {
+		if (getVar("bot_radius") != null)
+			_radius = Integer.parseInt(getVar("bot_radius"));
+		if (getVar("bot_page") != null)
+			_page = Integer.parseInt(getVar("bot_page"));
+		if (getVar("bot_buffProt") != null)
+			_noBuffProtection = getVar("bot_buffProt").equals("1");
+		if (getVar("bot_hpPot") != null)
+			_hpPotionPercentage = Integer.parseInt(getVar("bot_hpPot"));
+		if (getVar("bot_mpPot") != null)
+			_mpPotionPercentage = Integer.parseInt(getVar("bot_mpPot"));
+		if (getVar("bot_heal") != null)
+			_healPercent = Integer.parseInt(getVar("bot_heal"));
+		if (getVar("bot_antiKs") != null)
+			_antiKsProtected = getVar("bot_antiKs").equals("1");
+		if (getVar("bot_summon") != null)
+			_summonAttack = getVar("bot_summon").equals("1");
+		if (getVar("bot_sumSkP") != null)
+			_summonSkillPercent = Integer.parseInt(getVar("bot_sumSkP"));
+		if (getVar("bot_ignored") != null) {
+			_ignoredMonsters.clear();
+			String[] list = getVar("bot_ignored").split(",");
+			for (String id : list) {
+				if (!id.isEmpty())
+					_ignoredMonsters.add(Integer.parseInt(id));
+			}
+		}
+	}
+
+	public boolean isAutoFarm() {
+		return _autoFarm;
+	}
+
+	public void setAutoFarm(boolean val) {
+		_autoFarm = val;
+	}
+
+	public int getRadius() {
+		return _radius;
+	}
+
+	public void setRadius(int val) {
+		if (val < 200)
+			val = 200;
+		if (val > 3000)
+			val = 3000;
+		_radius = val;
+	}
+
+	public int getPage() {
+		return _page;
+	}
+
+	public void setPage(int val) {
+		if (val < 0)
+			val = 0;
+		if (val > 9)
+			val = 9;
+		_page = val;
+	}
+
+	public boolean isNoBuffProtected() {
+		return _noBuffProtection;
+	}
+
+	public void setNoBuffProtection(boolean val) {
+		_noBuffProtection = val;
+	}
+
+	public int getHpPotionPercentage() {
+		return _hpPotionPercentage;
+	}
+
+	public void setHpPotionPercentage(int val) {
+		if (val < 5)
+			val = 5;
+		if (val > 95)
+			val = 95;
+		_hpPotionPercentage = val;
+	}
+
+	public int getMpPotionPercentage() {
+		return _mpPotionPercentage;
+	}
+
+	public void setMpPotionPercentage(int val) {
+		if (val < 5)
+			val = 5;
+		if (val > 95)
+			val = 95;
+		_mpPotionPercentage = val;
+	}
+
+	public int getHealPercent() {
+		return _healPercent;
+	}
+
+	public void setHealPercent(int val) {
+		if (val < 10)
+			val = 10;
+		if (val > 90)
+			val = 90;
+		_healPercent = val;
+	}
+
+	public boolean isAntiKsProtected() {
+		return _antiKsProtected;
+	}
+
+	public void setAntiKsProtected(boolean val) {
+		_antiKsProtected = val;
+	}
+
+	public boolean isSummonAttack() {
+		return _summonAttack;
+	}
+
+	public void setSummonAttack(boolean val) {
+		_summonAttack = val;
+	}
+
+	public int getSummonSkillPercent() {
+		return _summonSkillPercent;
+	}
+
+	public void setSummonSkillPercent(int val) {
+		if (val < 0)
+			val = 0;
+		if (val > 100)
+			val = 100;
+		_summonSkillPercent = val;
+	}
+
+	public boolean ignoredMonsterContain(int npcId) {
+		return _ignoredMonsters.contains(npcId);
+	}
+
+	public void addIgnoredMonster(int npcId) {
+		if (!_ignoredMonsters.contains(npcId))
+			_ignoredMonsters.add(npcId);
+	}
+
+	public void removeIgnoredMonster(int npcId) {
+		_ignoredMonsters.remove(Integer.valueOf(npcId));
+	}
+
+	public List<Integer> getIgnoredMonsters() {
+		return _ignoredMonsters;
+	}
+
+	public AutofarmPlayerRoutine getBot() {
+		return _bot;
+	}
+	
+	public void saveAutoFarmSettings() {
+		setVar("bot_radius", String.valueOf(_radius));
+		setVar("bot_page", String.valueOf(_page));
+		setVar("bot_buffProt", _noBuffProtection ? "1" : "0");
+		setVar("bot_hpPot", String.valueOf(_hpPotionPercentage));
+		setVar("bot_mpPot", String.valueOf(_mpPotionPercentage));
+		setVar("bot_heal", String.valueOf(_healPercent));
+		setVar("bot_antiKs", _antiKsProtected ? "1" : "0");
+		setVar("bot_summon", _summonAttack ? "1" : "0");
+		setVar("bot_sumSkP", String.valueOf(_summonSkillPercent));
+
+		StringBuilder sb = new StringBuilder();
+		for (int id : _ignoredMonsters) {
+			sb.append(id).append(",");
+		}
+		setVar("bot_ignored", sb.toString());
+	}
+
+[Modification in loadVariables()]
+// Add this line at the end of loadVariables() method:
+		loadAutoFarmSettings();
