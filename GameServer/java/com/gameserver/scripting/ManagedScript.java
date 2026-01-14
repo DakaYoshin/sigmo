@@ -19,65 +19,54 @@
 package com.gameserver.scripting;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.script.ScriptException;
 
-public abstract class ManagedScript
-{
+public abstract class ManagedScript {
 	private File _scriptFile;
 	private long _lastLoadTime;
 	private boolean _isActive;
 
 	public abstract String getScriptName();
+
 	public abstract ScriptManager<?> getScriptManager();
+
 	public abstract boolean unload();
 
-	public ManagedScript()
-	{
+	public ManagedScript() {
 		_scriptFile = L2ScriptEngineManager.getInstance().getCurrentLoadScript();
 		setLastLoadTime(System.currentTimeMillis());
 	}
 
-	public boolean reload()
-	{
-		try
-		{
+	public boolean reload() {
+		try {
 			L2ScriptEngineManager.getInstance().executeScript(getScriptFile());
 			return true;
-		}
-		catch(FileNotFoundException e)
-		{
+		} catch (IOException e) {
 			return false;
-		}
-		catch(ScriptException e)
-		{
+		} catch (ScriptException e) {
 			return false;
 		}
 	}
 
-	public void setActive(boolean status)
-	{
+	public void setActive(boolean status) {
 		_isActive = status;
 	}
 
-	public boolean isActive()
-	{
+	public boolean isActive() {
 		return _isActive;
 	}
 
-	public File getScriptFile()
-	{
+	public File getScriptFile() {
 		return _scriptFile;
 	}
 
-	protected void setLastLoadTime(long lastLoadTime)
-	{
+	protected void setLastLoadTime(long lastLoadTime) {
 		_lastLoadTime = lastLoadTime;
 	}
 
-	protected long getLastLoadTime()
-	{
+	protected long getLastLoadTime() {
 		return _lastLoadTime;
 	}
 

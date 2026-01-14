@@ -39,20 +39,15 @@ import com.gameserver.templates.item.L2Armor;
 import com.gameserver.templates.item.L2Item;
 import com.gameserver.templates.item.L2Weapon;
 
-public class L2Multisell
-{
+public class L2Multisell {
 	private static Logger _log = Logger.getLogger(L2Multisell.class.getName());
 	private List<MultiSellListContainer> _entries = new FastList<MultiSellListContainer>();
 	private static L2Multisell _instance = new L2Multisell();
 
-	public MultiSellListContainer getList(int id)
-	{
-		synchronized (_entries)
-		{
-			for(MultiSellListContainer list : _entries)
-			{
-				if(list.getListId() == id)
-				{
+	public MultiSellListContainer getList(int id) {
+		synchronized (_entries) {
+			for (MultiSellListContainer list : _entries) {
+				if (list.getListId() == id) {
 					return list;
 				}
 			}
@@ -62,131 +57,109 @@ public class L2Multisell
 		return null;
 	}
 
-	public L2Multisell()
-	{
+	public L2Multisell() {
 		parseData();
 	}
 
-	public void reload()
-	{
+	public void reload() {
 		parseData();
 	}
 
-	public static L2Multisell getInstance()
-	{
+	public static L2Multisell getInstance() {
 		return _instance;
 	}
 
-	private void parseData()
-	{
+	private void parseData() {
 		_entries.clear();
 		parse();
 	}
 
-	private MultiSellListContainer generateMultiSell(int listId, boolean inventoryOnly, L2PcInstance player, int npcId, double taxRate)
-	{
+	private MultiSellListContainer generateMultiSell(int listId, boolean inventoryOnly, L2PcInstance player, int npcId,
+			double taxRate) {
 		MultiSellListContainer listTemplate = L2Multisell.getInstance().getList(listId);
 		MultiSellListContainer list = new MultiSellListContainer();
 
-		if(listTemplate == null)
-		{
+		if (listTemplate == null) {
 			return list;
 		}
 
 		list = new MultiSellListContainer();
 		list.setListId(listId);
 
-		if(npcId != 0 && !listTemplate.checkNpcId(npcId))
-		{
+		if (npcId != 0 && !listTemplate.checkNpcId(npcId)) {
 			listTemplate.addNpcId(npcId);
 		}
 
-		if(inventoryOnly)
-		{
-			if(player == null)
-			{
+		if (inventoryOnly) {
+			if (player == null) {
 				return list;
 			}
 
 			L2ItemInstance[] items;
 
-			if(listTemplate.getMaintainEnchantment())
-			{
+			if (listTemplate.getMaintainEnchantment()) {
 				items = player.getInventory().getUniqueItemsByEnchantLevel(false, false, false);
-			}
-			else
-			{
+			} else {
 				items = player.getInventory().getUniqueItems(false, false, false);
 			}
 
 			int enchantLevel;
-			for(L2ItemInstance item : items)
-			{
-				if(!item.isWear() && (item.getItem() instanceof L2Armor || item.getItem() instanceof L2Weapon))
-				{
+			for (L2ItemInstance item : items) {
+				if (!item.isWear() && (item.getItem() instanceof L2Armor || item.getItem() instanceof L2Weapon)) {
 					enchantLevel = listTemplate.getMaintainEnchantment() ? item.getEnchantLevel() : 0;
-					for(MultiSellEntry ent : listTemplate.getEntries())
-					{
+					for (MultiSellEntry ent : listTemplate.getEntries()) {
 						boolean doInclude = false;
 
-						for(MultiSellIngredient ing : ent.getIngredients())
-						{
-							if(item.getItemId() == ing.getItemId())
-							{
+						for (MultiSellIngredient ing : ent.getIngredients()) {
+							if (item.getItemId() == ing.getItemId()) {
 								doInclude = true;
 								break;
 							}
 						}
 
-						if(doInclude)
-						{
-							list.addEntry(prepareEntry(ent, listTemplate.getApplyTaxes(), listTemplate.getMaintainEnchantment(), enchantLevel, taxRate));
+						if (doInclude) {
+							int augmentationId = item.getAugmentation() == null ? 0
+									: item.getAugmentation().getAugmentationId();
+							list.addEntry(prepareEntry(ent, listTemplate.getApplyTaxes(),
+									listTemplate.getMaintainEnchantment(), enchantLevel, augmentationId, item.getMana(),
+									taxRate));
 						}
 					}
 				}
 			}
-		}
-		else
-		{
-			for(MultiSellEntry ent : listTemplate.getEntries())
-			{
-				list.addEntry(prepareEntry(ent, listTemplate.getApplyTaxes(), false, 0, taxRate));
+		} else {
+			for (MultiSellEntry ent : listTemplate.getEntries()) {
+				list.addEntry(prepareEntry(ent, listTemplate.getApplyTaxes(), false, 0, 0, -1, taxRate));
 			}
 		}
 		list.setIsCommunity(listTemplate.getIsCommunity());
 		return list;
 	}
 
-	private MultiSellEntry prepareEntry(MultiSellEntry templateEntry, boolean applyTaxes, boolean maintainEnchantment, int enchantLevel, double taxRate)
-	{
+	private MultiSellEntry prepareEntry(MultiSellEntry templateEntry, boolean applyTaxes, boolean maintainEnchantment,
+			int enchantLevel, int augmentationId, int manaLeft, double taxRate) {
 		MultiSellEntry newEntry = new MultiSellEntry();
 		newEntry.setEntryId(templateEntry.getEntryId() * 100000 + enchantLevel);
 
 		int adenaAmount = 0;
 
-		for(MultiSellIngredient ing : templateEntry.getIngredients())
-		{
+		for (MultiSellIngredient ing : templateEntry.getIngredients()) {
 			MultiSellIngredient newIngredient = new MultiSellIngredient(ing);
 
-			if(ing.getItemId() == 57 && ing.isTaxIngredient())
-			{
-				if(applyTaxes)
-				{
+			if (ing.getItemId() == 57 && ing.isTaxIngredient()) {
+				if (applyTaxes) {
 					adenaAmount += (int) Math.round(ing.getItemCount() * taxRate);
 				}
 				continue;
-			}
-			else if(ing.getItemId() == 57)
-			{
+			} else if (ing.getItemId() == 57) {
 				adenaAmount += ing.getItemCount();
 				continue;
-			}
-			else if(maintainEnchantment)
-			{
+			} else if (maintainEnchantment) {
 				L2Item tempItem = ItemTable.getInstance().createDummyItem(ing.getItemId()).getItem();
-				if(tempItem instanceof L2Armor || tempItem instanceof L2Weapon)
-				{
+				if (tempItem instanceof L2Armor || tempItem instanceof L2Weapon) {
 					newIngredient.setEnchantmentLevel(enchantLevel);
+					newIngredient.setAugmentationId(augmentationId);
+					newIngredient.setManaLeft(manaLeft);
 				}
 
 				tempItem = null;
@@ -196,22 +169,20 @@ public class L2Multisell
 			newIngredient = null;
 		}
 
-		if(adenaAmount > 0)
-		{
+		if (adenaAmount > 0) {
 			newEntry.addIngredient(new MultiSellIngredient(57, adenaAmount, 0, false, false));
 		}
 
-		for(MultiSellIngredient ing : templateEntry.getProducts())
-		{
+		for (MultiSellIngredient ing : templateEntry.getProducts()) {
 			MultiSellIngredient newIngredient = new MultiSellIngredient(ing);
 
-			if(maintainEnchantment)
-			{
+			if (maintainEnchantment) {
 				L2Item tempItem = ItemTable.getInstance().createDummyItem(ing.getItemId()).getItem();
 
-				if(tempItem instanceof L2Armor || tempItem instanceof L2Weapon)
-				{
+				if (tempItem instanceof L2Armor || tempItem instanceof L2Weapon) {
 					newIngredient.setEnchantmentLevel(enchantLevel);
+					newIngredient.setAugmentationId(augmentationId);
+					newIngredient.setManaLeft(manaLeft);
 				}
 			}
 			newEntry.addProduct(newIngredient);
@@ -220,23 +191,21 @@ public class L2Multisell
 		return newEntry;
 	}
 
-	public void SeparateAndSend(int listId, L2PcInstance player, int npcId, boolean inventoryOnly, double taxRate, boolean isCommunity)
-	{
+	public void SeparateAndSend(int listId, L2PcInstance player, int npcId, boolean inventoryOnly, double taxRate,
+			boolean isCommunity) {
 		MultiSellListContainer list = generateMultiSell(listId, inventoryOnly, player, npcId, taxRate);
 		MultiSellListContainer temp = new MultiSellListContainer();
-        if (isCommunity && !list.getIsCommunity())
-        {
-            _log.warning("player "+player.getName()+" try to open not BBS multisell with bypass _bbsmultisell. Ban him!");
-            return;
-        }
+		if (isCommunity && !list.getIsCommunity()) {
+			_log.warning("player " + player.getName()
+					+ " try to open not BBS multisell with bypass _bbsmultisell. Ban him!");
+			return;
+		}
 		int page = 1;
 
 		temp.setListId(list.getListId());
 
-		for(MultiSellEntry e : list.getEntries())
-		{
-			if(temp.getEntries().size() == 40)
-			{
+		for (MultiSellEntry e : list.getEntries()) {
+			if (temp.getEntries().size() == 40) {
 				player.sendPacket(new MultiSellList(temp, page++, 0));
 				temp = new MultiSellListContainer();
 				temp.setListId(list.getListId());
@@ -248,29 +217,24 @@ public class L2Multisell
 		player.sendPacket(new MultiSellList(temp, page, 1));
 	}
 
-	private void hashFiles(String dirname, List<File> hash)
-	{
+	private void hashFiles(String dirname, List<File> hash) {
 		File dir = new File(Config.DATAPACK_ROOT, "data/" + dirname);
 
-		if(!dir.exists())
-		{
+		if (!dir.exists()) {
 			_log.config("Dir " + dir.getAbsolutePath() + " not exists");
 			return;
 		}
 
 		File[] files = dir.listFiles();
 
-		for(File f : files)
-		{
-			if(f.getName().endsWith(".xml"))
-			{
+		for (File f : files) {
+			if (f.getName().endsWith(".xml")) {
 				hash.add(f);
 			}
 		}
 	}
 
-	private void parse()
-	{
+	private void parse() {
 		Document doc = null;
 
 		int id = 0;
@@ -278,85 +242,65 @@ public class L2Multisell
 		List<File> files = new FastList<File>();
 		hashFiles("multisell", files);
 
-		for(File f : files)
-		{
+		for (File f : files) {
 			id = Integer.parseInt(f.getName().replaceAll(".xml", ""));
-			try
-			{
+			try {
 
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 				factory.setValidating(false);
 				factory.setIgnoringComments(true);
 				doc = factory.newDocumentBuilder().parse(f);
 				factory = null;
-			}
-			catch(Exception e)
-			{
+			} catch (Exception e) {
 				_log.log(Level.SEVERE, "Error loading file " + f, e);
 			}
-			try
-			{
+			try {
 				MultiSellListContainer list = parseDocument(doc);
 				list.setListId(id);
 				_entries.add(list);
 				list = null;
-			}
-			catch(Exception e)
-			{
+			} catch (Exception e) {
 				_log.log(Level.SEVERE, "Error in file " + f, e);
 			}
 		}
 	}
 
-	protected MultiSellListContainer parseDocument(Document doc)
-	{
+	protected MultiSellListContainer parseDocument(Document doc) {
 		MultiSellListContainer list = new MultiSellListContainer();
 
-		for(Node n = doc.getFirstChild(); n != null; n = n.getNextSibling())
-		{
-			if("list".equalsIgnoreCase(n.getNodeName()))
-			{
+		for (Node n = doc.getFirstChild(); n != null; n = n.getNextSibling()) {
+			if ("list".equalsIgnoreCase(n.getNodeName())) {
 				Node attribute;
 				attribute = n.getAttributes().getNamedItem("applyTaxes");
 
-				if(attribute == null)
-				{
+				if (attribute == null) {
 					list.setApplyTaxes(false);
-				}
-				else
-				{
+				} else {
 					list.setApplyTaxes(Boolean.parseBoolean(attribute.getNodeValue()));
 				}
-				
-                attribute = n.getAttributes().getNamedItem("isCommunity");
-                
-                if (attribute == null)
-                    list.setIsCommunity(false);
-                else
-                    list.setIsCommunity(Boolean.parseBoolean(attribute.getNodeValue()));
-                
+
+				attribute = n.getAttributes().getNamedItem("isCommunity");
+
+				if (attribute == null)
+					list.setIsCommunity(false);
+				else
+					list.setIsCommunity(Boolean.parseBoolean(attribute.getNodeValue()));
+
 				attribute = n.getAttributes().getNamedItem("maintainEnchantment");
 
-				if(attribute == null)
-				{
+				if (attribute == null) {
 					list.setMaintainEnchantment(false);
-				}
-				else
-				{
+				} else {
 					list.setMaintainEnchantment(Boolean.parseBoolean(attribute.getNodeValue()));
 				}
 
-				for(Node d = n.getFirstChild(); d != null; d = d.getNextSibling())
-				{
-					if("item".equalsIgnoreCase(d.getNodeName()))
-					{
+				for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
+					if ("item".equalsIgnoreCase(d.getNodeName())) {
 						MultiSellEntry e = parseEntry(d);
 						list.addEntry(e);
 					}
 				}
-			}
-			else if("item".equalsIgnoreCase(n.getNodeName()))
-			{
+			} else if ("item".equalsIgnoreCase(n.getNodeName())) {
 				MultiSellEntry e = parseEntry(n);
 				list.addEntry(e);
 			}
@@ -365,17 +309,14 @@ public class L2Multisell
 		return list;
 	}
 
-	protected MultiSellEntry parseEntry(Node n)
-	{
+	protected MultiSellEntry parseEntry(Node n) {
 		int entryId = Integer.parseInt(n.getAttributes().getNamedItem("id").getNodeValue());
 
 		Node first = n.getFirstChild();
 		MultiSellEntry entry = new MultiSellEntry();
 
-		for(n = first; n != null; n = n.getNextSibling())
-		{
-			if("ingredient".equalsIgnoreCase(n.getNodeName()))
-			{
+		for (n = first; n != null; n = n.getNextSibling()) {
+			if ("ingredient".equalsIgnoreCase(n.getNodeName())) {
 				Node attribute;
 
 				int id = Integer.parseInt(n.getAttributes().getNamedItem("id").getNodeValue());
@@ -384,32 +325,53 @@ public class L2Multisell
 
 				attribute = n.getAttributes().getNamedItem("isTaxIngredient");
 
-				if(attribute != null)
-				{
+				if (attribute != null) {
 					isTaxIngredient = Boolean.parseBoolean(attribute.getNodeValue());
 				}
 
 				attribute = n.getAttributes().getNamedItem("mantainIngredient");
 
-				if(attribute != null)
-				{
+				if (attribute != null) {
 					mantainIngredient = Boolean.parseBoolean(attribute.getNodeValue());
 				}
 
-				MultiSellIngredient e = new MultiSellIngredient(id, count, isTaxIngredient, mantainIngredient);
+				int augmentationId = 0;
+				int manaLeft = -1;
+
+				attribute = n.getAttributes().getNamedItem("augmentationId");
+				if (attribute != null) {
+					augmentationId = Integer.parseInt(attribute.getNodeValue());
+				}
+
+				attribute = n.getAttributes().getNamedItem("manaLeft");
+				if (attribute != null) {
+					manaLeft = Integer.parseInt(attribute.getNodeValue());
+				}
+
+				MultiSellIngredient e = new MultiSellIngredient(id, count, 0, augmentationId, manaLeft, isTaxIngredient,
+						mantainIngredient);
 				entry.addIngredient(e);
-			}
-			else if("production".equalsIgnoreCase(n.getNodeName()))
-			{
+			} else if ("production".equalsIgnoreCase(n.getNodeName())) {
 				int id = Integer.parseInt(n.getAttributes().getNamedItem("id").getNodeValue());
 				int count = Integer.parseInt(n.getAttributes().getNamedItem("count").getNodeValue());
 				int enchant = 0;
 
-				if(n.getAttributes().getNamedItem("enchant") != null)
-				{
+				if (n.getAttributes().getNamedItem("enchant") != null) {
 					enchant = Integer.parseInt(n.getAttributes().getNamedItem("enchant").getNodeValue());
 				}
-				MultiSellIngredient e = new MultiSellIngredient(id, count, enchant, false, false);
+				int augmentationId = 0;
+				int manaLeft = -1;
+
+				if (n.getAttributes().getNamedItem("augmentationId") != null) {
+					augmentationId = Integer.parseInt(n.getAttributes().getNamedItem("augmentationId").getNodeValue());
+				}
+
+				if (n.getAttributes().getNamedItem("manaLeft") != null) {
+					manaLeft = Integer.parseInt(n.getAttributes().getNamedItem("manaLeft").getNodeValue());
+				}
+
+				MultiSellIngredient e = new MultiSellIngredient(id, count, enchant, augmentationId, manaLeft, false,
+						false);
 				entry.addProduct(e);
 			}
 		}

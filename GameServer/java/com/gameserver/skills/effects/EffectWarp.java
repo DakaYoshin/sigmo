@@ -34,7 +34,8 @@ import com.gameserver.util.Util;
  * radius are set as skill properties (flyCourse and flyRadius):
  * 
  * <li>Fly Radius means the distance between starting point and final point, it
- * must be an integer.</li> <li>Fly Course means the movement direction: imagine
+ * must be an integer.</li>
+ * <li>Fly Course means the movement direction: imagine
  * a compass above player's head, making north player's heading. So if fly
  * course is 180, player will go backwards (good for blink, e.g.). By the way,
  * if flyCourse = 360 or 0, player will be moved in in front of him. <br>
@@ -47,28 +48,24 @@ import com.gameserver.util.Util;
  * 
  * @author House
  */
-public class EffectWarp extends L2Effect
-{
+public class EffectWarp extends L2Effect {
 	private int x, y, z;
 	private L2Character _actor;
 
-	public EffectWarp(Env env, EffectTemplate template)
-	{
+	public EffectWarp(Env env, EffectTemplate template) {
 		super(env, template);
 	}
 
 	@Override
-	public L2EffectType getEffectType()
-	{
+	public L2EffectType getEffectType() {
 		return L2EffectType.WARP;
 	}
 
 	@Override
-	public void onStart()
-	{
+	public void onStart() {
 		_actor = isSelfEffect() ? getEffector() : getEffected();
 
-		if(_actor.isMovementDisabled())
+		if (_actor.isMovementDisabled())
 			return;
 
 		int _radius = getSkill().getFlyRadius();
@@ -84,15 +81,15 @@ public class EffectWarp extends L2Effect
 		y = _actor.getY() + y1;
 		z = _actor.getZ();
 
-		if(Config.GEODATA > 0)
-		{
+		if (Config.GEODATA > 0) {
 			Location destiny = GeoData.getInstance().moveCheck(_actor.getX(), _actor.getY(), _actor.getZ(), x, y, z);
 			x = destiny.getX();
 			y = destiny.getY();
 			z = destiny.getZ();
 		}
 
-		// TODO: check if this AI intention is retail-like. This stops player's previous movement
+		// Warp effects reset the AI intention to IDLE to prevent pathing issues from
+		// the new coordinates.
 		_actor.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
 
 		_actor.broadcastPacket(new FlyToLocation(_actor, x, y, z, FlyType.DUMMY));
@@ -104,8 +101,7 @@ public class EffectWarp extends L2Effect
 	}
 
 	@Override
-	public boolean onActionTime()
-	{
+	public boolean onActionTime() {
 		return false;
 	}
 

@@ -151,6 +151,23 @@ STATUS: COMPLETED (All Fixes Applied)
         *   Removed obsolete `@SuppressWarnings("synthetic-access")` from `SingletonHolder`.
      *  `Quest.java`:
         *   Removed obsolete `@SuppressWarnings("synthetic-access")` from `tmpOnSkillSee`.
+     *  `ThreadPoolManager.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")` from `SingletonHolder`.
+     *  `FaenorScriptEngine.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")` from `SingletonHolder`.
+     *  `CompiledScriptCache.java`:
+        *   Refactored `loadCompiledScript` and `save` to use try-with-resources.
+        *   Removed obsolete `@SuppressWarnings("resource")`.
+     *  `RequestRefine.java`:
+        *   Refactored augmentation check to be more explicit (Hero, Cursed, Shadow, Common items).
+        *   Resolved the TODO about "doing better" than just checking `isDestroyable()`.
+     *  `MultiSellIngredient.java`:
+        *   Added `_augmentationId` and `_manaLeft` fields, constructors, and getters/setters.
+     *  `MultiSellList.java`:
+        *   Resolved TODOs by sending `augmentationId` and `manaLeft` in the server packet.
+     *  `L2Multisell.java`:
+        *   Updated `prepareEntry` and `generateMultiSell` to maintain augmentation and mana data when `maintainEnchantment` is enabled.
+        *   Added XML parsing support for `augmentationId` and `manaLeft` attributes in ingredients and productions.
 
 4.  **Scripts Updated**:
     *   All `.bat` files updated for Java 17 flags.

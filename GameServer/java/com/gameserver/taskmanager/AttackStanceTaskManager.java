@@ -32,37 +32,29 @@ import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.network.serverpackets.AutoAttackStop;
 import com.gameserver.thread.ThreadPoolManager;
 
-public class AttackStanceTaskManager
-{
+public class AttackStanceTaskManager {
 	private static Log _log = LogFactory.getLog(AttackStanceTaskManager.class);
 
 	protected Map<L2Character, Long> _attackStanceTasks = new FastMap<L2Character, Long>().shared();
 
-	private AttackStanceTaskManager()
-	{
+	private AttackStanceTaskManager() {
 		ThreadPoolManager.getInstance().scheduleAiAtFixedRate(new FightModeScheduler(), 0, 1000);
 	}
 
-	public static AttackStanceTaskManager getInstance()
-	{
+	public static AttackStanceTaskManager getInstance() {
 		return SingletonHolder._instance;
 	}
 
-	public void addAttackStanceTask(L2Character actor)
-	{
-		if(actor instanceof L2Summon)
-		{
+	public void addAttackStanceTask(L2Character actor) {
+		if (actor instanceof L2Summon) {
 			L2Summon summon = (L2Summon) actor;
 			actor = summon.getOwner();
 		}
 
-		if(actor instanceof L2PcInstance)
-		{
+		if (actor instanceof L2PcInstance) {
 			L2PcInstance player = (L2PcInstance) actor;
-			for(L2CubicInstance cubic : player.getCubics().values())
-			{
-				if(cubic.getId() != L2CubicInstance.LIFE_CUBIC)
-				{
+			for (L2CubicInstance cubic : player.getCubics().values()) {
+				if (cubic.getId() != L2CubicInstance.LIFE_CUBIC) {
 					cubic.doAction(actor);
 				}
 			}
@@ -71,10 +63,8 @@ public class AttackStanceTaskManager
 		_attackStanceTasks.put(actor, System.currentTimeMillis());
 	}
 
-	public void removeAttackStanceTask(L2Character actor)
-	{
-		if(actor instanceof L2Summon)
-		{
+	public void removeAttackStanceTask(L2Character actor) {
+		if (actor instanceof L2Summon) {
 			L2Summon summon = (L2Summon) actor;
 			actor = summon.getOwner();
 		}
@@ -82,10 +72,8 @@ public class AttackStanceTaskManager
 		_attackStanceTasks.remove(actor);
 	}
 
-	public boolean getAttackStanceTask(L2Character actor)
-	{
-		if(actor instanceof L2Summon)
-		{
+	public boolean getAttackStanceTask(L2Character actor) {
+		if (actor instanceof L2Summon) {
 			L2Summon summon = (L2Summon) actor;
 			actor = summon.getOwner();
 		}
@@ -93,30 +81,22 @@ public class AttackStanceTaskManager
 		return _attackStanceTasks.containsKey(actor);
 	}
 
-	private class FightModeScheduler implements Runnable
-	{
-		protected FightModeScheduler()
-		{
+	private class FightModeScheduler implements Runnable {
+		protected FightModeScheduler() {
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			Long current = System.currentTimeMillis();
-			try
-			{
-				if(_attackStanceTasks != null)
-				{
-					synchronized (this)
-					{
-						for(L2Character actor : _attackStanceTasks.keySet())
-						{
-							if((current - _attackStanceTasks.get(actor)) > 15000)
-							{
+			try {
+				if (_attackStanceTasks != null) {
+					synchronized (this) {
+						for (L2Character actor : _attackStanceTasks.keySet()) {
+							if ((current - _attackStanceTasks.get(actor)) > 15000) {
 								actor.broadcastPacket(new AutoAttackStop(actor.getObjectId()));
-								if(actor instanceof L2PcInstance && ((L2PcInstance) actor).getPet() != null)
-								{
-									((L2PcInstance) actor).getPet().broadcastPacket(new AutoAttackStop(((L2PcInstance) actor).getPet().getObjectId()));
+								if (actor instanceof L2PcInstance && ((L2PcInstance) actor).getPet() != null) {
+									((L2PcInstance) actor).getPet().broadcastPacket(
+											new AutoAttackStop(((L2PcInstance) actor).getPet().getObjectId()));
 								}
 
 								actor.getAI().setAutoAttacking(false);
@@ -125,17 +105,13 @@ public class AttackStanceTaskManager
 						}
 					}
 				}
-			}
-			catch(Exception e)
-			{
+			} catch (Exception e) {
 				_log.warn("Error in FightModeScheduler: " + e.getMessage(), e);
 			}
 		}
 	}
 
-	@SuppressWarnings("synthetic-access")
-	private static class SingletonHolder
-	{
+	private static class SingletonHolder {
 		protected static final AttackStanceTaskManager _instance = new AttackStanceTaskManager();
 	}
 

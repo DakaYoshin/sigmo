@@ -18,81 +18,94 @@
  */
 package com.gameserver.model.multisell;
 
-public class MultiSellIngredient
-{
+public class MultiSellIngredient {
 	private int _itemId, _itemCount, _enchantmentLevel;
+	private int _augmentationId, _manaLeft;
 	private boolean _isTaxIngredient, _mantainIngredient;
 
-	public MultiSellIngredient(int itemId, int itemCount, boolean isTaxIngredient, boolean mantainIngredient)
-	{
+	public MultiSellIngredient(int itemId, int itemCount, boolean isTaxIngredient, boolean mantainIngredient) {
 		this(itemId, itemCount, 0, isTaxIngredient, mantainIngredient);
 	}
 
-	public MultiSellIngredient(int itemId, int itemCount, int enchantmentLevel, boolean isTaxIngredient, boolean mantainIngredient)
-	{
+	public MultiSellIngredient(int itemId, int itemCount, int enchantmentLevel, boolean isTaxIngredient,
+			boolean mantainIngredient) {
+		this(itemId, itemCount, enchantmentLevel, 0, -1, isTaxIngredient, mantainIngredient);
+	}
+
+	public MultiSellIngredient(int itemId, int itemCount, int enchantmentLevel, int augmentationId, int manaLeft,
+			boolean isTaxIngredient, boolean mantainIngredient) {
 		setItemId(itemId);
 		setItemCount(itemCount);
 		setEnchantmentLevel(enchantmentLevel);
+		setAugmentationId(augmentationId);
+		setManaLeft(manaLeft);
 		setIsTaxIngredient(isTaxIngredient);
 		setMantainIngredient(mantainIngredient);
 	}
 
-	public MultiSellIngredient(MultiSellIngredient e)
-	{
+	public MultiSellIngredient(MultiSellIngredient e) {
 		_itemId = e.getItemId();
 		_itemCount = e.getItemCount();
 		_enchantmentLevel = e.getEnchantmentLevel();
+		_augmentationId = e.getAugmentationId();
+		_manaLeft = e.getManaLeft();
 		_isTaxIngredient = e.isTaxIngredient();
 		_mantainIngredient = e.getMantainIngredient();
 	}
 
-	public void setItemId(int itemId)
-	{
+	public void setItemId(int itemId) {
 		_itemId = itemId;
 	}
 
-	public int getItemId()
-	{
+	public int getItemId() {
 		return _itemId;
 	}
 
-	public void setItemCount(int itemCount)
-	{
+	public void setItemCount(int itemCount) {
 		_itemCount = itemCount;
 	}
 
-	public int getItemCount()
-	{
+	public int getItemCount() {
 		return _itemCount;
 	}
 
-	public void setEnchantmentLevel(int enchantmentLevel)
-	{
+	public void setEnchantmentLevel(int enchantmentLevel) {
 		_enchantmentLevel = enchantmentLevel;
 	}
 
-	public int getEnchantmentLevel()
-	{
+	public int getEnchantmentLevel() {
 		return _enchantmentLevel;
 	}
 
-	public void setIsTaxIngredient(boolean isTaxIngredient)
-	{
+	public void setAugmentationId(int augmentationId) {
+		_augmentationId = augmentationId;
+	}
+
+	public int getAugmentationId() {
+		return _augmentationId;
+	}
+
+	public void setManaLeft(int manaLeft) {
+		_manaLeft = manaLeft;
+	}
+
+	public int getManaLeft() {
+		return _manaLeft;
+	}
+
+	public void setIsTaxIngredient(boolean isTaxIngredient) {
 		_isTaxIngredient = isTaxIngredient;
 	}
 
-	public boolean isTaxIngredient()
-	{
+	public boolean isTaxIngredient() {
 		return _isTaxIngredient;
 	}
 
-	public void setMantainIngredient(boolean mantainIngredient)
-	{
+	public void setMantainIngredient(boolean mantainIngredient) {
 		_mantainIngredient = mantainIngredient;
 	}
 
-	public boolean getMantainIngredient()
-	{
+	public boolean getMantainIngredient() {
 		return _mantainIngredient;
 	}
 }
