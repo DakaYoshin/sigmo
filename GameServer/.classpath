@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry excluding="**/.svn/*|.svn" kind="src" path="java"/>
 	<classpathentry excluding="**/.svn/*|.svn" kind="src" path="config"/>
-	<classpathentry including="**/*.java" kind="src" path="data/scripts"/>
+	<classpathentry excluding="**/.svn/*|.svn" including="**/*.java" kind="src" path="data/scripts"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="lib" path="lib/bcprov-jdk16-144.jar"/>
