@@ -29,14 +29,11 @@ import com.gameserver.taskmanager.AttackStanceTaskManager;
 /**
  * @author Matim
  */
-public class BuffBBSManager extends BaseBBSManager
-{
+public class BuffBBSManager extends BaseBBSManager {
 	@Override
-	public void parsecmd(String command, L2PcInstance activeChar)
-	{
-		if(command.startsWith("_bbsbuff"))
-		{
-			if(!checkAllowed(activeChar))
+	public void parsecmd(String command, L2PcInstance activeChar) {
+		if (command.startsWith("_bbsbuff")) {
+			if (!checkAllowed(activeChar))
 				return;
 
 			String val = command.substring(8);
@@ -46,10 +43,9 @@ public class BuffBBSManager extends BaseBBSManager
 			int id = Integer.parseInt(a);
 			String b = st.nextToken();
 			int lvl = Integer.parseInt(b);
-			
+
 			L2Skill skill = SkillTable.getInstance().getInfo(id, lvl);
-			if(skill != null)
-			{
+			if (skill != null) {
 				skill.getEffects(activeChar, activeChar);
 			}
 
@@ -58,76 +54,79 @@ public class BuffBBSManager extends BaseBBSManager
 
 			separateAndSend(content, activeChar);
 		}
-		
+
 	}
 
 	@Override
-	public void parsewrite(String ar1, String ar2, String ar3, String ar4, String ar5, L2PcInstance activeChar)
-	{
-		
+	public void parsewrite(String ar1, String ar2, String ar3, String ar4, String ar5, L2PcInstance activeChar) {
+
 	}
 
 	/**
 	 * @param player
 	 * @return
-	 * <br><br>
-	 * Check if player may use additional Community board functions.
-	 * Such as buffer, gatekeeper.
+	 *         <br>
+	 *         <br>
+	 *         Check if player may use additional Community board functions.
+	 *         Such as buffer, gatekeeper.
 	 */
-	public boolean checkAllowed(L2PcInstance activeChar)
-	{
+	public boolean checkAllowed(L2PcInstance activeChar) {
 		String msg = null;
 
-		if(activeChar.isSitting())
+		if (activeChar.isSitting())
 			msg = "You can't use Community Buffer when you sit!";
-		else if(activeChar.isCastingNow())
+		else if (activeChar.isCastingNow())
 			msg = "You can't use Community Buffer when you cast!";
-		else if(activeChar.isDead())
+		else if (activeChar.isDead())
 			msg = "You can't use Community Buffer when you dead!";
-		else if(activeChar.isInCombat())
+		else if (activeChar.isInCombat())
 			msg = "You can't use Community Buffer when you in combat!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("JAIL") && activeChar.isInJail())
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("JAIL") && activeChar.isInJail())
 			msg = "You can't use Community Buffer when you in jail!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("KARMA") && activeChar.getKarma() > 0)
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("KARMA") && activeChar.getKarma() > 0)
 			msg = "You can't use Community Buffer when you have karma!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("CURSED") && activeChar.isCursedWeaponEquiped())
-			msg = "You can't use Community Buffer when you have Cursed Weapon!"; 
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("ATTACK") && AttackStanceTaskManager.getInstance().getAttackStanceTask(activeChar))
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("CURSED") && activeChar.isCursedWeaponEquiped())
+			msg = "You can't use Community Buffer when you have Cursed Weapon!";
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("ATTACK")
+				&& AttackStanceTaskManager.getInstance().getAttackStanceTask(activeChar))
 			msg = "You can't use Community Buffer when you Attack!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("SEVEN") && activeChar.isIn7sDungeon())
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("SEVEN") && activeChar.isIn7sDungeon())
 			msg = "You can't use Community Buffer when you on 7 Signs!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("RB") && activeChar.isInsideZone(L2Character.ZONE_NOSUMMONFRIEND))
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("RB")
+				&& activeChar.isInsideZone(L2Character.ZONE_NOSUMMONFRIEND))
 			msg = "You can't use Community Buffer when you on Raid Zone!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("PVP") && activeChar.isInsideZone(L2Character.ZONE_PVP))
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("PVP") && activeChar.isInsideZone(L2Character.ZONE_PVP))
 			msg = "You can't use Community Buffer when you on PvP Zone!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("PEACE") && activeChar.isInsideZone(L2Character.ZONE_PEACE))
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("PEACE")
+				&& activeChar.isInsideZone(L2Character.ZONE_PEACE))
 			msg = "You can't use Community Buffer when you on Peace Zone!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("NOTINTOWN") && TownManager.getInstance().getTown(activeChar.getX(), activeChar.getY(), activeChar.getZ()) == null)
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("NOTINTOWN")
+				&& TownManager.getInstance().getTown(activeChar.getX(), activeChar.getY(), activeChar.getZ()) == null)
 			msg = "You can't use Community Buffer when you no in town!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("SIEGE") && activeChar.isInsideZone(L2Character.ZONE_SIEGE))
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("SIEGE")
+				&& activeChar.isInsideZone(L2Character.ZONE_SIEGE))
 			msg = "You can't use Community Buffer when you on siege!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("OLYMPIAD") && (activeChar.isInOlympiadMode() || activeChar.isInsideZone(L2Character.ZONE_OLY) || Olympiad.getInstance().isRegistered(activeChar) || Olympiad.getInstance().isRegisteredInComp(activeChar))) 
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("OLYMPIAD") && (activeChar.isInOlympiadMode()
+				|| activeChar.isInsideZone(L2Character.ZONE_OLY) || Olympiad.getInstance().isRegistered(activeChar)
+				|| Olympiad.getInstance().isRegisteredInComp(activeChar)))
 			msg = "You can't use Community Buffer when you on olympiad!";
-		else if(Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("EVENT") && activeChar.isFightingInEvent())
+		else if (Config.COMMUNITY_BUFFER_EXCLUDE_ON.contains("EVENT") && activeChar.isFightingInEvent())
 			msg = "You can't use Community Buffer when you on event!";
 
-		if(msg!=null)
+		if (msg != null)
 			activeChar.sendMessage(msg);
 
-		return msg==null;
+		return msg == null;
 	}
-	
+
 	/**
 	 * @return
 	 */
-	public static BuffBBSManager getInstance()
-	{
+	public static BuffBBSManager getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
-	
-	@SuppressWarnings("synthetic-access")
-	private static class SingletonHolder
-	{
+
+	private static class SingletonHolder {
 		protected static final BuffBBSManager INSTANCE = new BuffBBSManager();
 	}
 }

@@ -18,7 +18,6 @@
  */
 package com.gameserver.handler;
 
-
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.logging.Level;
@@ -26,57 +25,46 @@ import java.util.logging.Logger;
 
 import com.util.StringUtil;
 
-public class VoicedCommandHandler
-{
+public class VoicedCommandHandler {
 	private static final Logger _log = Logger.getLogger(VoicedCommandHandler.class.getName());
-	
+
 	private static final TIntObjectHashMap<IVoicedCommandHandler> _datatable = new TIntObjectHashMap<IVoicedCommandHandler>();
-	
-	public static VoicedCommandHandler getInstance()
-	{
+
+	public static VoicedCommandHandler getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
-	
-	private VoicedCommandHandler()
-	{
-		
+
+	private VoicedCommandHandler() {
+
 	}
-	
-	public void registerVoicedCommandHandler(IVoicedCommandHandler handler)
-	{
+
+	public void registerVoicedCommandHandler(IVoicedCommandHandler handler) {
 		String[] ids = handler.getVoicedCommandList();
-		for (int i = 0; i < ids.length; i++)
-		{
-			if (_log.isLoggable(Level.FINE))
-			{
+		for (int i = 0; i < ids.length; i++) {
+			if (_log.isLoggable(Level.FINE)) {
 				_log.fine(StringUtil.concat("Adding handler for command ", ids[i]));
 			}
 			_datatable.put(ids[i].hashCode(), handler);
 		}
 	}
-	
-	public IVoicedCommandHandler getVoicedCommandHandler(String voicedCommand)
-	{
+
+	public IVoicedCommandHandler getVoicedCommandHandler(String voicedCommand) {
 		String command = voicedCommand;
-		if (voicedCommand.indexOf(" ") != -1)
-		{
+		if (voicedCommand.indexOf(" ") != -1) {
 			command = voicedCommand.substring(0, voicedCommand.indexOf(" "));
 		}
-		if (_log.isLoggable(Level.FINE))
-		{
-			_log.fine(StringUtil.concat("getting handler for command: ", command, " -> ", String.valueOf(_datatable.get(command.hashCode()) != null)));
+		if (_log.isLoggable(Level.FINE)) {
+			_log.fine(StringUtil.concat("getting handler for command: ", command, " -> ",
+					String.valueOf(_datatable.get(command.hashCode()) != null)));
 		}
 		return _datatable.get(command.hashCode());
 	}
-	
-	public int size()
-	{
+
+	public int size() {
 		return _datatable.size();
 	}
-	
-	@SuppressWarnings("synthetic-access")
-	private static class SingletonHolder
-	{
+
+	private static class SingletonHolder {
 		protected static final VoicedCommandHandler INSTANCE = new VoicedCommandHandler();
 	}
 }

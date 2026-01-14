@@ -1106,8 +1106,9 @@ public class L2HashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
      * Custom Entry class used by EntryIterator.next(), that relays
      * setValue changes to the underlying map.
      */
-    @SuppressWarnings("serial")
     final class WriteThroughEntry extends AbstractMap.SimpleEntry<K, V> {
+        private static final long serialVersionUID = 7249069246763182391L;
+
         WriteThroughEntry(K k, V v) {
             super(k, v);
         }

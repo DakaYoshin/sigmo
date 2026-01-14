@@ -25,47 +25,37 @@ import javolution.util.FastMap;
 
 import com.util.StringUtil;
 
-public class ChatHandler
-{
+public class ChatHandler {
 	private static final Logger _log = Logger.getLogger(ChatHandler.class.getName());
-	
+
 	private static final FastMap<Integer, IChatHandler> _datatable = new FastMap<Integer, IChatHandler>();
-	
-	public static ChatHandler getInstance()
-	{
+
+	public static ChatHandler getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
-	
-	private ChatHandler()
-	{
+
+	private ChatHandler() {
 	}
-	
-	public void registerChatHandler(IChatHandler handler)
-	{
+
+	public void registerChatHandler(IChatHandler handler) {
 		int[] ids = handler.getChatTypeList();
-		for (int i = 0; i < ids.length; i++)
-		{
-			if (_log.isLoggable(Level.FINE))
-			{
+		for (int i = 0; i < ids.length; i++) {
+			if (_log.isLoggable(Level.FINE)) {
 				_log.fine(StringUtil.concat("Adding handler for chat type ", String.valueOf(ids[i])));
 			}
 			_datatable.put(ids[i], handler);
 		}
 	}
-	
-	public IChatHandler getChatHandler(int chatType)
-	{
+
+	public IChatHandler getChatHandler(int chatType) {
 		return _datatable.get(chatType);
 	}
-	
-	public int size()
-	{
+
+	public int size() {
 		return _datatable.size();
 	}
-	
-	@SuppressWarnings("synthetic-access")
-	private static class SingletonHolder
-	{
+
+	private static class SingletonHolder {
 		protected static final ChatHandler INSTANCE = new ChatHandler();
 	}
 }

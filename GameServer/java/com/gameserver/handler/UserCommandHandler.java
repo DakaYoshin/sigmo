@@ -26,51 +26,40 @@ import javolution.util.FastMap;
 
 import com.util.StringUtil;
 
-public class UserCommandHandler
-{
+public class UserCommandHandler {
 	private static final Logger _log = Logger.getLogger(UserCommandHandler.class.getName());
-	
+
 	private static final Map<Integer, IUserCommandHandler> _datatable = new FastMap<Integer, IUserCommandHandler>();
-	
-	public static UserCommandHandler getInstance()
-	{
+
+	public static UserCommandHandler getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
-	
-	private UserCommandHandler()
-	{
+
+	private UserCommandHandler() {
 	}
-	
-	public void registerUserCommandHandler(IUserCommandHandler handler)
-	{
+
+	public void registerUserCommandHandler(IUserCommandHandler handler) {
 		int[] ids = handler.getUserCommandList();
-		for (int i = 0; i < ids.length; i++)
-		{
-			if (_log.isLoggable(Level.FINE))
-			{
+		for (int i = 0; i < ids.length; i++) {
+			if (_log.isLoggable(Level.FINE)) {
 				_log.fine(StringUtil.concat("Adding handler for user command ", String.valueOf(ids[i])));
 			}
 			_datatable.put(Integer.valueOf(ids[i]), handler);
 		}
 	}
-	
-	public IUserCommandHandler getUserCommandHandler(int userCommand)
-	{
-		if (_log.isLoggable(Level.FINE))
-		{
+
+	public IUserCommandHandler getUserCommandHandler(int userCommand) {
+		if (_log.isLoggable(Level.FINE)) {
 			_log.fine(StringUtil.concat("getting handler for user command: ", String.valueOf(userCommand)));
 		}
 		return _datatable.get(Integer.valueOf(userCommand));
 	}
-	
-	public int size()
-	{
+
+	public int size() {
 		return _datatable.size();
 	}
-	
-	@SuppressWarnings("synthetic-access")
-	private static class SingletonHolder
-	{
+
+	private static class SingletonHolder {
 		protected static final UserCommandHandler INSTANCE = new UserCommandHandler();
 	}
 }

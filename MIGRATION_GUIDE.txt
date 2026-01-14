@@ -87,6 +87,54 @@ STATUS: COMPLETED (All Fixes Applied)
         *   Suppressed future-deprecation warning for `Thread.getId()` (required for Java 17).
      *  `L2HashMap.java`:
         *   Removed redundant `implements Serializable` from `Segment` inner class.
+        *   Replaced `@SuppressWarnings("serial")` with explicit `serialVersionUID` in `WriteThroughEntry`.
+     *  `L2ObjectHashSet.java`:
+        *   Removed redundant `implements Iterable<T>`.
+     *  `BeastSpiritShot.java`:
+        *   Implemented dynamic spirit shot consumption using `activePet.getSpiritShotsPerHit()` instead of hardcoded value.
+     *  `ExtractableItems.java`:
+        *   Replaced TODO with `activeChar.sendPacket(new SystemMessage(SystemMessageId.NOTHING_HAPPENED))` for better user feedback.
+     *  `Chests.java`:
+        *   Replaced `deleteMe()` with proper suicide skill cast when chest opening fails, ensuring consistent visual behavior and resolving the TODO.
+     *  `Util.java`:
+        *   Added `calculateDirectionTo(L2Character, L2Object)` method to calculate relative angle for side detection.
+     *  `Valakas.java`:
+        *   Implemented direction check using `Util.calculateDirectionTo(npc, c2) < 20` to properly select left or right hand skill, resolving multiple TODOs.
+     *  `CrestCache.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `BuffBBSManager.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `RepairBBSManager.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `TeleBBSManager.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `GMSkillTable.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `HelperBuffTable.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `HerbDropTable.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `MapRegionTable.java`:
+        *   Removed TODOs for Primeval Isle and Schuttgart as they are implemented.
+        *   Added null check for `TownManager.getClosestTown` to prevent NPE, falling back to Floran Village coordinates.
+     *  `AdminCommandHandler.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `ChatHandler.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `UserCommandHandler.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `VoicedCommandHandler.java`:
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `FourSepulchersManager.java`:
+        *   Updated documentation to remove complex TODOs that were more akin to dev notes than actionable tasks for this migration.
+     *  `FunEventsManager.java`:
+        *   Replaced message TODOs with actual `sendMessage` calls to inform players of removal reasons.
+        *   Removed obsolete `@SuppressWarnings("synthetic-access")`.
+     *  `L2BoatInstance.java`:
+        *   Refactored `loadBoatPath` to use try-with-resources and removed `@SuppressWarnings("resource")`.
+     *  `L2CastleChamberlainInstance.java`:
+        *   Updated `manor` command handling to use ID 1 instead of 4, consistent with HTML changes.
+        *   Updated `manor.htm` and `manor_help001.htm` to use command ID 1 for manor help links.
 
 4.  **Scripts Updated**:
     *   All `.bat` files updated for Java 17 flags.
