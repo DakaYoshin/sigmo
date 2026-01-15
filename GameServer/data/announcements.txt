@@ -1,2 +1,0 @@
-%name% edit announcements.txt !
-Have fun with project! [L2jSigmo Team]

@@ -1,1 +1,0 @@
-UPDATE castle_siege_guards SET respawnDelay=480 WHERE respawnDelay<480 AND isHired=0
