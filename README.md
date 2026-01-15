@@ -1,32 +1,44 @@
-# L2jSigmo
-Free project Interlude
+# Project Sigmo - Interlude Server
 
-1.  **Driver Updated**:
-    *   `mariadb-java-client-3.3.3.jar` is in `f:\sigmo\GameServer\lib\`.
+Free project Interlude based on L2J, modernized and enhanced for performance and features.
 
-2.  **Configuration**:
-    *   `build.xml`, `.properties` files, and IDE `.classpath` are updated.
+## 🚀 Recent Accomplishments
 
-3.  **Code Adjustments**:
-    *   `FileLogFormatter.java`: 
-        *   Renamed variable `_` to `TAB` (Java 9+ compliance).
-        *   Replaced deprecated `getThreadID()` with `getLongThreadID()` (Java 16+ compliance).
-           *   `AdminAnnouncements.java`:
-        *   Replaced deprecated `new Integer(String)` with `Integer.parseInt(String)`.
-            *   `AdminLogin.java`:
-        *   Replaced deprecated `new Integer(String)` with `Integer.parseInt(String)`.
-     *   `GameServerTable.java`:
-        *   Replaced deprecated `new Integer(String)` with `Integer.parseInt(String)`.       
-    *   `ClanTable.java`:
-        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
-    *   `ClanTable.java`:
-        *   Replaced deprecated `new Integer(int)` with `Integer.valueOf(int)`.
-4.  **Scripts Updated**:
-    *   All `.bat` files updated for Java 17 flags.
-    
-5.  **NEXT STEPS**:
-    1.  **Install JDK 17**: Ensure you have Java 17 installed on your system.
-    2.  **Install MariaDB**: Ensure you have MariaDB 10+ installed and running.
-    3.  **Compile**: Open a terminal in `f:\sigmo\GameServer` and run `ant dist`.
-    
-Your project is clean and ready to build!
+### 1. Modernization & Infrastructure
+*   **Java 17 Migration**: Full codebase upgrade to Java 17. Fixed syntax compliance issues (such as `_` identifier usage), updated deprecated constructors (e.g., `new Integer()`), and optimized JVM flags in all `.bat` scripts.
+*   **SLF4J Implementation**: Migrated the entire project from legacy `java.util.logging` to **SLF4J**, providing a more flexible and high-performance logging framework.
+*   **Project Consolidation**: Streamlined the development environment by merging the `DataPack` scripts and handlers into the `GameServer` project. This reduced pathing complexity and improved build times.
+*   **Dependency Updates**: Updated core libraries including `mariadb-java-client` to version 3.3.3.
+
+### 2. New Features & Enhancements
+*   **Advanced Auto Farm System**:
+    *   Implemented a fully configurable Auto Farm system for players.
+    *   Features include: radius control, HP/MP potion management, skill usage percentages, and ignored monster lists.
+    *   Integrated persistent database storage for player preferences.
+    *   New voiced command `.autofarm` and GUI menus.
+*   **Refactored Handler System**: Implemented `MasterHandler` to centralize the registration of Admin, Voiced, User, Chat, and Item handlers, significantly cleaning up the `GameServer` initialization logic.
+
+### 3. Stability & Security
+*   **Admin Command Fixes**: Resolved issues where admin commands were not being correctly registered or were inaccessible due to package path errors.
+*   **Anti-Dupe & Security**: Fixed compilation and logic errors in the `AntiDupeGuard` system.
+*   **Deadlock Prevention**: Refactored the `DeadlockDetector` daemon for better compatibility with modern thread management.
+*   **Script Engine Stability**: Fixed various compilation issues within the `L2ScriptEngineManager` and ensured proper script compilation caching.
+
+## 🛠️ Requirements & Setup
+
+1.  **Java Development Kit (JDK) 17**: Ensure your `JAVA_HOME` points to a JDK 17 installation.
+2.  **MariaDB 10+**: Database server required for character and server data.
+3.  **Build Tool**: Apache Ant is used for compilation.
+
+### How to Compile
+1.  Open a terminal in the `f:\sigmo\GameServer` directory.
+2.  Run the command: `ant dist`.
+3.  The compiled server files will be located in the `build/dist` folder.
+
+### Database Setup
+1.  Create a new schema in MariaDB.
+2.  Execute the updated SQL scripts located in the `DataPack/sql` folder (if applicable).
+3.  Configure `config/server.properties` with your database credentials.
+
+---
+*Your project is clean, modernized, and ready for production testing!*
