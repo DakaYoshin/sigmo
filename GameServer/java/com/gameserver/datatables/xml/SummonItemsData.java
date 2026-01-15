@@ -22,8 +22,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -34,7 +34,7 @@ import com.gameserver.model.L2SummonItem;
 
 public class SummonItemsData
 {
-	private static final Log _log = LogFactory.getLog(SummonItemsData.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(SummonItemsData.class.getName());
 
 	private FastMap<Integer, L2SummonItem> _summonitems;
 

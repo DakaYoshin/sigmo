@@ -18,8 +18,8 @@
  */
 package com.gameserver.network.clientpackets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.AdminCommandAccessRights;
 import com.gameserver.handler.AdminCommandHandler;
@@ -28,7 +28,7 @@ import com.gameserver.model.actor.instance.L2PcInstance;
 
 public final class SendBypassBuildCmd extends L2GameClientPacket
 {
-	private final static Log _log = LogFactory.getLog(SendBypassBuildCmd.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(SendBypassBuildCmd.class.getName());
 
 	private static final String _C__5B_SENDBYPASSBUILDCMD = "[C] 5b SendBypassBuildCmd";
 
@@ -77,3 +77,4 @@ public final class SendBypassBuildCmd extends L2GameClientPacket
 		return _C__5B_SENDBYPASSBUILDCMD;
 	}
 }
+

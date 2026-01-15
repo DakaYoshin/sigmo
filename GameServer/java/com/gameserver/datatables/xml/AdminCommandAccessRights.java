@@ -23,8 +23,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -35,7 +35,7 @@ import com.gameserver.datatables.AccessLevel;
 
 public class AdminCommandAccessRights
 {
-	private final static Log _log = LogFactory.getLog(AdminCommandAccessRights.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(AdminCommandAccessRights.class.getName());
 
 	private static AdminCommandAccessRights _instance = null;
 
@@ -142,3 +142,4 @@ public class AdminCommandAccessRights
 		}
 	}
 }
+

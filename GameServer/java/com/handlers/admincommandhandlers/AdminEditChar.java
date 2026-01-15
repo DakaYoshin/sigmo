@@ -25,8 +25,8 @@ import java.util.StringTokenizer;
 
 import javolution.text.TextBuilder;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.ai.CtrlIntention;
@@ -48,7 +48,7 @@ import com.gameserver.network.serverpackets.SystemMessage;
 import com.gameserver.util.Util;
 
 public class AdminEditChar implements IAdminCommandHandler {
-	private final static Log _log = LogFactory.getLog(AdminEditChar.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(AdminEditChar.class.getName());
 
 	private static String[] ADMIN_COMMANDS = {
 			"admin_setname",

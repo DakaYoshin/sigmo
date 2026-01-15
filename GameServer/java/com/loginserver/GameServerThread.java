@@ -34,8 +34,8 @@ import java.util.Set;
 
 import javolution.util.FastSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.GameServerTable;
@@ -57,7 +57,7 @@ import com.util.protection.NewCrypt;
 
 public class GameServerThread extends Thread
 {
-	private final static Log _log = LogFactory.getLog(GameServerThread.class);
+	private final static Logger _log = LoggerFactory.getLogger(GameServerThread.class);
 
 	private Socket _connection;
 	private InputStream _in;
@@ -578,3 +578,4 @@ public class GameServerThread extends Thread
 	}
 
 }
+

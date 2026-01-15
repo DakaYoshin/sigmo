@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.ArmorSetsTable;
 import com.gameserver.model.L2ArmorSet;
@@ -32,7 +32,7 @@ import com.util.database.L2DatabaseFactory;
 
 public final class CustomArmorSetsTable
 {
-	private static final Log _log = LogFactory.getLog(CustomArmorSetsTable.class);
+	private static final Logger _log = LoggerFactory.getLogger(CustomArmorSetsTable.class);
 	private static CustomArmorSetsTable _instance;
 	public static CustomArmorSetsTable getInstance()
 	{

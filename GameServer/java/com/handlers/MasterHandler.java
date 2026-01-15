@@ -18,7 +18,8 @@
  */
 package com.handlers;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.handler.AdminCommandHandler;
@@ -31,14 +32,11 @@ import com.handlers.chathandlers.*;
 import com.handlers.itemhandlers.*;
 import com.handlers.usercommandhandlers.*;
 import com.handlers.voicedcommandhandlers.*;
-import com.handlers.chathandlers.ChatPetition; // Explicit import just in case
 
-public class MasterHandler
-{
-	private static final Logger _log = Logger.getLogger(MasterHandler.class.getName());
+public class MasterHandler {
+	private static final Logger _log = LoggerFactory.getLogger(MasterHandler.class);
 
-	private static void loadAdminHandlers()
-	{
+	private static void loadAdminHandlers() {
 		AdminCommandHandler.getInstance().registerAdminCommandHandler(new AdminAdmin());
 		AdminCommandHandler.getInstance().registerAdminCommandHandler(new AdminAio());
 		AdminCommandHandler.getInstance().registerAdminCommandHandler(new AdminBoat());
@@ -104,11 +102,10 @@ public class MasterHandler
 		AdminCommandHandler.getInstance().registerAdminCommandHandler(new AdminBuffs());
 		AdminCommandHandler.getInstance().registerAdminCommandHandler(new AdminClanFull());
 		AdminCommandHandler.getInstance().registerAdminCommandHandler(new AdminChaos());
-		_log.config("Loaded " + AdminCommandHandler.getInstance().size() + " AdminHandlers");
+		_log.info("Loaded " + AdminCommandHandler.getInstance().size() + " AdminHandlers");
 	}
 
-	private static void loadChatHandlers()
-	{
+	private static void loadChatHandlers() {
 		ChatHandler.getInstance().registerChatHandler(new ChatAll());
 		ChatHandler.getInstance().registerChatHandler(new ChatAlliance());
 		ChatHandler.getInstance().registerChatHandler(new ChatClan());
@@ -121,11 +118,10 @@ public class MasterHandler
 		ChatHandler.getInstance().registerChatHandler(new ChatShout());
 		ChatHandler.getInstance().registerChatHandler(new ChatTell());
 		ChatHandler.getInstance().registerChatHandler(new ChatTrade());
-		_log.config("Loaded " + ChatHandler.getInstance().size() + " ChatHandlers");
+		_log.info("Loaded " + ChatHandler.getInstance().size() + " ChatHandlers");
 	}
 
-	private static void loadUserHandlers()
-	{
+	private static void loadUserHandlers() {
 		UserCommandHandler.getInstance().registerUserCommandHandler(new Time());
 		UserCommandHandler.getInstance().registerUserCommandHandler(new OlympiadStat());
 		UserCommandHandler.getInstance().registerUserCommandHandler(new ChannelLeave());
@@ -138,27 +134,25 @@ public class MasterHandler
 		UserCommandHandler.getInstance().registerUserCommandHandler(new Loc());
 		UserCommandHandler.getInstance().registerUserCommandHandler(new Mount());
 		UserCommandHandler.getInstance().registerUserCommandHandler(new PartyInfo());
-		_log.config("Loaded " + UserCommandHandler.getInstance().size() + " UserCommandHandlers");
+		_log.info("Loaded " + UserCommandHandler.getInstance().size() + " UserCommandHandlers");
 	}
 
-	private static void loadVoicedHandlers()
-	{
-		if(Config.BANKING_SYSTEM_ENABLED)
+	private static void loadVoicedHandlers() {
+		if (Config.BANKING_SYSTEM_ENABLED)
 			VoicedCommandHandler.getInstance().registerVoicedCommandHandler(new Banking());
-		if(Config.ALLOW_WEDDING)
+		if (Config.ALLOW_WEDDING)
 			VoicedCommandHandler.getInstance().registerVoicedCommandHandler(new Wedding());
-		if(Config.MULTILANG_ENABLE)
+		if (Config.MULTILANG_ENABLE)
 			VoicedCommandHandler.getInstance().registerVoicedCommandHandler(new Lang());
-		if(Config.ENABLED_CHAOS_EVENT)
+		if (Config.ENABLED_CHAOS_EVENT)
 			VoicedCommandHandler.getInstance().registerVoicedCommandHandler(new ChaosCmd());
 
 		VoicedCommandHandler.getInstance().registerVoicedCommandHandler(new VoicedAutoFarm());
 
-		_log.config("Loaded " + VoicedCommandHandler.getInstance().size() + " VoicedCommandHandlers");
+		_log.info("Loaded " + VoicedCommandHandler.getInstance().size() + " VoicedCommandHandlers");
 	}
 
-	private static void loadItemHandlers()
-	{
+	private static void loadItemHandlers() {
 		ItemHandler.getInstance().registerItemHandler(new ScrollOfEscape());
 		ItemHandler.getInstance().registerItemHandler(new ScrollOfResurrection());
 		ItemHandler.getInstance().registerItemHandler(new SoulShots());
@@ -200,17 +194,16 @@ public class MasterHandler
 		ItemHandler.getInstance().registerItemHandler(new Crystals());
 		ItemHandler.getInstance().registerItemHandler(new Primeval());
 
-		_log.config("Loaded " + ItemHandler.getInstance().size() + " ItemHandlers");
+		_log.info("Loaded " + ItemHandler.getInstance().size() + " ItemHandlers");
 	}
 
-	public static void main(String[] args)
-	{
-		_log.config("Loading Handlers..");
+	public static void main(String[] args) {
+		_log.info("Loading Handlers..");
 		loadAdminHandlers();
 		loadChatHandlers();
 		loadUserHandlers();
 		loadVoicedHandlers();
 		loadItemHandlers();
-		_log.config("Handlers loaded!");
+		_log.info("Handlers loaded!");
 	}
 }

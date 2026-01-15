@@ -25,8 +25,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.NpcTable;
 import com.gameserver.model.actor.instance.L2PcInstance;
@@ -38,7 +38,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class SiegeGuardManager
 {
-	private static final Log _log = LogFactory.getLog(SiegeGuardManager.class);
+	private static final Logger _log = LoggerFactory.getLogger(SiegeGuardManager.class);
 
 	private Castle _castle;
 	private List<L2Spawn> _siegeGuardSpawn = new FastList<L2Spawn>();

@@ -21,14 +21,14 @@ package com.gameserver.network.gameserverpackets;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.thread.TaskPriority;
 
 public abstract class GameServerBasePacket
 {
-	protected final static Log _log = LogFactory.getLog(GameServerBasePacket.class);
+	protected final static Logger _log = LoggerFactory.getLogger(GameServerBasePacket.class);
 
 	private ByteArrayOutputStream _bao;
 
@@ -128,3 +128,4 @@ public abstract class GameServerBasePacket
 	public abstract byte[] getContent() throws IOException;
 
 }
+

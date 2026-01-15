@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.cache.CrestCache;
 import com.gameserver.idfactory.IdFactory;
@@ -36,7 +36,7 @@ import com.util.database.L2DatabaseFactory;
 
 public final class RequestExSetPledgeCrestLarge extends L2GameClientPacket
 {
-	private final static Log _log = LogFactory.getLog(RequestExSetPledgeCrestLarge.class);
+	private final static Logger _log = LoggerFactory.getLogger(RequestExSetPledgeCrestLarge.class);
 
 	private static final String _C__D0_11_REQUESTEXSETPLEDGECRESTLARGE = "[C] D0:11 RequestExSetPledgeCrestLarge";
 
@@ -160,3 +160,4 @@ public final class RequestExSetPledgeCrestLarge extends L2GameClientPacket
 		return _C__D0_11_REQUESTEXSETPLEDGECRESTLARGE;
 	}
 }
+

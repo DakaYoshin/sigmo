@@ -25,14 +25,14 @@ import java.util.Set;
 
 import javolution.util.FastSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.thread.L2Thread;
 import com.util.Util;
 
 public final class DeadlockDetector implements Runnable {
-	private static final Log _log = LogFactory.getLog(DeadlockDetector.class);
+	private static final Logger _log = LoggerFactory.getLogger(DeadlockDetector.class);
 	private final Set<Long> _logged = new FastSet<Long>();
 
 	private static DeadlockDetector _instance;
@@ -70,7 +70,7 @@ public final class DeadlockDetector implements Runnable {
 
 			for (Thread thread : deadlocked) {
 				for (String line : L2Thread.getStats(thread)) {
-					_log.fatal(line);
+					_log.error(line);
 				}
 			}
 
@@ -86,7 +86,6 @@ public final class DeadlockDetector implements Runnable {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	private Thread findThreadById(long id) {
 		for (Thread thread : Thread.getAllStackTraces().keySet()) {
 			if (thread.getId() == id) {

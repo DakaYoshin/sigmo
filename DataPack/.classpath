@@ -5,6 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/GameServer"/>
 	<classpathentry kind="lib" path="/GameServer/lib/javolution-5.5.1.jar"/>
 	<classpathentry kind="lib" path="/GameServer/lib/trove-3.0.2.jar"/>
-	<classpathentry kind="lib" path="/GameServer/lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="/GameServer/lib/slf4j-api-2.0.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

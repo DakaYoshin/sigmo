@@ -18,8 +18,8 @@
  */
 package com.gameserver;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.sql.OfflineTradersTable;
@@ -70,7 +70,7 @@ public class Shutdown extends Thread {
 		}
 	}
 
-	private static Log _log = LogFactory.getLog(Shutdown.class);
+	private static Logger _log = LoggerFactory.getLogger(Shutdown.class);
 	private static Shutdown _instance;
 	private static Shutdown _counterInstance = null;
 	private int _secondsShut;

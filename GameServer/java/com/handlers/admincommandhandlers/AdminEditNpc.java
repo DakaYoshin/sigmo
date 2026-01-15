@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javolution.text.TextBuilder;
 import javolution.util.FastList;
@@ -55,7 +56,7 @@ import com.gameserver.templates.skills.L2SkillType;
 import com.util.database.L2DatabaseFactory;
 
 public class AdminEditNpc implements IAdminCommandHandler {
-	private static Logger _log = Logger.getLogger(AdminEditChar.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(AdminEditNpc.class);
 	private final static int PAGE_LIMIT = 20;
 
 	private static final String[] ADMIN_COMMANDS = {
@@ -153,7 +154,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 
 						updateDropData(activeChar, npcId, itemId, min, max, category, chance);
 					} catch (Exception e) {
-						_log.fine("admin_edit_drop parements error: " + command);
+						_log.debug("admin_edit_drop parements error: " + command);
 					}
 				} else
 					activeChar.sendChatMessage(0, 0, "SYS",
@@ -190,7 +191,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 
 						addDropData(activeChar, npcId, itemId, min, max, category, chance);
 					} catch (Exception e) {
-						_log.fine("admin_add_drop parements error: " + command);
+						_log.debug("admin_add_drop parements error: " + command);
 					}
 				} else
 					activeChar.sendChatMessage(0, 0, "SYS",
@@ -772,7 +773,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 				newNpcData.set("absorb_level", intVal < 0 ? 0 : intVal > 12 ? 0 : intVal);
 			}
 		} catch (Exception e) {
-			_log.warning("Error saving new npc value: " + e);
+			_log.warn("Error saving new npc value: " + e);
 		}
 
 		int npcId = newNpcData.getInteger("npcId");
@@ -1318,7 +1319,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			activeChar.sendPacket(adminReply);
 		} catch (Exception e) {
 			activeChar.sendChatMessage(0, 0, "SYS", "Could not edit npc skills!");
-			_log.warning("Error while editing npc skills (" + npcId + ", " + skillId + "): " + e);
+			_log.warn("Error while editing npc skills (" + npcId + ", " + skillId + "): " + e.getMessage(), e);
 		}
 	}
 
@@ -1357,7 +1358,9 @@ public class AdminEditNpc implements IAdminCommandHandler {
 					"Updated skill id " + skillId + " for npc id " + npcId + " to level " + level + ".");
 		} catch (Exception e) {
 			activeChar.sendChatMessage(0, 0, "SYS", "Could not update npc skill!");
-			_log.warning("Error while updating npc skill (" + npcId + ", " + skillId + ", " + level + "): " + e);
+			_log.warn(
+					"Error while updating npc skill (" + npcId + ", " + skillId + ", " + level + "): " + e.getMessage(),
+					e);
 		} finally {
 			try {
 				con.close();
@@ -1416,7 +1419,9 @@ public class AdminEditNpc implements IAdminCommandHandler {
 					"Added skill " + skillId + "-" + level + " to npc id " + npcId + ".");
 		} catch (Exception e) {
 			activeChar.sendChatMessage(0, 0, "SYS", "Could not add npc skill!");
-			_log.warning("Error while adding a npc skill (" + npcId + ", " + skillId + ", " + level + "): " + e);
+			_log.warn(
+					"Error while adding a npc skill (" + npcId + ", " + skillId + ", " + level + "): " + e.getMessage(),
+					e);
 		} finally {
 			try {
 				con.close();
@@ -1445,7 +1450,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			}
 		} catch (Exception e) {
 			activeChar.sendChatMessage(0, 0, "SYS", "Could not delete npc skill!");
-			_log.warning("Error while deleting npc skill (" + npcId + ", " + skillId + "): " + e);
+			_log.warn("Error while deleting npc skill (" + npcId + ", " + skillId + "): " + e.getMessage(), e);
 		} finally {
 			try {
 				con.close();
@@ -1480,7 +1485,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			skillDataList.close();
 			statement.close();
 		} catch (Exception e) {
-			_log.warning("Error while reloading npc skill list (" + npcId + "): " + e);
+			_log.warn("Error while reloading npc skill list (" + npcId + "): " + e.getMessage(), e);
 		} finally {
 			try {
 				con.close();

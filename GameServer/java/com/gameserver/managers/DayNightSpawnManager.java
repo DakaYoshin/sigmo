@@ -23,8 +23,8 @@ import java.util.Map;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.GameTimeController;
 import com.gameserver.datatables.SkillTable;
@@ -39,7 +39,7 @@ import com.gameserver.network.serverpackets.SystemMessage;
 
 public class DayNightSpawnManager
 {
-	private final static Log _log = LogFactory.getLog(DayNightSpawnManager.class);
+	private final static Logger _log = LoggerFactory.getLogger(DayNightSpawnManager.class);
 
 	private static DayNightSpawnManager _instance;
 	private static Map<L2Spawn, L2Npc> _dayCreatures;
@@ -320,3 +320,4 @@ public class DayNightSpawnManager
 	}
 
 }
+

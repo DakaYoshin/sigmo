@@ -26,8 +26,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -46,7 +46,7 @@ import com.gameserver.thread.ThreadPoolManager;
 import com.util.random.Rnd;
 
 public class AutoChatHandler implements SpawnListener {
-	private final static Log _log = LogFactory.getLog(AutoChatHandler.class);
+	private final static Logger _log = LoggerFactory.getLogger(AutoChatHandler.class);
 
 	private static AutoChatHandler _instance;
 
@@ -611,3 +611,4 @@ public class AutoChatHandler implements SpawnListener {
 		}
 	}
 }
+

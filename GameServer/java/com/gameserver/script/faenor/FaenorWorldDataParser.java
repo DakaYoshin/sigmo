@@ -24,8 +24,8 @@ import javax.script.ScriptContext;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import com.gameserver.script.IntList;
@@ -35,7 +35,7 @@ import com.gameserver.script.ScriptEngine;
 
 public class FaenorWorldDataParser extends FaenorParser
 {
-	private final static Log _log = LogFactory.getLog(FaenorWorldDataParser.class);
+	private final static Logger _log = LoggerFactory.getLogger(FaenorWorldDataParser.class);
 
 	private final static String PET_DATA = "PetData";
 
@@ -133,3 +133,4 @@ public class FaenorWorldDataParser extends FaenorParser
 	}
 
 }
+

@@ -23,8 +23,8 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.security.interfaces.RSAPrivateKey;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.loginserver.network.serverpackets.L2LoginServerPacket;
@@ -41,7 +41,7 @@ import com.util.random.Rnd;
 
 public final class L2LoginClient extends MMOClient<MMOConnection<L2LoginClient>>
 {
-	private final static Log _log = LogFactory.getLog(L2LoginClient.class);
+	private final static Logger _log = LoggerFactory.getLogger(L2LoginClient.class);
 
 	public static enum LoginClientState
 	{
@@ -280,3 +280,4 @@ public final class L2LoginClient extends MMOClient<MMOConnection<L2LoginClient>>
 	}
 
 }
+

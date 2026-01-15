@@ -23,8 +23,8 @@ import java.security.GeneralSecurityException;
 
 import javax.crypto.Cipher;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.GameServerTable.GameServerInfo;
@@ -40,7 +40,7 @@ import com.loginserver.network.serverpackets.LoginOk;
 import com.loginserver.network.serverpackets.ServerList;
 
 public class RequestAuthLogin extends L2LoginClientPacket {
-	private static final Log _log = LogFactory.getLog(RequestAuthLogin.class);
+	private static final Logger _log = LoggerFactory.getLogger(RequestAuthLogin.class);
 
 	private byte[] _raw = new byte[128];
 

@@ -26,13 +26,13 @@ import java.util.Map;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 
 public abstract class FloodProtectedListener extends Thread {
-	private final static Log _log = LogFactory.getLog(FloodProtectedListener.class);
+	private final static Logger _log = LoggerFactory.getLogger(FloodProtectedListener.class);
 
 	private Map<String, ForeignConnection> _floodProtection = new FastMap<String, ForeignConnection>();
 	private String _listenIp;
@@ -155,3 +155,4 @@ public abstract class FloodProtectedListener extends Thread {
 	}
 
 }
+

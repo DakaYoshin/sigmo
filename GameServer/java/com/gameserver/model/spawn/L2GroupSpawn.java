@@ -20,8 +20,8 @@ package com.gameserver.model.spawn;
 
 import java.lang.reflect.Constructor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.TerritoryTable;
 import com.gameserver.idfactory.IdFactory;
@@ -31,7 +31,7 @@ import com.util.random.Rnd;
 
 public class L2GroupSpawn extends L2Spawn
 {
-	private static final Log _log = LogFactory.getLog(L2GroupSpawn.class);
+	private static final Logger _log = LoggerFactory.getLogger(L2GroupSpawn.class);
 
 	private Constructor<?> _constructor;
 	private L2NpcTemplate _template;

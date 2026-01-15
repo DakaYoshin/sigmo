@@ -18,12 +18,12 @@
  */
 package com.loginserver.network.clientpackets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ClientBasePacket
 {
-	private final static Log _log = LogFactory.getLog(ClientBasePacket.class);
+	private final static Logger _log = LoggerFactory.getLogger(ClientBasePacket.class);
 
 	private byte[] _decrypt;
 	private int _off;
@@ -100,3 +100,4 @@ public abstract class ClientBasePacket
 	}
 
 }
+

@@ -21,12 +21,12 @@ package com.loginserver.network.serverpackets;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ServerBasePacket
 {
-	private final static Log _log = LogFactory.getLog(ServerBasePacket.class);
+	private final static Logger _log = LoggerFactory.getLogger(ServerBasePacket.class);
 
 	private final ByteArrayOutputStream _bao;
 
@@ -120,3 +120,4 @@ public abstract class ServerBasePacket
 	public abstract byte[] getContent() throws IOException;
 
 }
+

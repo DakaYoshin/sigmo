@@ -20,8 +20,8 @@ package com.gameserver.handler.skillhandlers;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.handler.ISkillHandler;
@@ -42,7 +42,7 @@ import com.gameserver.util.Util;
 
 public class SummonFriend implements ISkillHandler
 {
-	private final static Log _log = LogFactory.getLog(SummonFriend.class);
+	private final static Logger _log = LoggerFactory.getLogger(SummonFriend.class);
 
 	private static final L2SkillType[] SKILL_IDS = { L2SkillType.SUMMON_FRIEND };
 
@@ -241,3 +241,4 @@ public class SummonFriend implements ISkillHandler
 		return SKILL_IDS;
 	}
 }
+

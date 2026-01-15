@@ -28,8 +28,8 @@ import java.util.Map;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.communitybbs.BB.Forum;
@@ -63,7 +63,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class L2Clan
 {
-	private static final Log _log = LogFactory.getLog(L2Clan.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(L2Clan.class.getName());
 
 	private String _name;
 	private int _clanId;

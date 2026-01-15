@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.GmListTable;
@@ -37,7 +37,7 @@ import com.gameserver.network.serverpackets.SystemMessage;
 import com.util.database.L2DatabaseFactory;
 
 public class AdminAio implements IAdminCommandHandler {
-	private final static Logger _log = Logger.getLogger(AdminAio.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(AdminAio.class);
 
 	private static String[] _adminCommands = {
 			"admin_setaio",
@@ -149,7 +149,7 @@ public class AdminAio implements IAdminCommandHandler {
 				GmListTable.broadcastMessageToGMs("Admin " + activeChar.getName() + " set Aio stats for player "
 						+ _playername + " for " + _time + " day(s)");
 			} catch (Exception e) {
-				_log.log(Level.WARNING, "could not set Aio stats to char:", e);
+				_log.warn("could not set Aio stats to char: " + e.getMessage(), e);
 			} finally {
 				try {
 					connection.close();
@@ -190,7 +190,7 @@ public class AdminAio implements IAdminCommandHandler {
 					"Admin " + activeChar.getName() + " removed Aio stats of player " + _playername);
 			_player.sendChatMessage(0, 0, "SYS", "Admin removed your Aio Stats!");
 		} catch (Exception e) {
-			_log.log(Level.WARNING, "could not remove Aio stats of char:", e);
+			_log.warn("could not remove Aio stats of char: " + e.getMessage(), e);
 		} finally {
 			try {
 				connection.close();

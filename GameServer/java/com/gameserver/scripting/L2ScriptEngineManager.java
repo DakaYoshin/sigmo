@@ -42,15 +42,14 @@ import javax.script.SimpleScriptContext;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.l2jserver.script.jython.JythonScriptEngine;
 import com.Config;
 import com.gameserver.thread.ThreadPoolManager;
 
 public final class L2ScriptEngineManager {
-	private static final Log _log = LogFactory.getLog(L2ScriptEngineManager.class);
+	private static final Logger _log = LoggerFactory.getLogger(L2ScriptEngineManager.class);
 
 	public final static File SCRIPT_FOLDER = new File(Config.DATAPACK_ROOT.getAbsolutePath(), "data/scripts");
 
@@ -294,9 +293,11 @@ public final class L2ScriptEngineManager {
 				context.setAttribute("mainClass", getClassForFile(file).replace('/', '.').replace('\\', '.'),
 						ScriptContext.ENGINE_SCOPE);
 				context.setAttribute(ScriptEngine.FILENAME, file.getName(), ScriptContext.ENGINE_SCOPE);
-				context.setAttribute("classpath", SCRIPT_FOLDER.getAbsolutePath(), ScriptContext.ENGINE_SCOPE);
+				context.setAttribute("classpath",
+						SCRIPT_FOLDER.getAbsolutePath() + File.pathSeparator + System.getProperty("java.class.path"),
+						ScriptContext.ENGINE_SCOPE);
 				context.setAttribute("sourcepath", SCRIPT_FOLDER.getAbsolutePath(), ScriptContext.ENGINE_SCOPE);
-				context.setAttribute(JythonScriptEngine.JYTHON_ENGINE_INSTANCE, engine, ScriptContext.ENGINE_SCOPE);
+				context.setAttribute("jython", engine, ScriptContext.ENGINE_SCOPE);
 
 				setCurrentLoadingScript(file);
 				ScriptContext ctx = engine.getContext();
@@ -321,7 +322,9 @@ public final class L2ScriptEngineManager {
 				context.setAttribute("mainClass", getClassForFile(file).replace('/', '.').replace('\\', '.'),
 						ScriptContext.ENGINE_SCOPE);
 				context.setAttribute(ScriptEngine.FILENAME, file.getName(), ScriptContext.ENGINE_SCOPE);
-				context.setAttribute("classpath", SCRIPT_FOLDER.getAbsolutePath(), ScriptContext.ENGINE_SCOPE);
+				context.setAttribute("classpath",
+						SCRIPT_FOLDER.getAbsolutePath() + File.pathSeparator + System.getProperty("java.class.path"),
+						ScriptContext.ENGINE_SCOPE);
 				context.setAttribute("sourcepath", SCRIPT_FOLDER.getAbsolutePath(), ScriptContext.ENGINE_SCOPE);
 				setCurrentLoadingScript(file);
 				try {
@@ -360,9 +363,15 @@ public final class L2ScriptEngineManager {
 
 	public Object eval(ScriptEngine engine, String script, ScriptContext context) throws ScriptException {
 		if (engine instanceof Compilable && Config.SCRIPT_ALLOW_COMPILATION) {
-			Compilable eng = (Compilable) engine;
-			CompiledScript cs = eng.compile(script);
-			return context != null ? cs.eval(context) : cs.eval();
+			try {
+				Compilable eng = (Compilable) engine;
+				CompiledScript cs = eng.compile(script);
+				return context != null ? cs.eval(context) : cs.eval();
+			} catch (Throwable e) {
+				_log.warn("Script engine " + engine
+						+ " failed to compile script, falling back to interpreted mode. Error: " + e.getMessage());
+				return context != null ? engine.eval(script, context) : engine.eval(script);
+			}
 		} else {
 			return context != null ? engine.eval(script, context) : engine.eval(script);
 		}

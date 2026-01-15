@@ -22,8 +22,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -34,7 +34,7 @@ import com.gameserver.model.L2ArmorSet;
 
 public class ArmorSetsTable
 {
-	private static final Log _log = LogFactory.getLog(ArmorSetsTable.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(ArmorSetsTable.class.getName());
 
 	private static ArmorSetsTable _instance;
 

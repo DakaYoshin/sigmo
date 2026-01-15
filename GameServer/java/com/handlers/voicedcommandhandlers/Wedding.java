@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.GameTimeController;
@@ -49,7 +49,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class Wedding implements IVoicedCommandHandler
 {
-	static final Log _log = LogFactory.getLog(Wedding.class);
+	static final Logger _log = LoggerFactory.getLogger(Wedding.class);
 
 	private static String[] _voicedCommands =
 	{
@@ -482,3 +482,5 @@ public class Wedding implements IVoicedCommandHandler
 		return _voicedCommands;
 	}
 }
+
+

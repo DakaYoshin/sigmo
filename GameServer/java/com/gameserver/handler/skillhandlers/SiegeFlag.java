@@ -18,8 +18,8 @@
  */
 package com.gameserver.handler.skillhandlers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.NpcTable;
 import com.gameserver.handler.ISkillHandler;
@@ -38,7 +38,7 @@ import com.gameserver.templates.skills.L2SkillType;
 
 public class SiegeFlag implements ISkillHandler
 {
-	private static final Log _log = LogFactory.getLog(SiegeFlag.class);
+	private static final Logger _log = LoggerFactory.getLogger(SiegeFlag.class);
 
 	private static final L2SkillType[] SKILL_IDS = { L2SkillType.SIEGEFLAG };
 

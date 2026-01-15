@@ -18,13 +18,15 @@
  */
 package com.loginserver.network.serverpackets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.loginserver.L2LoginClient;
 import com.mmocore.SendablePacket;
 
 public abstract class L2LoginServerPacket extends SendablePacket<L2LoginClient>
 { 
-	protected final static Log _log = LogFactory.getLog(L2LoginServerPacket.class); 
+	protected final static Logger _log = LoggerFactory.getLogger(L2LoginServerPacket.class); 
 }
+
+

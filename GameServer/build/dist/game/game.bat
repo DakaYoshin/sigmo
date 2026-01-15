@@ -7,7 +7,7 @@ REM -------------------------------------
 REM Default parameters for a basic server.
 REM -------------------------------------
 
-java -Xmx1g -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -cp ./lib/*;L2jSigmo.jar com.gameserver.GameServer
+java -Xmx1g -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED -cp ./lib/* com.gameserver.GameServer
 
 
 if ERRORLEVEL 7 goto telldown

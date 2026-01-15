@@ -24,8 +24,8 @@ import static com.gameserver.ai.CtrlIntention.AI_INTENTION_IDLE;
 
 import java.util.concurrent.Future;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.GameTimeController;
 import com.gameserver.model.L2Object;
@@ -48,7 +48,7 @@ import com.gameserver.thread.ThreadPoolManager;
 
 abstract class AbstractAI implements Ctrl
 {
-	protected static final Log _log = LogFactory.getLog(AbstractAI.class);
+	protected static final Logger _log = LoggerFactory.getLogger(AbstractAI.class);
 
 	private NextAction _nextAction;
 	

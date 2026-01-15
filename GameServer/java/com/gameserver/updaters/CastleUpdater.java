@@ -18,8 +18,8 @@
  */
 package com.gameserver.updaters;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.managers.CastleManager;
@@ -30,7 +30,7 @@ import com.gameserver.thread.ThreadPoolManager;
 
 public class CastleUpdater implements Runnable
 {
-	private static Log _log = LogFactory.getLog(CastleUpdater.class);
+	private static Logger _log = LoggerFactory.getLogger(CastleUpdater.class);
 
 	private L2Clan _clan;
 	private int _runCount = 0;

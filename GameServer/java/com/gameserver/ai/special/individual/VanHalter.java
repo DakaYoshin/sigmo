@@ -28,8 +28,8 @@ import java.util.concurrent.ScheduledFuture;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.ai.CtrlIntention;
@@ -59,7 +59,7 @@ import com.util.random.Rnd;
 
 public class VanHalter extends Quest
 {
-	private static final Log _log = LogFactory.getLog(VanHalter.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(VanHalter.class.getName());
 
 	protected Map<Integer, List<L2PcInstance>> _bleedingPlayers = new FastMap<Integer, List<L2PcInstance>>();
 

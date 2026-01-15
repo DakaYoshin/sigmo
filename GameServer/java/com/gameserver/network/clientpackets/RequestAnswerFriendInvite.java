@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.L2World;
 import com.gameserver.model.actor.instance.L2PcInstance;
@@ -35,7 +35,7 @@ import com.util.database.L2DatabaseFactory;
 
 public final class RequestAnswerFriendInvite extends L2GameClientPacket
 {
-	private final static Log _log = LogFactory.getLog(RequestAnswerFriendInvite.class);
+	private final static Logger _log = LoggerFactory.getLogger(RequestAnswerFriendInvite.class);
 
 	private static final String _C__5F_REQUESTANSWERFRIENDINVITE = "[C] 5F RequestAnswerFriendInvite";
 
@@ -148,3 +148,4 @@ public final class RequestAnswerFriendInvite extends L2GameClientPacket
 		return _C__5F_REQUESTANSWERFRIENDINVITE;
 	}
 }
+

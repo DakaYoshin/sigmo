@@ -25,8 +25,8 @@ import java.util.Map;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.GameTimeController;
@@ -58,7 +58,7 @@ import com.util.random.Rnd;
 
 public final class QuestState
 {
-	private static final Log _log = LogFactory.getLog(Quest.class);
+	private static final Logger _log = LoggerFactory.getLogger(Quest.class);
 
 	public static final String SOUND_ACCEPT = "ItemSound.quest_accept";
 	public static final String SOUND_ITEMGET = "ItemSound.quest_itemget";

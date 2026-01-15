@@ -22,12 +22,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Base64
 {
-	private static final Log _log = LogFactory.getLog(Base64.class);
+	private static final Logger _log = LoggerFactory.getLogger(Base64.class);
 
 	public final static int NO_OPTIONS = 0;
 	public final static int ENCODE = 1;

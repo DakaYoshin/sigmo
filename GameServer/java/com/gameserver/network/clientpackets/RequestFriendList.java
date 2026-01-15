@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.L2World;
 import com.gameserver.model.actor.instance.L2PcInstance;
@@ -34,7 +34,7 @@ import com.util.database.L2DatabaseFactory;
 
 public final class RequestFriendList extends L2GameClientPacket
 {
-	private final static Log _log = LogFactory.getLog(RequestFriendList.class);
+	private final static Logger _log = LoggerFactory.getLogger(RequestFriendList.class);
 
 	private static final String _C__60_REQUESTFRIENDLIST = "[C] 60 RequestFriendList";
 
@@ -102,3 +102,4 @@ public final class RequestFriendList extends L2GameClientPacket
 		return _C__60_REQUESTFRIENDLIST;
 	}
 }
+

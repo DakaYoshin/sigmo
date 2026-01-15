@@ -25,8 +25,8 @@ import java.util.Calendar;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.sql.ClanTable;
@@ -46,7 +46,7 @@ import com.util.random.Rnd;
 
 public class CastleManorManager
 {
-	private static final Log _log = LogFactory.getLog(CastleManorManager.class);
+	private static final Logger _log = LoggerFactory.getLogger(CastleManorManager.class);
 
 	private static CastleManorManager _instance;
 

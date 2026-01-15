@@ -23,15 +23,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Calendar;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.util.ResourceUtil;
 import com.util.database.L2DatabaseFactory;
 
 public abstract class ClanHallSiege
 {
-	private static final Log _log = LogFactory.getLog(ClanHallSiege.class);
+	private static final Logger _log = LoggerFactory.getLogger(ClanHallSiege.class);
 
 	private Calendar _siegeDate;
 	public Calendar _siegeEndDate;

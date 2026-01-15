@@ -36,8 +36,8 @@ import java.util.concurrent.ScheduledFuture;
 import javolution.text.TextBuilder;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.managers.OlympiadStadiaManager;
@@ -57,7 +57,7 @@ import com.util.protection.nProtect.RestrictionType;
 
 public class Olympiad
 {
-	protected static final Log _log = LogFactory.getLog(Olympiad.class);
+	protected static final Logger _log = LoggerFactory.getLogger(Olympiad.class);
 
 	private static Olympiad _instance;
 	protected static Map<Integer, StatsSet> _nobles;

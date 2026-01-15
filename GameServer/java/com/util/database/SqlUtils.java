@@ -21,12 +21,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SqlUtils
 {
-	private final static Log _log = LogFactory.getLog(SqlUtils.class);
+	private final static Logger _log = LoggerFactory.getLogger(SqlUtils.class);
 
 	private static SqlUtils _instance;
 
@@ -292,3 +292,4 @@ public class SqlUtils
 	}
 
 }
+

@@ -18,7 +18,8 @@
  */
 package com.gameserver.handler.skillhandlers;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.handler.ISkillHandler;
 import com.gameserver.model.L2Object;
@@ -27,33 +28,28 @@ import com.gameserver.model.actor.L2Character;
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.templates.skills.L2SkillType;
 
-public class DrainSoul implements ISkillHandler
-{
-	private static Logger _log = Logger.getLogger(DrainSoul.class.getName());
-	
+public class DrainSoul implements ISkillHandler {
+	private static final Logger _log = LoggerFactory.getLogger(DrainSoul.class);
+
 	private static final L2SkillType[] SKILL_IDS = { L2SkillType.DRAIN_SOUL };
 
 	@Override
-	public void useSkill(L2Character activeChar, L2Skill skill, L2Object[] targets)
-	{
-		if(!(activeChar instanceof L2PcInstance))
-		{
+	public void useSkill(L2Character activeChar, L2Skill skill, L2Object[] targets) {
+		if (!(activeChar instanceof L2PcInstance)) {
 			return;
 		}
 
 		L2Object[] targetList = skill.getTargetList(activeChar);
 
-		if(targetList == null)
-		{
+		if (targetList == null) {
 			return;
 		}
-		
-		_log.fine("Soul Crystal casting succeded.");
+
+		_log.debug("Soul Crystal casting succeded.");
 	}
 
 	@Override
-	public L2SkillType[] getSkillIds()
-	{
+	public L2SkillType[] getSkillIds() {
 		return SKILL_IDS;
 	}
 }

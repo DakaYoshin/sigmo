@@ -22,8 +22,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -35,7 +35,7 @@ import com.gameserver.model.L2NpcWalkerNode;
 
 public class NpcWalkerRoutesTable
 {
-	private final static Log _log = LogFactory.getLog(SpawnTable.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(SpawnTable.class.getName());
 
 	private static NpcWalkerRoutesTable _instance;
 
@@ -142,3 +142,4 @@ public class NpcWalkerRoutesTable
 		return _return;
 	}
 }
+

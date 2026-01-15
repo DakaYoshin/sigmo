@@ -26,8 +26,8 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -44,7 +44,7 @@ import com.gameserver.model.base.ClassId;
 
 public class SkillTreeTable
 {
-	private static final Log _log = LogFactory.getLog(SkillTreeTable.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(SkillTreeTable.class.getName());
 
 	private static SkillTreeTable _instance;
 

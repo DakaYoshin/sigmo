@@ -28,13 +28,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class L2Properties extends Properties
 {
 	private static final long serialVersionUID = -4599023842346938325L;
-	private static final Log _log = LogFactory.getLog(L2Properties.class);
+	private static final Logger _log = LoggerFactory.getLogger(L2Properties.class);
 	private boolean _warn = false;
 
 	public L2Properties()

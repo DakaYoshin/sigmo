@@ -72,13 +72,7 @@ import com.gameserver.datatables.xml.TerritoryTable;
 import com.gameserver.datatables.xml.ZoneData;
 import com.gameserver.geo.GeoData;
 import com.gameserver.geo.pathfinding.PathFinding;
-import com.gameserver.handler.AdminCommandHandler;
 import com.gameserver.handler.AutoAnnouncementHandler;
-import com.gameserver.handler.ChatHandler;
-import com.gameserver.handler.ItemHandler;
-import com.gameserver.handler.SkillHandler;
-import com.gameserver.handler.UserCommandHandler;
-import com.gameserver.handler.VoicedCommandHandler;
 import com.gameserver.idfactory.IdFactory;
 import com.gameserver.managers.AuctionManager;
 import com.gameserver.managers.BoatManager;
@@ -141,8 +135,7 @@ import com.util.services.CreateFolders;
 import com.util.services.Restart;
 import com.util.services.ServerType;
 
-public class GameServer
-{
+public class GameServer {
 	private static Logger _log = Logger.getLogger("Loader");
 	private static SelectorThread<L2GameClient> _selectorThread;
 	private static LoginServerThread _loginThread;
@@ -150,8 +143,7 @@ public class GameServer
 
 	public static final Calendar dateTimeServerStarted = Calendar.getInstance();
 
-	public static void main(String[] args) throws Exception
-	{
+	public static void main(String[] args) throws Exception {
 		ServerType.serverMode = ServerType.MODE_GAMESERVER;
 		long serverLoadStart = System.currentTimeMillis();
 
@@ -176,7 +168,7 @@ public class GameServer
 		loadItems();
 		loadNpcs();
 		loadCharacters();
-		loadHenna();	
+		loadHenna();
 		loadHelperBuff();
 		loadGeoData();
 		loadTradeAndRecipes();
@@ -199,49 +191,34 @@ public class GameServer
 		loadAi();
 
 		Util.printSection("Scripts");
-		try
-		{
+		try {
 			File scripts = new File(Config.DATAPACK_ROOT + "/data/scripts/scripts.cfg");
 			L2ScriptEngineManager.getInstance().executeScriptsList(scripts);
-		}
-		catch(IOException ioe)
-		{
+		} catch (IOException ioe) {
 			_log.warning("Failed loading scripts.cfg, no script going to be loaded");
 		}
-		try
-		{
+		try {
 			CompiledScriptCache compiledScriptCache = L2ScriptEngineManager.getInstance().getCompiledScriptCache();
-			if(compiledScriptCache == null)
-			{
+			if (compiledScriptCache == null) {
 				_log.info("Compiled Scripts Cache is disabled.");
-			}
-			else
-			{
+			} else {
 				compiledScriptCache.purge();
-				if(compiledScriptCache.isModified())
-				{
+				if (compiledScriptCache.isModified()) {
 					compiledScriptCache.save();
 					_log.info("Compiled Scripts Cache was saved.");
-				}
-				else
-				{
+				} else {
 					_log.info("Compiled Scripts Cache is up-to-date.");
 				}
 			}
-		}
-		catch(IOException e)
-		{
+		} catch (IOException e) {
 			_log.warning("Failed to store Compiled Scripts Cache." + e);
 		}
 
 		QuestManager.getInstance().report();
 
-		if(!Config.ALT_DEV_NO_SCRIPT)
-		{
+		if (!Config.ALT_DEV_NO_SCRIPT) {
 			FaenorScriptEngine.getInstance();
-		}
-		else
-		{
+		} else {
 			System.out.println("Script: disable load.");
 		}
 
@@ -265,63 +242,56 @@ public class GameServer
 
 		_gamePacketHandler = new L2GamePacketHandler();
 
-		_selectorThread = new SelectorThread<L2GameClient>(sc, _gamePacketHandler, _gamePacketHandler, _gamePacketHandler, new IPv4Filter());
+		_selectorThread = new SelectorThread<L2GameClient>(sc, _gamePacketHandler, _gamePacketHandler,
+				_gamePacketHandler, new IPv4Filter());
 
 		InetAddress bindAddress = null;
-		if(!Config.GAMESERVER_HOSTNAME.equals("*"))
-		{
-			try
-			{
+		if (!Config.GAMESERVER_HOSTNAME.equals("*")) {
+			try {
 				bindAddress = InetAddress.getByName(Config.GAMESERVER_HOSTNAME);
-			}
-			catch(UnknownHostException e1)
-			{
-				_log.log(Level.SEVERE, "WARNING: The GameServer bind address is invalid, using all avaliable IPs. Reason: " + e1.getMessage(), e1);
+			} catch (UnknownHostException e1) {
+				_log.log(Level.SEVERE,
+						"WARNING: The GameServer bind address is invalid, using all avaliable IPs. Reason: "
+								+ e1.getMessage(),
+						e1);
 			}
 		}
 
-		try
-		{
+		try {
 			_selectorThread.openServerSocket(bindAddress, Config.PORT_GAME);
-		}
-		catch(IOException e)
-		{
+		} catch (IOException e) {
 			_log.log(Level.SEVERE, "FATAL: Failed to open server socket. Reason: " + e.getMessage(), e);
 			System.exit(1);
 		}
 
 		_selectorThread.start();
 	}
-	
-	private static void loadDatabase() throws Exception
-	{
+
+	private static void loadDatabase() throws Exception {
 		Util.printSection("Database");
 		L2DatabaseFactory.getInstance();
 		DatatablesManager.LoadSTS();
-		if(Config.DEADLOCKCHECK_INTIAL_TIME > 0)
-		{
-			ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(DeadlockDetector.getInstance(), Config.DEADLOCKCHECK_INTIAL_TIME, Config.DEADLOCKCHECK_DELAY_TIME);
+		if (Config.DEADLOCKCHECK_INTIAL_TIME > 0) {
+			ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(DeadlockDetector.getInstance(),
+					Config.DEADLOCKCHECK_INTIAL_TIME, Config.DEADLOCKCHECK_DELAY_TIME);
 		}
 		SQLQueue.getInstance();
 	}
-	
-	private static void loadScriptEngines()
-	{
+
+	private static void loadScriptEngines() {
 		Util.printSection("Script Engines");
 		L2ScriptEngineManager.getInstance();
 		ThreadPoolManager.getInstance();
 		nProtect.getInstance();
 	}
 
-	private static void loadChache()
-	{
+	private static void loadChache() {
 		Util.printSection("Cache");
 		HtmCache.getInstance();
 		CrestCache.getInstance();
 	}
-	
-	private static void loadL2World()
-	{
+
+	private static void loadL2World() {
 		Util.printSection("World");
 		L2World.getInstance();
 		MapRegionTable.getInstance();
@@ -332,16 +302,14 @@ public class GameServer
 		PartyMatchWaitingList.getInstance();
 		PartyMatchRoomList.getInstance();
 	}
-	
-	private static void loadAnnouncements()
-	{
+
+	private static void loadAnnouncements() {
 		Util.printSection("Announcements");
 		Announcements.getInstance();
 		AutoAnnouncementHandler.getInstance();
 	}
-	
-	private static void loadSkils()
-	{
+
+	private static void loadSkils() {
 		Util.printSection("Skills");
 		SkillTable.getInstance();
 		SkillTreeTable.getInstance();
@@ -350,124 +318,107 @@ public class GameServer
 		GMSkillTable.getInstance();
 		HeroSkillTable.getInstance();
 	}
-	
-	private static void loadItems()
-	{
+
+	private static void loadItems() {
 		Util.printSection("Items");
 		ItemTable.getInstance();
 		ArmorSetsTable.getInstance();
-		
-		if(Config.CUSTOM_ARMORSETS_TABLE)
+
+		if (Config.CUSTOM_ARMORSETS_TABLE)
 			CustomArmorSetsTable.getInstance();
-		
+
 		ExtractableItemsData.getInstance();
 		SummonItemsData.getInstance();
 		StaticObjects.getInstance();
-		
-		if(Config.ALLOW_FISHING)
+
+		if (Config.ALLOW_FISHING)
 			FishTable.getInstance();
-		if(Config.SAVE_DROPPED_ITEM)
+		if (Config.SAVE_DROPPED_ITEM)
 			ItemsOnGroundManager.getInstance();
-		if(Config.AUTODESTROY_ITEM_AFTER > 0 || Config.HERB_AUTO_DESTROY_TIME > 0)
+		if (Config.AUTODESTROY_ITEM_AFTER > 0 || Config.HERB_AUTO_DESTROY_TIME > 0)
 			ItemsAutoDestroy.getInstance();
 	}
-	
-	private static void loadNpcs()
-	{
+
+	private static void loadNpcs() {
 		Util.printSection("Npc");
 		NpcWalkerRoutesTable.getInstance().load();
 		NpcTable.getInstance();
 	}
-	
-	private static void loadCharacters()
-	{
+
+	private static void loadCharacters() {
 		Util.printSection("Characters");
 		ClanTable.getInstance();
 		CharTemplateTable.getInstance();
 		LevelUpData.getInstance();
 	}
-	
-	private static void loadCustomMods()
-	{
+
+	private static void loadCustomMods() {
 		Util.printSection("Custom Mods");
-		
-		if (Config.ENABLE_FLOOD_PROTECTOR)
-		{
+
+		if (Config.ENABLE_FLOOD_PROTECTOR) {
 			FloodProtector.getInstance();
-		}
-		else
-		{
+		} else {
 			_log.info("[Flood Protection] System is Disabled !");
 		}
 
-		if(Config.RESTART_BY_TIME_OF_DAY)
-		{
+		if (Config.RESTART_BY_TIME_OF_DAY) {
 			Restart.getInstance().StartCalculationOfNextRestartTime();
-		}
-		else
-		{
+		} else {
 			_log.info("[Auto Restart] System is Disabled !");
 		}
-     
-     System.gc();
-	
-		if(Config.COMMUNITY_TYPE.equals("full"))
+
+		System.gc();
+
+		if (Config.COMMUNITY_TYPE.equals("full"))
 			ForumsBBSManager.getInstance().initRoot();
 
-		if((Config.OFFLINE_TRADE_ENABLE || Config.OFFLINE_CRAFT_ENABLE) && Config.OFFLINE_RESTORE)
+		if ((Config.OFFLINE_TRADE_ENABLE || Config.OFFLINE_CRAFT_ENABLE) && Config.OFFLINE_RESTORE)
 			OfflineTradersTable.restoreOfflineTraders();
 
 		Market.getInstance();
 
-		if(Config.ALLOW_WEDDING)
+		if (Config.ALLOW_WEDDING)
 			CoupleManager.getInstance();
 		else
 			_log.info("Wedding Manager: Disabled");
-		
+
 		FunEventsManager.getInstance().autoStartEvents();
 	}
-	
-	private static void loadGeoData()
-	{
+
+	private static void loadGeoData() {
 		Util.printSection("Geodata");
 		GeoData.getInstance();
-		if(Config.GEODATA == 2)
+		if (Config.GEODATA == 2)
 			PathFinding.getInstance();
 	}
-	
-	private static void loadIdFactory()
-	{
+
+	private static void loadIdFactory() {
 		Util.printSection("ID Factory");
 		IdFactory.getInstance();
 	}
-	
-	private static void loadHenna()
-	{
+
+	private static void loadHenna() {
 		Util.printSection("Henna");
 		HennaTable.getInstance();
 		HennaTreeTable.getInstance();
 	}
-	
-	private static void loadTeleports()
-	{
+
+	private static void loadTeleports() {
 		Util.printSection("Teleport");
 		TeleportLocationTable.getInstance();
 	}
-	
-	private static void loadHelperBuff()
-	{
+
+	private static void loadHelperBuff() {
 		Util.printSection("Helper Buff");
 		HelperBuffTable.getInstance();
 	}
-	
-	private static void loadDoors()
-	{
+
+	private static void loadDoors() {
 		Util.printSection("Doors");
 		DoorTable.getInstance().parseData();
 		OpenLockDoors.getInstance();
-		
-		try
-		{
+
+		try {
 			DoorTable doorTable = DoorTable.getInstance();
 			doorTable.getDoor(19160010).openMe();
 			doorTable.getDoor(19160011).openMe();
@@ -489,14 +440,11 @@ public class GameServer
 			doorTable.getDoor(23180006).openMe();
 			doorTable.checkAutoOpen();
 			doorTable = null;
-		}
-		catch (NullPointerException e)
-		{
+		} catch (NullPointerException e) {
 		}
 	}
-	
-	private static void loadProperty()
-	{
+
+	private static void loadProperty() {
 		Util.printSection("Castle");
 		CastleManager.getInstance();
 		SiegeManager.getInstance();
@@ -508,117 +456,99 @@ public class GameServer
 		Util.printSection("Auction");
 		AuctionManager.getInstance();
 	}
-	
-	private static void loadTradeAndRecipes()
-	{
+
+	private static void loadTradeAndRecipes() {
 		Util.printSection("Trade & Recipe");
 		TradeController.getInstance();
 		RecipeController.getInstance();
 		RecipeTable.getInstance();
 	}
-	
-	private static void loadSpawnLists()
-	{
+
+	private static void loadSpawnLists() {
 		Util.printSection("Spawnlist");
-		if(!Config.ALT_DEV_NO_SPAWNS)
+		if (!Config.ALT_DEV_NO_SPAWNS)
 			SpawnTable.getInstance();
 		else
 			_log.info("Spawn: Disable load.");
 
-		if(!Config.ALT_DEV_NO_RB)
-		{
+		if (!Config.ALT_DEV_NO_RB) {
 			RaidBossSpawnManager.getInstance();
 			GrandBossManager.getInstance();
 			RaidBossPointsManager.init();
-		}
-		else
-		{
+		} else {
 			_log.info("RaidBoss: Disable load.");
 		}
 		DayNightSpawnManager.getInstance().notifyChangeMode();
 	}
-	
-	private static void loadHandlers()
-	{
+
+	private static void loadHandlers() {
 		Util.printSection("Handlers");
 		AutoSpawn.getInstance();
 		AutoChatHandler.getInstance();
-		ChatHandler.getInstance();
-		ItemHandler.getInstance();
-		SkillHandler.getInstance();
-		AdminCommandHandler.getInstance();
-		UserCommandHandler.getInstance();
-		VoicedCommandHandler.getInstance();
-		
+
+		// Load all handlers via MasterHandler
+		com.handlers.MasterHandler.main(null);
+
 		_log.info("AutoChatHandler: Loaded " + AutoChatHandler.getInstance().size() + " handlers.");
 		_log.info("SpawnHandler: Loaded " + AutoSpawn.getInstance().size() + " handlers.");
 	}
-	
-	private static void loadSevenSignsAnd4S()
-	{
+
+	private static void loadSevenSignsAnd4S() {
 		Util.printSection("Seven Signs");
 		SevenSigns.getInstance();
 		SevenSignsFestival.getInstance();
 		EventDroplist.getInstance();
 		MonsterRace.getInstance();
 		TaskManager.getInstance();
-		
+
 		Util.printSection("Four Sepulchers");
 		FourSepulchersManager.getInstance().init();
 	}
-	
-	private static void loadOlympiadAndHero() throws Exception
-	{
+
+	private static void loadOlympiadAndHero() throws Exception {
 		Util.printSection("Olympiad System");
 		Olympiad.getInstance().load();
 
 		Util.printSection("Hero System");
 		Hero.getInstance();
 	}
-	
-	private static void loadAccessLevel()
-	{
+
+	private static void loadAccessLevel() {
 		Util.printSection("Access Levels");
 		AccessLevels.getInstance();
 		AdminCommandAccessRights.getInstance();
 		GmListTable.getInstance();
 	}
-	
-	private static void loadConquerableHalls()
-	{
+
+	private static void loadConquerableHalls() {
 		Util.printSection("Conquerable Halls");
 		BanditStrongholdSiege.getInstance();
 		WildBeastFarmSiege.getInstance();
 		DevastatedCastle.getInstance();
 		FortressOfResistance.getInstance();
 	}
-	
-	private static void loadZones()
-	{
+
+	private static void loadZones() {
 		Util.printSection("Zone");
 		ZoneData.getInstance();
 	}
-	
-	private static void loadAugmention()
-	{
+
+	private static void loadAugmention() {
 		Util.printSection("Augmention");
 		AugmentationData.getInstance();
 	}
-	
-	private static void loadRift()
-	{
+
+	private static void loadRift() {
 		Util.printSection("Dimensional Rift");
 		DimensionalRiftManager.getInstance();
 	}
-	
-	private static void loadCursedWeapons()
-	{
+
+	private static void loadCursedWeapons() {
 		Util.printSection("Cursed Weapons");
 		CursedWeaponsManager.getInstance();
 	}
-	
-	private static void loadManoor()
-	{
+
+	private static void loadManoor() {
 		Util.printSection("Manor");
 		L2Manor.getInstance();
 		CastleManorManager.getInstance();
@@ -628,38 +558,33 @@ public class GameServer
 		// Boats
 		BoatManager.getInstance();
 	}
-	
-	private static void loadPets()
-	{
+
+	private static void loadPets() {
 		Util.printSection("Pets");
 		L2PetDataTable.getInstance().loadPetsData();
 	}
-	
-	private static void loadQuests()
-	{
+
+	private static void loadQuests() {
 		Util.printSection("Quests");
-		if(!Config.ALT_DEV_NO_QUESTS)
+		if (!Config.ALT_DEV_NO_QUESTS)
 			QuestManager.getInstance();
 		else
 			_log.info("Quest: disable load.");
 	}
-	
-	private static void loadAi()
-	{
+
+	private static void loadAi() {
 		Util.printSection("AI");
-		if(!Config.ALT_DEV_NO_AI)
+		if (!Config.ALT_DEV_NO_AI)
 			AILoader.init();
 		else
 			_log.info("AI: disable load.");
 	}
 
-	public static SelectorThread<L2GameClient> getSelectorThread()
-	{
+	public static SelectorThread<L2GameClient> getSelectorThread() {
 		return _selectorThread;
 	}
-	
-	public static void stopGameServer()
-	{
+
+	public static void stopGameServer() {
 		return;
 	}
 }

@@ -18,57 +18,46 @@
  */
 package com.gameserver.thread.daemons;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.actor.instance.L2PcInstance;
 
-public class AutoSave implements Runnable
-{
-	private static Log _log = LogFactory.getLog(AutoSave.class);
+public class AutoSave implements Runnable {
+	private static Logger _log = LoggerFactory.getLogger(AutoSave.class);
 
 	private L2PcInstance _player;
 
 	private static AutoSave _instance;
-	public static AutoSave getInstance()
-	{
-		if(_instance==null)
+
+	public static AutoSave getInstance() {
+		if (_instance == null)
 			_instance = new AutoSave();
 
 		return _instance;
 	}
 
-	public AutoSave(L2PcInstance player)
-	{
+	public AutoSave(L2PcInstance player) {
 		_player = player;
 	}
 
-	private AutoSave()
-	{
+	private AutoSave() {
 		_log.info("Start auto save daemon.");
 	}
 
 	@Override
-	public void run()
-	{
-		try
-		{
-			if(_player != null)
-			{
-				try
-				{
+	public void run() {
+		try {
+			if (_player != null) {
+				try {
 					_player.store();
-				}
-				catch(Exception e)
-				{
+				} catch (Exception e) {
 					_log.error("Error saving player character: " + _player.getName(), e);
 				}
 			}
 			_player = null;
-		}
-		catch(Throwable e)
-		{
-			_log.error(e);
+		} catch (Throwable e) {
+			_log.error("AutoSave daemon error", e);
 		}
 	}
 

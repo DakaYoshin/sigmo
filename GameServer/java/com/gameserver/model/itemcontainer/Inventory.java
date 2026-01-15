@@ -25,8 +25,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.SkillTable;
 import com.gameserver.datatables.sql.ItemTable;
@@ -49,7 +49,7 @@ import com.util.database.L2DatabaseFactory;
 
 public abstract class Inventory extends ItemContainer
 {
-	private static final Log _log = LogFactory.getLog(Inventory.class);
+	private static final Logger _log = LoggerFactory.getLogger(Inventory.class);
 
 	public interface PaperdollListener
 	{

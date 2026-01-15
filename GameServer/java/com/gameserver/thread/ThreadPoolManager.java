@@ -33,14 +33,14 @@ import javolution.util.FastList;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.util.StringUtil;
 
 public class ThreadPoolManager {
-	private static final Log _log = LogFactory.getLog(ThreadPoolManager.class);
+	private static final Logger _log = LoggerFactory.getLogger(ThreadPoolManager.class);
 
 	private static final class RunnableWrapper implements Runnable {
 		private final Runnable _r;

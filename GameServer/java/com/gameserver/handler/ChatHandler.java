@@ -18,15 +18,15 @@
  */
 package com.gameserver.handler;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javolution.util.FastMap;
 
 import com.util.StringUtil;
 
 public class ChatHandler {
-	private static final Logger _log = Logger.getLogger(ChatHandler.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(ChatHandler.class);
 
 	private static final FastMap<Integer, IChatHandler> _datatable = new FastMap<Integer, IChatHandler>();
 
@@ -40,8 +40,8 @@ public class ChatHandler {
 	public void registerChatHandler(IChatHandler handler) {
 		int[] ids = handler.getChatTypeList();
 		for (int i = 0; i < ids.length; i++) {
-			if (_log.isLoggable(Level.FINE)) {
-				_log.fine(StringUtil.concat("Adding handler for chat type ", String.valueOf(ids[i])));
+			if (_log.isDebugEnabled()) {
+				_log.debug(StringUtil.concat("Adding handler for chat type ", String.valueOf(ids[i])));
 			}
 			_datatable.put(ids[i], handler);
 		}

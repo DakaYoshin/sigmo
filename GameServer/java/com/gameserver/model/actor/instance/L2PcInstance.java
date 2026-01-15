@@ -44,8 +44,8 @@ import java.util.ArrayList;
 import com.gameserver.model.autofarm.AutofarmPlayerRoutine;
 import com.gameserver.util.Util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.GameTimeController;
@@ -241,7 +241,7 @@ public final class L2PcInstance extends L2Playable {
 	public String warehouseAccountId,
 			warehouseAccountPwd;
 
-	protected static final Log _log = LogFactory.getLog(L2PcInstance.class);
+	protected static final Logger _log = LoggerFactory.getLogger(L2PcInstance.class);
 
 	private static final String RESTORE_CHARACTER_HP_MP = "SELECT curHp, curCp, curMp FROM characters WHERE obj_id = ?";
 

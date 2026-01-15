@@ -18,8 +18,8 @@
  */
 package com.gameserver.geo;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.geo.pathfinding.Node;
@@ -32,7 +32,7 @@ import com.util.object.Point3D;
 
 public class GeoData
 {
-	protected static final Log _log = LogFactory.getLog(GeoData.class);
+	protected static final Logger _log = LoggerFactory.getLogger(GeoData.class);
 
 	private static final class SingletonHolder
 	{

@@ -27,8 +27,8 @@ import java.util.Map;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.HennaTable;
 import com.gameserver.model.actor.instance.L2HennaInstance;
@@ -39,7 +39,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class HennaTreeTable
 {
-	private static final Log _log = LogFactory.getLog(HennaTreeTable.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(HennaTreeTable.class.getName());
 
 	private static final HennaTreeTable _instance = new HennaTreeTable();
 	private Map<ClassId, List<L2HennaInstance>> _hennaTrees;

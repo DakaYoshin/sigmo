@@ -18,15 +18,15 @@
  */
 package com.gameserver.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.templates.StatsSet;
 import com.util.random.Rnd;
 
 public final class ChanceCondition
 {
-	private final static Log _log = LogFactory.getLog(ChanceCondition.class);
+	private final static Logger _log = LoggerFactory.getLogger(ChanceCondition.class);
 
 	public static final int EVT_HIT = 1;
 	public static final int EVT_CRIT = 2;
@@ -111,3 +111,4 @@ public final class ChanceCondition
 	}
 
 }
+

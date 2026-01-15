@@ -27,8 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.sql.ClanTable;
 import com.gameserver.datatables.xml.DoorTable;
@@ -47,7 +47,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class ClanHall
 {
-	private static final Log _log = LogFactory.getLog(ClanHall.class);
+	private static final Logger _log = LoggerFactory.getLogger(ClanHall.class);
 
 	private int _clanHallId;
 	private List<L2DoorInstance> _doors = new FastList<L2DoorInstance>();;

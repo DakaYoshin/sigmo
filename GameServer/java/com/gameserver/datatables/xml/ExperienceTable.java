@@ -8,8 +8,8 @@ import java.io.InputStreamReader;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -20,7 +20,7 @@ import com.gameserver.model.base.Experience;
 
 public class ExperienceTable
 {
-	private final static Log _log = LogFactory.getLog(ExperienceTable.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(ExperienceTable.class.getName());
 
 	private static ExperienceTable _instance = null;
 
@@ -85,3 +85,4 @@ public class ExperienceTable
 		return _instance == null ? (_instance = new ExperienceTable()) : _instance;
 	}
 }
+

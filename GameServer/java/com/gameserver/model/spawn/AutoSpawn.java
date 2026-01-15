@@ -29,8 +29,8 @@ import java.util.concurrent.TimeUnit;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.sql.SpawnTable;
 import com.gameserver.datatables.xml.MapRegionTable;
@@ -46,7 +46,7 @@ import com.util.database.L2DatabaseFactory;
 import com.util.random.Rnd;
 
 public class AutoSpawn {
-	private static final Log _log = LogFactory.getLog(AutoSpawn.class);
+	private static final Logger _log = LoggerFactory.getLogger(AutoSpawn.class);
 
 	private static AutoSpawn _instance;
 

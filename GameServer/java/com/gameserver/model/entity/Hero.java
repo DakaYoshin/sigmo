@@ -27,13 +27,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.sql.CharNameTable;
 import com.gameserver.datatables.sql.ClanTable;
@@ -58,7 +57,7 @@ import com.util.ResourceUtil;
 import com.util.database.L2DatabaseFactory;
 
 public class Hero {
-	private static final Log _log = LogFactory.getLog(Hero.class);
+	private static final Logger _log = LoggerFactory.getLogger(Hero.class);
 
 	private static Hero _instance;
 	private static final String GET_HEROES = "SELECT * FROM heroes WHERE played = 1";
@@ -643,7 +642,7 @@ public class Hero {
 			statement.execute();
 			statement.close();
 		} catch (SQLException e) {
-			_log.warn(Level.SEVERE, e);
+			_log.warn("Hero System: Couldnt save diary data for char_id: " + charId, e);
 		}
 	}
 }

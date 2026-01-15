@@ -24,8 +24,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.L2Object;
 import com.gameserver.model.TradeList;
@@ -42,7 +42,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class PcInventory extends Inventory
 {
-	private static final Log _log = LogFactory.getLog(PcInventory.class);
+	private static final Logger _log = LoggerFactory.getLogger(PcInventory.class);
 
 	public static final int ADENA_ID = 57;
 	public static final int ANCIENT_ADENA_ID = 5575;

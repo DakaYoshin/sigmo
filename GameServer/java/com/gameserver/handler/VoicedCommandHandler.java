@@ -20,13 +20,13 @@ package com.gameserver.handler;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.util.StringUtil;
 
 public class VoicedCommandHandler {
-	private static final Logger _log = Logger.getLogger(VoicedCommandHandler.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(VoicedCommandHandler.class);
 
 	private static final TIntObjectHashMap<IVoicedCommandHandler> _datatable = new TIntObjectHashMap<IVoicedCommandHandler>();
 
@@ -41,8 +41,8 @@ public class VoicedCommandHandler {
 	public void registerVoicedCommandHandler(IVoicedCommandHandler handler) {
 		String[] ids = handler.getVoicedCommandList();
 		for (int i = 0; i < ids.length; i++) {
-			if (_log.isLoggable(Level.FINE)) {
-				_log.fine(StringUtil.concat("Adding handler for command ", ids[i]));
+			if (_log.isDebugEnabled()) {
+				_log.debug(StringUtil.concat("Adding handler for command ", ids[i]));
 			}
 			_datatable.put(ids[i].hashCode(), handler);
 		}
@@ -53,8 +53,8 @@ public class VoicedCommandHandler {
 		if (voicedCommand.indexOf(" ") != -1) {
 			command = voicedCommand.substring(0, voicedCommand.indexOf(" "));
 		}
-		if (_log.isLoggable(Level.FINE)) {
-			_log.fine(StringUtil.concat("getting handler for command: ", command, " -> ",
+		if (_log.isDebugEnabled()) {
+			_log.debug(StringUtil.concat("getting handler for command: ", command, " -> ",
 					String.valueOf(_datatable.get(command.hashCode()) != null)));
 		}
 		return _datatable.get(command.hashCode());

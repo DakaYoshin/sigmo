@@ -29,8 +29,8 @@ import java.util.zip.ZipFile;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import com.Config;
@@ -42,7 +42,7 @@ import com.gameserver.script.ScriptPackage;
 import com.gameserver.scripting.L2ScriptEngineManager;
 
 public class FaenorScriptEngine extends ScriptEngine {
-	private final static Log _log = LogFactory.getLog(FaenorScriptEngine.class);
+	private final static Logger _log = LoggerFactory.getLogger(FaenorScriptEngine.class);
 
 	public final static String PACKAGE_DIRECTORY = "data/faenor/";
 	public final static boolean DEBUG = true;
@@ -176,3 +176,4 @@ public class FaenorScriptEngine extends ScriptEngine {
 	}
 
 }
+

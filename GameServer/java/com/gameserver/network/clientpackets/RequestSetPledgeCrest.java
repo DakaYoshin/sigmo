@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.cache.CrestCache;
 import com.gameserver.idfactory.IdFactory;
@@ -36,7 +36,7 @@ import com.util.database.L2DatabaseFactory;
 
 public final class RequestSetPledgeCrest extends L2GameClientPacket
 {
-	private final static Log _log = LogFactory.getLog(RequestSetPledgeCrest.class);
+	private final static Logger _log = LoggerFactory.getLogger(RequestSetPledgeCrest.class);
 
 	private static final String _C__53_REQUESTSETPLEDGECREST = "[C] 53 RequestSetPledgeCrest";
 
@@ -158,3 +158,4 @@ public final class RequestSetPledgeCrest extends L2GameClientPacket
 		return _C__53_REQUESTSETPLEDGECREST;
 	}
 }
+

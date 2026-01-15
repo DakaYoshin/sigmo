@@ -23,8 +23,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -35,7 +35,7 @@ import com.gameserver.templates.L2HelperBuff;
 import com.gameserver.templates.StatsSet;
 
 public class HelperBuffTable {
-	private static final Log _log = LogFactory.getLog(HennaTable.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(HennaTable.class.getName());
 
 	private List<L2HelperBuff> _helperBuff;
 

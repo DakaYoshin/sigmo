@@ -18,8 +18,8 @@
  */
 package com.gameserver.network.clientpackets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.actor.L2Npc;
 import com.gameserver.model.actor.instance.L2PcInstance;
@@ -27,7 +27,7 @@ import com.gameserver.network.serverpackets.NpcHtmlMessage;
 
 public final class RequestLinkHtml extends L2GameClientPacket
 {
-	 private static Log _log = LogFactory.getLog(RequestLinkHtml.class);
+	 private static Logger _log = LoggerFactory.getLogger(RequestLinkHtml.class);
 
 	private static final String REQUESTLINKHTML__C__20 = "[C] 20 RequestLinkHtml";
 
@@ -70,7 +70,7 @@ public final class RequestLinkHtml extends L2GameClientPacket
 		}
 		catch (Exception e)
 		{
-			_log.fatal("Bad RequestLinkHtml: " + this._link, e);
+			_log.error("Bad RequestLinkHtml: " + this._link, e);
 		}
 	}
 

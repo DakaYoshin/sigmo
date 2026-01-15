@@ -18,8 +18,8 @@
  */
 package com.gameserver.handler.skillhandlers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.handler.ISkillHandler;
 import com.gameserver.model.L2Object;
@@ -30,7 +30,7 @@ import com.util.random.Rnd;
 
 public class ZakenPlayer implements ISkillHandler
 {
-	private final static Log _log = LogFactory.getLog(ZakenPlayer.class);
+	private final static Logger _log = LoggerFactory.getLogger(ZakenPlayer.class);
 
 	private static final L2SkillType[] SKILL_IDS = { L2SkillType.ZAKENPLAYER };
 
@@ -114,3 +114,4 @@ public class ZakenPlayer implements ISkillHandler
 		return SKILL_IDS;
 	}
 }
+

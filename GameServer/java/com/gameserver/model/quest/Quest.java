@@ -28,8 +28,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.cache.HtmCache;
@@ -55,7 +55,7 @@ import com.util.database.L2DatabaseFactory;
 import com.util.random.Rnd;
 
 public class Quest extends ManagedScript {
-	protected static final Log _log = LogFactory.getLog(Quest.class);
+	protected static final Logger _log = LoggerFactory.getLogger(Quest.class);
 
 	private static Map<String, Quest> _allEventsS = new FastMap<String, Quest>();
 	private Map<String, FastList<QuestTimer>> _allEventTimers = new FastMap<String, FastList<QuestTimer>>();

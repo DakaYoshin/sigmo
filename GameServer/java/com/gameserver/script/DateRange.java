@@ -22,12 +22,12 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DateRange
 {
-	private final static Log _log = LogFactory.getLog(DateRange.class);
+	private final static Logger _log = LoggerFactory.getLogger(DateRange.class);
 
 	private Date _startDate, _endDate;
 
@@ -78,3 +78,4 @@ public class DateRange
 	}
 
 }
+

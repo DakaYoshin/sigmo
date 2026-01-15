@@ -26,8 +26,8 @@ import java.util.Map;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.sql.ClanTable;
 import com.gameserver.idfactory.IdFactory;
@@ -44,7 +44,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class Auction
 {
-	private static final Log _log = LogFactory.getLog(Auction.class);
+	private static final Logger _log = LoggerFactory.getLogger(Auction.class);
 	private int _id = 0;
 	private int _adenaId = 57;
 	private long _endDate;

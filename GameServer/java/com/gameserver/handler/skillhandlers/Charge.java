@@ -18,8 +18,6 @@
  */
 package com.gameserver.handler.skillhandlers;
 
-import java.util.logging.Logger;
-
 import com.gameserver.handler.ISkillHandler;
 import com.gameserver.model.L2Effect;
 import com.gameserver.model.L2Object;
@@ -28,19 +26,14 @@ import com.gameserver.model.actor.L2Character;
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.templates.skills.L2SkillType;
 
-public class Charge implements ISkillHandler
-{
-	static Logger _log = Logger.getLogger(Charge.class.getName());
+public class Charge implements ISkillHandler {
 
-	private static final L2SkillType[] SKILL_IDS = { };
+	private static final L2SkillType[] SKILL_IDS = {};
 
 	@Override
-	public void useSkill(L2Character activeChar, L2Skill skill, L2Object[] targets)
-	{
-		for(int index = 0; index < targets.length; index++)
-		{
-			if(!(targets[index] instanceof L2PcInstance))
-			{
+	public void useSkill(L2Character activeChar, L2Skill skill, L2Object[] targets) {
+		for (int index = 0; index < targets.length; index++) {
+			if (!(targets[index] instanceof L2PcInstance)) {
 				continue;
 			}
 
@@ -49,8 +42,7 @@ public class Charge implements ISkillHandler
 		}
 
 		L2Effect effect = activeChar.getFirstEffect(skill.getId());
-		if(effect != null && effect.isSelfEffect())
-		{
+		if (effect != null && effect.isSelfEffect()) {
 			effect.exit();
 		}
 
@@ -58,8 +50,7 @@ public class Charge implements ISkillHandler
 	}
 
 	@Override
-	public L2SkillType[] getSkillIds()
-	{
+	public L2SkillType[] getSkillIds() {
 		return SKILL_IDS;
 	}
 }

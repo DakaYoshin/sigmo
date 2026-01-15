@@ -18,8 +18,8 @@
  */
 package com.gameserver.skills.effects;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.ai.CtrlIntention;
 import com.gameserver.model.L2Effect;
@@ -28,7 +28,7 @@ import com.gameserver.templates.skills.L2EffectType;
 
 public class EffectRemoveTarget extends L2Effect
 {
-	private final static Log _log = LogFactory.getLog(EffectRemoveTarget.class);
+	private final static Logger _log = LoggerFactory.getLogger(EffectRemoveTarget.class);
 
 	public EffectRemoveTarget(final Env env, final EffectTemplate template)
 	{
@@ -77,3 +77,4 @@ public class EffectRemoveTarget extends L2Effect
 		}
 	}
 }
+

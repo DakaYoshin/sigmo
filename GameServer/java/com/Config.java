@@ -37,8 +37,8 @@ import javolution.text.TypeFormat;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.util.object.L2Properties;
 import com.util.services.ClassMasterSettings;
@@ -47,7 +47,7 @@ import com.util.services.ServerType;
 
 public final class Config
 {
-	private static final Log _log = LogFactory.getLog(Config.class);
+	private static final Logger _log = LoggerFactory.getLogger(Config.class);
 	//============================================================
 	// custom.ini
 	//============================================================
@@ -3147,7 +3147,7 @@ public final class Config
 		}
 		else
 		{
-			_log.fatal("Can't load config: server mode isn't set");
+			_log.error("Can't load config: server mode isn't set");
 		}
 	}
 

@@ -23,8 +23,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -36,7 +36,7 @@ import com.gameserver.model.actor.instance.L2PetInstance;
 
 public class L2PetDataTable
 {
-	private static final Log _log = LogFactory.getLog(L2PetInstance.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(L2PetInstance.class.getName());
 
 	private static L2PetDataTable _instance;
 
@@ -429,3 +429,4 @@ public class L2PetDataTable
 				|| npcId == 12621; // wyvern
 	}
 }
+

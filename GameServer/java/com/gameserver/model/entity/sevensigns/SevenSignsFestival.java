@@ -29,8 +29,8 @@ import java.util.concurrent.ScheduledFuture;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.ai.CtrlIntention;
@@ -64,7 +64,7 @@ import com.util.random.Rnd;
 
 public class SevenSignsFestival implements SpawnListener
 {
-	private static final Log _log = LogFactory.getLog(SevenSignsFestival.class);
+	private static final Logger _log = LoggerFactory.getLogger(SevenSignsFestival.class);
 
 	private static SevenSignsFestival _instance;
 

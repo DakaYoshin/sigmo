@@ -31,8 +31,8 @@ import java.util.StringTokenizer;
 import javolution.text.TextBuilder;
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.cache.HtmCache;
@@ -47,7 +47,7 @@ import com.gameserver.services.Messages;
 
 public class Announcements
 {
-	private static final Log _log = LogFactory.getLog(Announcements.class);
+	private static final Logger _log = LoggerFactory.getLogger(Announcements.class);
 
 	private static Announcements _instance;
 	private List<String> _announcements = new FastList<String>();

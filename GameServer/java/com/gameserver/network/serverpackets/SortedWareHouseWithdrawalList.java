@@ -24,8 +24,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.RecipeController;
 import com.gameserver.model.L2RecipeList;
@@ -41,7 +41,7 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	public static final int CLAN = 2;
 	public static final int CASTLE = 3;
 	public static final int FREIGHT = 4;
-	private final static Log _log = LogFactory.getLog(SortedWareHouseWithdrawalList.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(SortedWareHouseWithdrawalList.class.getName());
 	private static final String _S__54_SORTEDWAREHOUSEWITHDRAWALLIST = "[S] 42 SortedWareHouseWithdrawalList";
 	private L2PcInstance _activeChar;
 	private int _playerAdena;
@@ -702,3 +702,4 @@ public class SortedWareHouseWithdrawalList extends L2GameServerPacket
 	}
 
 }
+

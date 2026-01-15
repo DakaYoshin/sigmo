@@ -22,8 +22,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -34,7 +34,7 @@ import com.gameserver.datatables.AccessLevel;
 
 public class AccessLevels
 {
-	private final static Log _log = LogFactory.getLog(AccessLevels.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(AccessLevels.class.getName());
 
 	public static final int _masterAccessLevelNum = Config.GM_ACCESS_LEVEL;
 	
@@ -198,3 +198,4 @@ public class AccessLevels
 		}
 	}
 }
+

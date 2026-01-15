@@ -14,13 +14,13 @@ package com.gameserver.handler;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.util.StringUtil;
 
 public class AdminCommandHandler {
-	private static final Logger _log = Logger.getLogger(AdminCommandHandler.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(AdminCommandHandler.class);
 
 	private static final TIntObjectHashMap<IAdminCommandHandler> _datatable = new TIntObjectHashMap<IAdminCommandHandler>();
 
@@ -35,8 +35,8 @@ public class AdminCommandHandler {
 	public void registerAdminCommandHandler(IAdminCommandHandler handler) {
 		String[] ids = handler.getAdminCommandList();
 		for (int i = 0; i < ids.length; i++) {
-			if (_log.isLoggable(Level.FINE)) {
-				_log.fine(StringUtil.concat("Adding handler for command ", ids[i]));
+			if (_log.isDebugEnabled()) {
+				_log.debug(StringUtil.concat("Adding handler for command ", ids[i]));
 			}
 			_datatable.put(ids[i].hashCode(), handler);
 		}
@@ -49,8 +49,8 @@ public class AdminCommandHandler {
 		if (sepPos > -1) {
 			command = adminCommand.substring(0, sepPos);
 		}
-		if (_log.isLoggable(Level.FINE)) {
-			_log.fine(StringUtil.concat("getting handler for command: ", command, " -> ",
+		if (_log.isDebugEnabled()) {
+			_log.debug(StringUtil.concat("getting handler for command: ", command, " -> ",
 					String.valueOf(_datatable.get(command.hashCode()) != null)));
 		}
 		return _datatable.get(command.hashCode());

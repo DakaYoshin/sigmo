@@ -25,8 +25,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.NpcTable;
 import com.gameserver.idfactory.IdFactory;
@@ -52,7 +52,7 @@ import com.util.database.L2DatabaseFactory;
  */
 public class MercTicketManager
 {
-	private final static Log _log = LogFactory.getLog(CastleManager.class);
+	private final static Logger _log = LoggerFactory.getLogger(CastleManager.class);
 
 	private static MercTicketManager _instance;
 
@@ -461,3 +461,4 @@ public class MercTicketManager
 	}
 
 }
+

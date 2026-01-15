@@ -27,8 +27,8 @@ import java.util.Map;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.communitybbs.Manager.ForumsBBSManager;
 import com.gameserver.communitybbs.Manager.TopicBBSManager;
@@ -37,7 +37,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class Forum
 {
-	private final static Log _log = LogFactory.getLog(Forum.class);
+	private final static Logger _log = LoggerFactory.getLogger(Forum.class);
 
 	//type
 	public static final int ROOT = 0;
@@ -278,3 +278,4 @@ public class Forum
 		}
 	}
 }
+

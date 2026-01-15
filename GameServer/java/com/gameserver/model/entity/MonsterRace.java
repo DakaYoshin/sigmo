@@ -20,8 +20,8 @@ package com.gameserver.model.entity;
 
 import java.lang.reflect.Constructor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.NpcTable;
 import com.gameserver.idfactory.IdFactory;
@@ -31,7 +31,7 @@ import com.util.random.Rnd;
 
 public class MonsterRace
 {
-	private final static Log _log = LogFactory.getLog(MonsterRace.class);
+	private final static Logger _log = LoggerFactory.getLogger(MonsterRace.class);
 
 	private L2Npc[] _monsters;
 	private static MonsterRace _instance;
@@ -151,3 +151,4 @@ public class MonsterRace
 	}
 
 }
+

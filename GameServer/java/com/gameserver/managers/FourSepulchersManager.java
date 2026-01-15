@@ -30,8 +30,8 @@ import java.util.concurrent.ScheduledFuture;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.sql.SpawnTable;
@@ -61,7 +61,7 @@ import com.util.random.Rnd;
  * spawns, and gatekeepers.
  */
 public class FourSepulchersManager extends GrandBossManager {
-	private static final Log _log = LogFactory.getLog(FourSepulchersManager.class);
+	private static final Logger _log = LoggerFactory.getLogger(FourSepulchersManager.class);
 
 	private static FourSepulchersManager _instance;
 

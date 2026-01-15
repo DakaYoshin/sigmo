@@ -26,8 +26,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.xml.L2PetDataTable;
@@ -36,7 +36,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class PetNameTable
 {
-	private static final Log _log = LogFactory.getLog(PetNameTable.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(PetNameTable.class.getName());
 
 	private static PetNameTable _instance;
 

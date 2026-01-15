@@ -24,8 +24,8 @@ import java.util.Map;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.ItemsAutoDestroy;
@@ -73,7 +73,7 @@ import com.util.random.Rnd;
 
 public class L2Attackable extends L2Npc
 {
-	private static final Log _log = LogFactory.getLog(L2Attackable.class);
+	private static final Logger _log = LoggerFactory.getLogger(L2Attackable.class);
 
 	public final class AggroInfo
 	{

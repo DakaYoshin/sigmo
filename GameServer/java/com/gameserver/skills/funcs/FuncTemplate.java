@@ -21,8 +21,8 @@ package com.gameserver.skills.funcs;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.skills.Env;
 import com.gameserver.skills.Stats;
@@ -30,7 +30,7 @@ import com.gameserver.skills.conditions.Condition;
 
 public final class FuncTemplate
 {
-	private final static Log _log = LogFactory.getLog(FuncTemplate.class);
+	private final static Logger _log = LoggerFactory.getLogger(FuncTemplate.class);
 
 	public Condition attachCond;
 	public Condition applayCond;
@@ -104,3 +104,4 @@ public final class FuncTemplate
 	}
 
 }
+

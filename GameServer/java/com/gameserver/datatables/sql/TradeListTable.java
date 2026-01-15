@@ -25,8 +25,8 @@ import java.sql.ResultSet;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.NpcTable;
 import com.gameserver.model.L2TradeList;
@@ -36,7 +36,7 @@ import com.util.ResourceUtil;
 import com.util.database.L2DatabaseFactory;
 
 public class TradeListTable {
-	private final static Log _log = LogFactory.getLog(TradeListTable.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(TradeListTable.class.getName());
 	private static TradeListTable _instance;
 
 	private int _nextListId;
@@ -259,7 +259,7 @@ public class TradeListTable {
 			statement.close();
 			statement = null;
 		} catch (Exception e) {
-			_log.fatal("TradeController: Could not update Timer save in Buylist");
+			_log.error("TradeController: Could not update Timer save in Buylist");
 		} finally {
 			ResourceUtil.closeConnection(con);
 		}
@@ -299,9 +299,10 @@ public class TradeListTable {
 				}
 			}
 		} catch (Exception e) {
-			_log.fatal("TradeController: Could not store Count Item");
+			_log.error("TradeController: Could not store Count Item");
 		} finally {
 			ResourceUtil.closeConnection(con);
 		}
 	}
 }
+

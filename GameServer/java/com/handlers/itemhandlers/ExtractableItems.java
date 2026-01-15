@@ -19,7 +19,8 @@
 
 package com.handlers.itemhandlers;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.csv.ExtractableItemsData;
 import com.gameserver.datatables.sql.ItemTable;
@@ -34,7 +35,7 @@ import com.gameserver.network.serverpackets.SystemMessage;
 import com.util.random.Rnd;
 
 public class ExtractableItems implements IItemHandler {
-	private static Logger _log = Logger.getLogger(ItemTable.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(ExtractableItems.class);
 
 	public void useItem(L2Playable playable, L2ItemInstance item) {
 		if (!(playable instanceof L2PcInstance)) {
@@ -70,7 +71,7 @@ public class ExtractableItems implements IItemHandler {
 
 		if (createItemID > 0) {
 			if (ItemTable.getInstance().createDummyItem(createItemID) == null) {
-				_log.warning("createItemID " + createItemID + " doesn't have template!");
+				_log.warn("createItemID " + createItemID + " doesn't have template!");
 				activeChar.sendMessage("Nothing happened.");
 				return;
 			}

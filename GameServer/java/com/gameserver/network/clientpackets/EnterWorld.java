@@ -31,8 +31,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.GameTimeController;
@@ -109,7 +109,7 @@ import com.util.protection.nProtect;
 import com.util.protection.nProtect.RestrictionType;
 
 public class EnterWorld extends L2GameClientPacket {
-	private final static Log _log = LogFactory.getLog(EnterWorld.class);
+	private final static Logger _log = LoggerFactory.getLogger(EnterWorld.class);
 	public static Vector<L2PcInstance> _onlineplayers = new Vector<>();
 
 	long _daysleft;
@@ -942,3 +942,4 @@ public class EnterWorld extends L2GameClientPacket {
 	}
 
 }
+

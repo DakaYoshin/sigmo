@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.GmListTable;
 import com.gameserver.datatables.xml.AdminCommandAccessRights;
@@ -34,44 +34,37 @@ import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.network.serverpackets.SocialAction;
 import com.util.database.L2DatabaseFactory;
 
-public class AdminNoble implements IAdminCommandHandler
-{
-	private static String[] ADMIN_COMMANDS =
-	{
-		"admin_setnoble"
+public class AdminNoble implements IAdminCommandHandler {
+	private static String[] ADMIN_COMMANDS = {
+			"admin_setnoble"
 	};
 
-	private final static Log _log = LogFactory.getLog(AdminNoble.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(AdminNoble.class.getName());
 
-	public boolean useAdminCommand(String command, L2PcInstance activeChar)
-	{
-		if(activeChar == null)
+	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
+		if (activeChar == null)
 			return false;
 
 		AdminCommandAccessRights.getInstance().hasAccess(command, activeChar.getAccessLevel());
 
-		GMAudit.auditGMAction(activeChar.getName(), command, (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target"), "");
+		GMAudit.auditGMAction(activeChar.getName(), command,
+				(activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target"), "");
 
-		if(command.startsWith("admin_setnoble"))
-		{
+		if (command.startsWith("admin_setnoble")) {
 			L2Object target = activeChar.getTarget();
 
-			if(target instanceof L2PcInstance)
-			{
+			if (target instanceof L2PcInstance) {
 				L2PcInstance targetPlayer = (L2PcInstance) target;
 
 				boolean newNoble = !targetPlayer.isNoble();
 
-				if(newNoble)
-				{
+				if (newNoble) {
 					targetPlayer.setNoble(true);
 					targetPlayer.sendChatMessage(0, 0, "SYS", "You are now a noblesse.");
 					updateDatabase(targetPlayer, true);
 					sendMessages(true, targetPlayer, activeChar, true, true);
 					targetPlayer.broadcastPacket(new SocialAction(targetPlayer.getObjectId(), 16));
-				}
-				else
-				{
+				} else {
 					targetPlayer.setNoble(false);
 					targetPlayer.sendChatMessage(0, 0, "SYS", "You are no longer a noblesse.");
 					updateDatabase(targetPlayer, false);
@@ -79,9 +72,7 @@ public class AdminNoble implements IAdminCommandHandler
 				}
 
 				targetPlayer = null;
-			}
-			else
-			{
+			} else {
 				activeChar.sendChatMessage(0, 0, "SYS", "Impossible to set a non Player Target as noble.");
 				_log.info("GM: " + activeChar.getName() + " is trying to set a non Player Target as noble.");
 
@@ -94,26 +85,23 @@ public class AdminNoble implements IAdminCommandHandler
 		return true;
 	}
 
-	private void sendMessages(boolean forNewNoble, L2PcInstance player, L2PcInstance gm, boolean announce, boolean notifyGmList)
-	{
-		if(forNewNoble)
-		{
+	private void sendMessages(boolean forNewNoble, L2PcInstance player, L2PcInstance gm, boolean announce,
+			boolean notifyGmList) {
+		if (forNewNoble) {
 			player.sendChatMessage(0, 0, "SYS", gm.getName() + " has granted Noble Status from you!");
 			gm.sendChatMessage(0, 0, "SYS", "You've granted Noble Status from " + player.getName());
 
-			if(notifyGmList)
-			{
-				GmListTable.broadcastMessageToGMs("Warn: " + gm.getName() + " has set " + player.getName() + " as Noble !");
+			if (notifyGmList) {
+				GmListTable.broadcastMessageToGMs(
+						"Warn: " + gm.getName() + " has set " + player.getName() + " as Noble !");
 			}
-		}
-		else
-		{
+		} else {
 			player.sendChatMessage(0, 0, "SYS", gm.getName() + " has revoked Noble Status for you!");
 			gm.sendChatMessage(0, 0, "SYS", "You've revoked Noble Status for " + player.getName());
 
-			if(notifyGmList)
-			{
-				GmListTable.broadcastMessageToGMs("Warn: " + gm.getName() + " has removed Noble Status of player" + player.getName());
+			if (notifyGmList) {
+				GmListTable.broadcastMessageToGMs(
+						"Warn: " + gm.getName() + " has removed Noble Status of player" + player.getName());
 			}
 		}
 	}
@@ -122,13 +110,11 @@ public class AdminNoble implements IAdminCommandHandler
 	 * @param activeChar
 	 * @param newNoble
 	 */
-	private void updateDatabase(L2PcInstance player, boolean newNoble)
-	{
+	private void updateDatabase(L2PcInstance player, boolean newNoble) {
 		Connection con = null;
 
-		try
-		{
-			if(player == null)
+		try {
+			if (player == null)
 				return;
 
 			con = L2DatabaseFactory.getInstance().getConnection();
@@ -136,18 +122,14 @@ public class AdminNoble implements IAdminCommandHandler
 			statement.setInt(1, player.getObjectId());
 			ResultSet result = statement.executeQuery();
 
-			if(result.next())
-			{
+			if (result.next()) {
 				PreparedStatement stmt = con.prepareStatement(newNoble ? UPDATE_DATA : DEL_DATA);
 				stmt.setInt(1, player.getObjectId());
 				stmt.execute();
 				stmt.close();
 				stmt = null;
-			}
-			else
-			{
-				if(newNoble)
-				{
+			} else {
+				if (newNoble) {
 					PreparedStatement stmt = con.prepareStatement(INSERT_DATA);
 					stmt.setInt(1, player.getObjectId());
 					stmt.setString(2, player.getName());
@@ -162,29 +144,27 @@ public class AdminNoble implements IAdminCommandHandler
 
 			result = null;
 			statement = null;
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("Error: could not update database: ", e);
-		}
-		finally
-		{
-			try { con.close(); } catch(Exception e) { }
+		} finally {
+			try {
+				con.close();
+			} catch (Exception e) {
+			}
 			con = null;
 		}
 	}
 
 	// Updates That Will be Executed by MySQL
 	// ----------------------------------------
-	String INSERT_DATA= "INSERT INTO characters_custom_data (obj_Id, char_name, noble) VALUES (?,?,?)";
+	String INSERT_DATA = "INSERT INTO characters_custom_data (obj_Id, char_name, noble) VALUES (?,?,?)";
 	String UPDATE_DATA = "UPDATE characters_custom_data SET noble=1 WHERE obj_Id=?";
 	String DEL_DATA = "UPDATE characters_custom_data SET noble=0 WHERE obj_Id=?";
 
 	/**
 	 * @return
 	 */
-	public String[] getAdminCommandList()
-	{
+	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
 	}
 }

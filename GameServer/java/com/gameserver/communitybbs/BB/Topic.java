@@ -21,8 +21,8 @@ package com.gameserver.communitybbs.BB;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.communitybbs.Manager.TopicBBSManager;
 import com.util.ResourceUtil;
@@ -30,7 +30,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class Topic
 {
-	private final static Log _log = LogFactory.getLog(Topic.class);
+	private final static Logger _log = LoggerFactory.getLogger(Topic.class);
 
 	public static final int MORMAL = 0;
 	public static final int MEMO = 1;
@@ -168,3 +168,4 @@ public class Topic
 		return _date;
 	}
 }
+

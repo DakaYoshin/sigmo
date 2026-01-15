@@ -26,8 +26,8 @@ import java.util.Map;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.L2Object;
 import com.gameserver.model.actor.L2Character;
@@ -40,7 +40,7 @@ import com.util.object.L2FastList;
 
 public class GrandBossManager
 {
-	private static Log _log = LogFactory.getLog(GrandBossManager.class);
+	private static Logger _log = LoggerFactory.getLogger(GrandBossManager.class);
 
 	private static final String DELETE_GRAND_BOSS_LIST = "DELETE FROM grandboss_list";
 

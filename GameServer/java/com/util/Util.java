@@ -23,15 +23,15 @@ import java.io.StringWriter;
 
 import javolution.text.TextBuilder;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.util.object.Memory;
 
 public class Util
 {
-	private final static Log _log = LogFactory.getLog(Util.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(Util.class.getName());
 
 	public static String printData(byte[] data, int len)
 	{
@@ -170,7 +170,7 @@ public class Util
         _log.info("                         DESENVOLVED FOR BRDEVELOPERS                          ");
 		_log.info("_______________________________________________________________________________");
         _log.info("               	        		   	                                          ");
-        _log.info("               	       © 2013-2026 ALL RIGHTS RESERVED 		   	              ");
+        _log.info("               	       Â© 2013-2026 ALL RIGHTS RESERVED 		   	              ");
 		_log.info("_______________________________________________________________________________");
 	}
 	/**
@@ -190,3 +190,4 @@ public class Util
 	}
 
 }
+

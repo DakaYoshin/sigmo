@@ -19,15 +19,15 @@
 package com.gameserver.handler;
 
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javolution.util.FastMap;
 
 import com.util.StringUtil;
 
 public class UserCommandHandler {
-	private static final Logger _log = Logger.getLogger(UserCommandHandler.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(UserCommandHandler.class);
 
 	private static final Map<Integer, IUserCommandHandler> _datatable = new FastMap<Integer, IUserCommandHandler>();
 
@@ -41,16 +41,16 @@ public class UserCommandHandler {
 	public void registerUserCommandHandler(IUserCommandHandler handler) {
 		int[] ids = handler.getUserCommandList();
 		for (int i = 0; i < ids.length; i++) {
-			if (_log.isLoggable(Level.FINE)) {
-				_log.fine(StringUtil.concat("Adding handler for user command ", String.valueOf(ids[i])));
+			if (_log.isDebugEnabled()) {
+				_log.debug(StringUtil.concat("Adding handler for user command ", String.valueOf(ids[i])));
 			}
 			_datatable.put(Integer.valueOf(ids[i]), handler);
 		}
 	}
 
 	public IUserCommandHandler getUserCommandHandler(int userCommand) {
-		if (_log.isLoggable(Level.FINE)) {
-			_log.fine(StringUtil.concat("getting handler for user command: ", String.valueOf(userCommand)));
+		if (_log.isDebugEnabled()) {
+			_log.debug(StringUtil.concat("getting handler for user command: ", String.valueOf(userCommand)));
 		}
 		return _datatable.get(Integer.valueOf(userCommand));
 	}

@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.GmListTable;
 import com.gameserver.datatables.xml.AdminCommandAccessRights;
@@ -34,59 +34,48 @@ import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.network.serverpackets.SocialAction;
 import com.util.database.L2DatabaseFactory;
 
-public class AdminHero implements IAdminCommandHandler
-{
-	private static String[] ADMIN_COMMANDS =
-	{
-		"admin_sethero"
+public class AdminHero implements IAdminCommandHandler {
+	private static String[] ADMIN_COMMANDS = {
+			"admin_sethero"
 	};
 
-	private final static Log _log = LogFactory.getLog(AdminHero.class.getName());
+	private final static Logger _log = LoggerFactory.getLogger(AdminHero.class.getName());
 
-	public boolean useAdminCommand(String command, L2PcInstance activeChar)
-	{
-		if(activeChar == null)
+	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
+		if (activeChar == null)
 			return false;
 
 		AdminCommandAccessRights.getInstance().hasAccess(command, activeChar.getAccessLevel());
 
-		GMAudit.auditGMAction(activeChar.getName(), command, (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target"), "");
+		GMAudit.auditGMAction(activeChar.getName(), command,
+				(activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target"), "");
 
-		if(command.startsWith("admin_sethero"))
-		{
+		if (command.startsWith("admin_sethero")) {
 			String[] cmdParams = command.split(" ");
 
 			long heroTime = 0;
-			if(cmdParams.length > 1)
-			{
-				try
-				{
+			if (cmdParams.length > 1) {
+				try {
 					heroTime = Integer.parseInt(cmdParams[1]) * 24L * 60L * 60L * 1000L;
-				}
-				catch(NumberFormatException nfe)
-				{
-					//None
+				} catch (NumberFormatException nfe) {
+					// None
 				}
 			}
-		
+
 			L2Object target = activeChar.getTarget();
 
-			if(target instanceof L2PcInstance)
-			{
+			if (target instanceof L2PcInstance) {
 				L2PcInstance targetPlayer = (L2PcInstance) target;
 				boolean newHero = !targetPlayer.isHero();
 
-				if(newHero)
-				{
+				if (newHero) {
 					targetPlayer.setIsHero(true);
 					targetPlayer.sendMessage("You are now a hero.");
 					updateDatabase(targetPlayer, true, heroTime);
 					sendMessages(true, targetPlayer, activeChar, true, true);
 					targetPlayer.broadcastPacket(new SocialAction(targetPlayer.getObjectId(), 16));
 					targetPlayer.broadcastUserInfo();
-				}
-				else
-				{
+				} else {
 					targetPlayer.setIsHero(false);
 					targetPlayer.sendMessage("You are no longer a hero.");
 					updateDatabase(targetPlayer, false, 0);
@@ -95,9 +84,7 @@ public class AdminHero implements IAdminCommandHandler
 				}
 
 				targetPlayer = null;
-			}
-			else
-			{
+			} else {
 				activeChar.sendMessage("Impossible to set a non Player Target as hero.");
 				_log.info("GM: " + activeChar.getName() + " is trying to set a non Player Target as hero.");
 
@@ -109,26 +96,23 @@ public class AdminHero implements IAdminCommandHandler
 		return true;
 	}
 
-	private void sendMessages(boolean fornewHero, L2PcInstance player, L2PcInstance gm, boolean announce, boolean notifyGmList)
-	{
-		if(fornewHero)
-		{
+	private void sendMessages(boolean fornewHero, L2PcInstance player, L2PcInstance gm, boolean announce,
+			boolean notifyGmList) {
+		if (fornewHero) {
 			player.sendMessage(gm.getName() + " has granted Hero Status for you!");
 			gm.sendMessage("You've granted Hero Status for " + player.getName());
 
-			if(notifyGmList)
-			{
-				GmListTable.broadcastMessageToGMs("Warn: " + gm.getName() + " has set " + player.getName() + " as Hero !");
+			if (notifyGmList) {
+				GmListTable
+						.broadcastMessageToGMs("Warn: " + gm.getName() + " has set " + player.getName() + " as Hero !");
 			}
-		}
-		else
-		{
+		} else {
 			player.sendMessage(gm.getName() + " has revoked Hero Status from you!");
 			gm.sendMessage("You've revoked Hero Status from " + player.getName());
 
-			if(notifyGmList)
-			{
-				GmListTable.broadcastMessageToGMs("Warn: " + gm.getName() + " has removed Hero Status of player" + player.getName());
+			if (notifyGmList) {
+				GmListTable.broadcastMessageToGMs(
+						"Warn: " + gm.getName() + " has removed Hero Status of player" + player.getName());
 			}
 		}
 	}
@@ -137,12 +121,10 @@ public class AdminHero implements IAdminCommandHandler
 	 * @param activeChar
 	 * @param newHero
 	 */
-	private void updateDatabase(L2PcInstance player, boolean newHero, long heroTime)
-	{
+	private void updateDatabase(L2PcInstance player, boolean newHero, long heroTime) {
 		Connection con = null;
-		try
-		{
-			if(player == null)
+		try {
+			if (player == null)
 				return;
 
 			con = L2DatabaseFactory.getInstance().getConnection();
@@ -150,27 +132,20 @@ public class AdminHero implements IAdminCommandHandler
 			statement.setInt(1, player.getObjectId());
 			ResultSet result = statement.executeQuery();
 
-			if(result.next())
-			{
+			if (result.next()) {
 				PreparedStatement stmt = con.prepareStatement(newHero ? UPDATE_DATA : DEL_DATA);
-				if(newHero)
-				{
+				if (newHero) {
 					stmt.setLong(1, heroTime == 0 ? 0 : System.currentTimeMillis() + heroTime);
 					stmt.setInt(2, player.getObjectId());
 					stmt.execute();
-				}
-				else
-				{
+				} else {
 					stmt.setInt(1, player.getObjectId());
 					stmt.execute();
 				}
 				stmt.close();
 				stmt = null;
-			}
-			else
-			{
-				if(newHero)
-				{
+			} else {
+				if (newHero) {
 					PreparedStatement stmt = con.prepareStatement(INSERT_DATA);
 					stmt.setInt(1, player.getObjectId());
 					stmt.setString(2, player.getName());
@@ -187,29 +162,27 @@ public class AdminHero implements IAdminCommandHandler
 
 			result = null;
 			statement = null;
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("Error: could not update database: ", e);
-		}
-		finally
-		{
-			try { con.close(); } catch(Exception e) { }
+		} finally {
+			try {
+				con.close();
+			} catch (Exception e) {
+			}
 			con = null;
 		}
 	}
 
 	// Updates That Will be Executed by MySQL
 	// ----------------------------------------
-	String INSERT_DATA= "INSERT INTO characters_custom_data (obj_Id, char_name, noble, hero, hero_end_date) VALUES (?,?,?,?,?)";
+	String INSERT_DATA = "INSERT INTO characters_custom_data (obj_Id, char_name, noble, hero, hero_end_date) VALUES (?,?,?,?,?)";
 	String UPDATE_DATA = "UPDATE characters_custom_data SET noble=1, hero=1, hero_end_date=? WHERE obj_Id=?";
 	String DEL_DATA = "UPDATE characters_custom_data SET hero = 0, hero_end_date=0 WHERE obj_Id=?";
 
 	/**
 	 * @return
 	 */
-	public String[] getAdminCommandList()
-	{
+	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
 	}
 

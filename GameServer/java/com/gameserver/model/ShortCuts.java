@@ -24,8 +24,8 @@ import java.sql.ResultSet;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.actor.instance.L2ItemInstance;
 import com.gameserver.model.actor.instance.L2PcInstance;
@@ -37,7 +37,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class ShortCuts
 {
-	private static final Log _log = LogFactory.getLog(ShortCuts.class);
+	private static final Logger _log = LoggerFactory.getLogger(ShortCuts.class);
 
 	private L2PcInstance _owner;
 	private Map<Integer, L2ShortCut> _shortCuts = new TreeMap<Integer, L2ShortCut>();

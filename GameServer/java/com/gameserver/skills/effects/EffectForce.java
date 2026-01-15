@@ -18,8 +18,8 @@
  */
 package com.gameserver.skills.effects;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.SkillTable;
 import com.gameserver.model.L2Effect;
@@ -30,7 +30,7 @@ import com.gameserver.util.Util;
 
 public class EffectForce extends L2Effect
 {
-	static final Log _log = LogFactory.getLog(EffectForce.class.getName());
+	static final Logger _log = LoggerFactory.getLogger(EffectForce.class.getName());
 
 	public int forces = 0;
 	private int _range = -1;
@@ -87,3 +87,4 @@ public class EffectForce extends L2Effect
 		
 	}
 }
+

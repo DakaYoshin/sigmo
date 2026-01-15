@@ -21,8 +21,8 @@ package com.gameserver.skills.effects;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.L2Effect;
 import com.gameserver.skills.Env;
@@ -33,7 +33,7 @@ import com.gameserver.templates.skills.L2SkillType;
 
 public final class EffectTemplate
 {
-	private final static Log _log = LogFactory.getLog(EffectTemplate.class);
+	private final static Logger _log = LoggerFactory.getLogger(EffectTemplate.class);
 
 	private final Class<?> _func;
 	private final Constructor<?> _constructor;
@@ -133,3 +133,4 @@ public final class EffectTemplate
 	}
 
 }
+

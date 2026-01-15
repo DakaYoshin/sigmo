@@ -22,8 +22,8 @@ import java.util.Map;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.actor.L2Character;
 import com.gameserver.model.actor.L2Summon;
@@ -33,7 +33,7 @@ import com.gameserver.network.serverpackets.AutoAttackStop;
 import com.gameserver.thread.ThreadPoolManager;
 
 public class AttackStanceTaskManager {
-	private static Log _log = LogFactory.getLog(AttackStanceTaskManager.class);
+	private static Logger _log = LoggerFactory.getLogger(AttackStanceTaskManager.class);
 
 	protected Map<L2Character, Long> _attackStanceTasks = new FastMap<L2Character, Long>().shared();
 

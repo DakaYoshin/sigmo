@@ -21,57 +21,49 @@ package com.util.protection;
 import java.lang.reflect.Method;
 import java.util.concurrent.ScheduledFuture;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.network.L2GameClient;
 import com.gameserver.network.serverpackets.GameGuardQuery;
 
-public class nProtect
-{
-	private final static Log _log = LogFactory.getLog(nProtect.class);
+public class nProtect {
+	private final static Logger _log = LoggerFactory.getLogger(nProtect.class);
 
-	public static enum RestrictionType
-	{
-		RESTRICT_ENTER,RESTRICT_EVENT,RESTRICT_OLYMPIAD,RESTRICT_SIEGE
+	public static enum RestrictionType {
+		RESTRICT_ENTER, RESTRICT_EVENT, RESTRICT_OLYMPIAD, RESTRICT_SIEGE
 	}
 
-	public class nProtectAccessor
-	{
-		public nProtectAccessor()
-		{}
+	public class nProtectAccessor {
+		public nProtectAccessor() {
+		}
 
-		public void setCheckGameGuardQuery(Method m)
-		{
+		public void setCheckGameGuardQuery(Method m) {
 			nProtect.this._checkGameGuardQuery = m;
 		}
 
-		public void setStartTask(Method m)
-		{
+		public void setStartTask(Method m) {
 			nProtect.this._startTask = m;
 		}
 
-		public void setCheckRestriction(Method m)
-		{
+		public void setCheckRestriction(Method m) {
 			nProtect.this._checkRestriction = m;
 		}
 
-		public void setSendRequest(Method m)
-		{
+		public void setSendRequest(Method m) {
 			nProtect.this._sendRequest = m;
 		}
 
-		public void setCloseSession(Method m)
-		{
+		public void setCloseSession(Method m) {
 			nProtect.this._closeSession = m;
 		}
 
-		public void setSendGGQuery(Method m)
-		{
+		public void setSendGGQuery(Method m) {
 			nProtect.this._sendGGQuery = m;
 		}
 	}
+
 	protected Method _checkGameGuardQuery = null;
 	protected Method _startTask = null;
 	protected Method _checkRestriction = null;
@@ -79,127 +71,89 @@ public class nProtect
 	protected Method _closeSession = null;
 	protected Method _sendGGQuery = null;
 	private static nProtect _instance = null;
-	public static nProtect getInstance()
-	{
-		if(_instance == null)
-		{
+
+	public static nProtect getInstance() {
+		if (_instance == null) {
 			_instance = new nProtect();
 		}
 		return _instance;
 	}
 
-	private nProtect()
-	{
-		Class<?> clazz=null;
-		try
-		{
-			try
-			{
+	private nProtect() {
+		Class<?> clazz = null;
+		try {
+			try {
 				clazz = Class.forName("com.net.protection.main");
+			} catch (ClassNotFoundException e) {
 			}
-			catch(ClassNotFoundException e)
-			{}
-			if(clazz!=null)
-			{
+			if (clazz != null) {
 				Method m = clazz.getMethod("init", nProtectAccessor.class);
-				if(m!=null)
-				{
+				if (m != null) {
 					m.invoke(null, new nProtectAccessor());
 				}
 			}
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("", e);
 		}
 	}
 
-	public void sendGameGuardQuery(GameGuardQuery pkt)
-	{
-		try
-		{
-			if(_sendGGQuery!=null)
-			{
+	public void sendGameGuardQuery(GameGuardQuery pkt) {
+		try {
+			if (_sendGGQuery != null) {
 				_sendGGQuery.invoke(pkt);
 			}
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("", e);
 		}
 	}
 
-	public boolean checkGameGuardRepy(L2GameClient cl, int [] reply)
-	{
-		try
-		{
-			if(_checkGameGuardQuery!=null)
-			{
-				return (Boolean)_checkGameGuardQuery.invoke(null, cl,reply);
+	public boolean checkGameGuardRepy(L2GameClient cl, int[] reply) {
+		try {
+			if (_checkGameGuardQuery != null) {
+				return (Boolean) _checkGameGuardQuery.invoke(null, cl, reply);
 			}
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("", e);
 		}
 		return true;
 	}
 
-	public ScheduledFuture<?> startTask(L2GameClient client)
-	{
-		try
-		{
-			if(_startTask != null)
-			{
-				return (ScheduledFuture<?>)_startTask.invoke(null, client);
+	public ScheduledFuture<?> startTask(L2GameClient client) {
+		try {
+			if (_startTask != null) {
+				return (ScheduledFuture<?>) _startTask.invoke(null, client);
 			}
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("", e);
 		}
 		return null;
 	}
 
-	public void sendRequest(L2GameClient cl)
-	{
-		if(_sendRequest!=null)
-		{
-			try
-			{
+	public void sendRequest(L2GameClient cl) {
+		if (_sendRequest != null) {
+			try {
 				_sendRequest.invoke(null, cl);
-			}
-			catch(Exception e)
-			{
+			} catch (Exception e) {
 				_log.error("", e);
 			}
 		}
 	}
 
-	public void closeSession(L2GameClient cl)
-	{
-		if(_closeSession!=null)
-		{
-			try
-			{
+	public void closeSession(L2GameClient cl) {
+		if (_closeSession != null) {
+			try {
 				_closeSession.invoke(null, cl);
+			} catch (Exception e) {
 			}
-			catch(Exception e)
-			{}
 		}
 	}
 
-	public boolean checkRestriction(L2PcInstance player, RestrictionType type, Object... params)
-	{
-		try
-		{
-			if(_checkRestriction!=null)
-			{
-				return (Boolean)_checkRestriction.invoke(null,player,type,params);
+	public boolean checkRestriction(L2PcInstance player, RestrictionType type, Object... params) {
+		try {
+			if (_checkRestriction != null) {
+				return (Boolean) _checkRestriction.invoke(null, player, type, params);
 			}
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("", e);
 		}
 		return true;

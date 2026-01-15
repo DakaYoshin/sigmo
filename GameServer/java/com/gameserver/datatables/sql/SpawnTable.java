@@ -25,8 +25,8 @@ import java.util.Map;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.xml.NpcTable;
@@ -39,7 +39,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class SpawnTable
 {
-	private static final Log _log = LogFactory.getLog(SpawnTable.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(SpawnTable.class.getName());
 
 	private static final SpawnTable _instance = new SpawnTable();
 

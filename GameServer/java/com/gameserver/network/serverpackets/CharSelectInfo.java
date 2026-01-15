@@ -25,8 +25,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.CharSelectInfoPackage;
 import com.gameserver.model.L2Clan;
@@ -39,7 +39,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class CharSelectInfo extends L2GameServerPacket
 {
-	private final static Log _log = LogFactory.getLog(CharSelectInfo.class);
+	private final static Logger _log = LoggerFactory.getLogger(CharSelectInfo.class);
 
 	private static final String _S__1F_CHARSELECTINFO = "[S] 1F CharSelectInfo";
 
@@ -395,3 +395,4 @@ public class CharSelectInfo extends L2GameServerPacket
 		return _S__1F_CHARSELECTINFO;
 	}
 }
+

@@ -23,8 +23,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Calendar;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.idfactory.IdFactory;
 import com.gameserver.model.actor.instance.L2PcInstance;
@@ -33,7 +33,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class Wedding
 {
-	private static final Log _log = LogFactory.getLog(Wedding.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(Wedding.class.getName());
 
 	private int _Id = 0;
 	private int _player1Id = 0;

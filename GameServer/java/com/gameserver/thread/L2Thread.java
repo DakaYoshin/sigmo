@@ -26,11 +26,11 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class L2Thread extends Thread {
-	private static final Log _log = LogFactory.getLog(L2Thread.class);
+	private static final Logger _log = LoggerFactory.getLogger(L2Thread.class);
 
 	protected abstract void runTurn();
 
@@ -74,7 +74,6 @@ public abstract class L2Thread extends Thread {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public static List<String> getStats(Thread t) {
 		List<String> list = new FastList<String>();
 

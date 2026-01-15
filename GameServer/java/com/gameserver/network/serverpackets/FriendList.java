@@ -22,62 +22,54 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.L2World;
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.util.ResourceUtil;
 import com.util.database.L2DatabaseFactory;
 
-public class FriendList extends L2GameServerPacket
-{
-	private final static Log _log = LogFactory.getLog(FriendList.class);
+public class FriendList extends L2GameServerPacket {
+	private final static Logger _log = LoggerFactory.getLogger(FriendList.class);
 
 	private static final String _S__FA_FRIENDLIST = "[S] FA FriendList";
 
 	private L2PcInstance _activeChar;
 
-	public FriendList(L2PcInstance character)
-	{
+	public FriendList(L2PcInstance character) {
 		_activeChar = character;
 	}
 
 	@Override
-	protected final void writeImpl()
-	{
-		if(_activeChar == null)
-		{
+	protected final void writeImpl() {
+		if (_activeChar == null) {
 			return;
 		}
 
 		Connection con = null;
 
-		try
-		{
-			String sqlQuery = "SELECT friend_id, friend_name FROM character_friends WHERE " + "char_id=" + _activeChar.getObjectId() + " ORDER BY friend_name ASC";
-
+		try {
+			String sqlQuery = "SELECT friend_id, friend_name FROM character_friends WHERE char_id=? ORDER BY friend_name ASC";
 			con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement = con.prepareStatement(sqlQuery);
-			ResultSet rset = statement.executeQuery(sqlQuery);
+			statement.setInt(1, _activeChar.getObjectId());
+			ResultSet rset = statement.executeQuery();
 
 			rset.last();
 
-			if(rset.getRow() > 0)
-			{
+			if (rset.getRow() > 0) {
 
 				writeC(0xfa);
 				writeH(rset.getRow());
 
 				rset.beforeFirst();
 
-				while(rset.next())
-				{
+				while (rset.next()) {
 					int friendId = rset.getInt("friend_id");
 					String friendName = rset.getString("friend_name");
 
-					if(friendId == _activeChar.getObjectId())
-					{
+					if (friendId == _activeChar.getObjectId()) {
 						continue;
 					}
 
@@ -87,12 +79,9 @@ public class FriendList extends L2GameServerPacket
 					writeD(friendId);
 					writeS(friendName);
 
-					if(friend == null)
-					{
+					if (friend == null) {
 						writeD(0);
-					}
-					else
-					{
+					} else {
 						writeD(1);
 					}
 
@@ -102,20 +91,15 @@ public class FriendList extends L2GameServerPacket
 
 			rset.close();
 			ResourceUtil.closeStatement(statement);
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			_log.error("Error found in " + _activeChar.getName() + "'s", e);
-		}
-		finally
-		{
-			ResourceUtil.closeConnection(con); 
+		} finally {
+			ResourceUtil.closeConnection(con);
 		}
 	}
 
 	@Override
-	public String getType()
-	{
+	public String getType() {
 		return _S__FA_FRIENDLIST;
 	}
 }

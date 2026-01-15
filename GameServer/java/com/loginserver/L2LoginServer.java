@@ -31,8 +31,8 @@ import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.logging.LogManager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.GameServerTable;
@@ -45,7 +45,7 @@ import com.util.services.ServerType;
 
 public class L2LoginServer
 {
-	private static Log _log = LogFactory.getLog(L2LoginServer.class);
+	private static Logger _log = LoggerFactory.getLogger(L2LoginServer.class);
 
 	public static final int PROTOCOL_REV = 0x0102;
 
@@ -116,7 +116,7 @@ public class L2LoginServer
 		}
 		catch(SQLException e)
 		{
-			_log.fatal("Failed initializing database.", e);
+			_log.error("Failed initializing database.", e);
 			System.exit(1);
 		}
 
@@ -126,7 +126,7 @@ public class L2LoginServer
 		}
 		catch(GeneralSecurityException e)
 		{
-			_log.fatal("Failed initializing LoginController.", e);
+			_log.error("Failed initializing LoginController.", e);
 			System.exit(1);
 		}
 
@@ -136,12 +136,12 @@ public class L2LoginServer
 		}
 		catch(GeneralSecurityException e)
 		{
-			_log.fatal("Failed to load GameServerTable.", e);
+			_log.error("Failed to load GameServerTable.", e);
 			System.exit(1);
 		}
 		catch(SQLException e)
 		{
-			_log.fatal("Failed to load GameServerTable.", e);
+			_log.error("Failed to load GameServerTable.", e);
 			System.exit(1);
 		}
 		loadBanFile();
@@ -154,7 +154,7 @@ public class L2LoginServer
 			}
 			catch(UnknownHostException e1)
 			{
-				_log.fatal("The LoginServer bind address is invalid, using all avaliable IPs.", e1);
+				_log.error("The LoginServer bind address is invalid, using all avaliable IPs.", e1);
 			}
 		}
 
@@ -172,7 +172,7 @@ public class L2LoginServer
 		}
 		catch(IOException e)
 		{
-			_log.fatal("Failed to open Selector.", e);
+			_log.error("Failed to open Selector.", e);
 			System.exit(1);
 		}
 
@@ -184,7 +184,7 @@ public class L2LoginServer
 		}
 		catch(IOException e)
 		{
-			_log.fatal("FATAL: Failed to start the Game Server Listener.", e);
+			_log.error("FATAL: Failed to start the Game Server Listener.", e);
 			System.exit(1);
 		}
 
@@ -194,7 +194,7 @@ public class L2LoginServer
 		}
 		catch(IOException e)
 		{
-			_log.fatal("Failed to open server socket.", e);
+			_log.error("Failed to open server socket.", e);
 			System.exit(1);
 		}
 		_selectorThread.start();

@@ -28,8 +28,8 @@ import java.util.concurrent.ScheduledFuture;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.GmListTable;
@@ -46,7 +46,7 @@ import com.util.random.Rnd;
 
 public class RaidBossSpawnManager
 {
-	private static Log _log = LogFactory.getLog(RaidBossSpawnManager.class);
+	private static Logger _log = LoggerFactory.getLogger(RaidBossSpawnManager.class);
 
 	private static RaidBossSpawnManager _instance;
 	protected static Map<Integer, L2RaidBossInstance> _bosses;

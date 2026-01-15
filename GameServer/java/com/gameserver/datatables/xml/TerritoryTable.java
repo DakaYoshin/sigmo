@@ -22,8 +22,8 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -34,7 +34,7 @@ import com.gameserver.TradeController;
 import com.gameserver.model.L2Territory;
 
 public class TerritoryTable {
-	private static final Log _log = LogFactory.getLog(TradeController.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(TradeController.class.getName());
 
 	private static final TerritoryTable _instance = new TerritoryTable();
 	private static Map<String, L2Territory> _territory;

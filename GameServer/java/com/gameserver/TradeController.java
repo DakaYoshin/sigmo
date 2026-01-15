@@ -32,8 +32,8 @@ import java.util.StringTokenizer;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.sql.ItemTable;
@@ -44,7 +44,7 @@ import com.util.ResourceUtil;
 import com.util.database.L2DatabaseFactory;
 
 public class TradeController {
-	private static Log _log = LogFactory.getLog(TradeController.class);
+	private static Logger _log = LoggerFactory.getLogger(TradeController.class);
 
 	private static TradeController _instance;
 

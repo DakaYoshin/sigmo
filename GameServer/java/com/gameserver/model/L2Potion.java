@@ -20,15 +20,15 @@ package com.gameserver.model;
 
 import java.util.concurrent.Future;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.actor.L2Character;
 import com.gameserver.thread.ThreadPoolManager;
 
 public class L2Potion extends L2Object
 {
-	private static final Log _log = LogFactory.getLog(L2Character.class);
+	private static final Logger _log = LoggerFactory.getLogger(L2Character.class);
 
 	private Future<?> _potionhpRegTask;
 	private Future<?> _potionmpRegTask;

@@ -24,8 +24,8 @@ import java.util.concurrent.ScheduledFuture;
 import javolution.text.TextBuilder;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.model.entity.Announcements;
@@ -36,7 +36,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class AutoAnnouncementHandler
 {
-	protected static Log _log = LogFactory.getLog(AutoAnnouncementHandler.class.getName());
+	protected static Logger _log = LoggerFactory.getLogger(AutoAnnouncementHandler.class.getName());
 	private static AutoAnnouncementHandler _instance;
 	private static final long DEFAULT_ANNOUNCEMENT_DELAY = 180000;
 	protected Map<Integer, AutoAnnouncementInstance> _registeredAnnouncements;
@@ -168,7 +168,7 @@ public class AutoAnnouncementHandler
 		}
 		catch(Exception e)
 		{
-			_log.fatal("System: Could Not Insert Auto Announcment into DataBase: Reason: " + "Duplicate Id");
+			_log.error("System: Could Not Insert Auto Announcment into DataBase: Reason: " + "Duplicate Id");
 		}
 		finally
 		{
@@ -263,7 +263,7 @@ public class AutoAnnouncementHandler
 		}
 		catch(Exception e)
 		{
-			_log.fatal("Could not Delete Auto Announcement in Database, Reason:", e);
+			_log.error("Could not Delete Auto Announcement in Database, Reason:", e);
 		}
 		finally
 		{

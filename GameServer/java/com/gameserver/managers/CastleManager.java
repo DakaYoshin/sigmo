@@ -25,8 +25,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.L2Clan;
 import com.gameserver.model.L2ClanMember;
@@ -40,7 +40,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class CastleManager
 {
-	private final static Log _log = LogFactory.getLog(CastleManager.class);
+	private final static Logger _log = LoggerFactory.getLogger(CastleManager.class);
 
 	private static CastleManager _instance;
 
@@ -353,3 +353,4 @@ public class CastleManager
 		player = null;
 	}
 }
+

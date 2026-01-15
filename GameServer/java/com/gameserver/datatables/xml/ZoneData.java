@@ -27,8 +27,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -71,7 +71,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class ZoneData
 {
-	private static final Log _log = LogFactory.getLog(ZoneData.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(ZoneData.class.getName());
 
 	private static ZoneData _instance;
 

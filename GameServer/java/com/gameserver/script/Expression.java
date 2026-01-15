@@ -20,14 +20,14 @@ package com.gameserver.script;
 
 import javax.script.ScriptContext;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.scripting.L2ScriptEngineManager;
 
 public class Expression
 {
-	private final static Log _log = LogFactory.getLog(Expression.class);
+	private final static Logger _log = LoggerFactory.getLogger(Expression.class);
 
 	private final ScriptContext _context;
 
@@ -100,3 +100,4 @@ public class Expression
 	}
 
 }
+

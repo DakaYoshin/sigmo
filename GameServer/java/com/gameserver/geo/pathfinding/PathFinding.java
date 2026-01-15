@@ -20,7 +20,7 @@ package com.gameserver.geo.pathfinding;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import com.Config;
 import com.gameserver.geo.GeoData;

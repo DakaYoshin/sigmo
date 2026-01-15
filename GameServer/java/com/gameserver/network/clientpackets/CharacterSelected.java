@@ -18,8 +18,8 @@
  */
 package com.gameserver.network.clientpackets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.network.L2GameClient.GameClientState;
@@ -29,7 +29,7 @@ import com.util.protection.nProtect;
 
 public class CharacterSelected extends L2GameClientPacket
 {
-	private final static Log _log = LogFactory.getLog(CharacterSelected.class);
+	private final static Logger _log = LoggerFactory.getLogger(CharacterSelected.class);
 
 	private static final String _C__0D_CHARACTERSELECTED = "[C] 0D CharacterSelected";
 
@@ -101,3 +101,4 @@ public class CharacterSelected extends L2GameClientPacket
 	}
 
 }
+

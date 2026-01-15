@@ -18,15 +18,15 @@
  */
 package com.loginserver.network.clientpackets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.loginserver.L2LoginClient;
 import com.mmocore.ReceivablePacket;
 
 public abstract class L2LoginClientPacket extends ReceivablePacket<L2LoginClient>
 {
-	protected final static Log _log = LogFactory.getLog(L2LoginClientPacket.class);
+	protected final static Logger _log = LoggerFactory.getLogger(L2LoginClientPacket.class);
 
 	@Override
 	protected final boolean read()
@@ -45,3 +45,4 @@ public abstract class L2LoginClientPacket extends ReceivablePacket<L2LoginClient
 	protected abstract boolean readImpl();
 
 }
+

@@ -37,8 +37,8 @@ import javolution.util.FastCollection.Record;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.GameServerTable;
@@ -52,7 +52,7 @@ import com.util.protection.ScrambledKeyPair;
 import com.util.random.Rnd;
 
 public class LoginController {
-	private static final Log _log = LogFactory.getLog(LoginController.class);
+	private static final Logger _log = LoggerFactory.getLogger(LoginController.class);
 
 	private static LoginController _instance;
 	private final static int LOGIN_TIMEOUT = 60 * 1000;

@@ -20,7 +20,8 @@ package com.handlers.admincommandhandlers;
 
 import java.io.File;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 
@@ -31,60 +32,47 @@ import com.gameserver.model.GMAudit;
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.scripting.L2ScriptEngineManager;
 
-public class AdminScript implements IAdminCommandHandler
-{
+public class AdminScript implements IAdminCommandHandler {
 	private static final File SCRIPT_FOLDER = new File(Config.DATAPACK_ROOT.getAbsolutePath(), "data/scripts");
-	private static final Logger _log = Logger.getLogger(AdminScript.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(AdminScript.class);
 
-	private static final String[] ADMIN_COMMANDS =
-	{
-		"admin_load_script"
+	private static final String[] ADMIN_COMMANDS = {
+			"admin_load_script"
 	};
 
-	public boolean useAdminCommand(String command, L2PcInstance activeChar)
-	{
+	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
 		AdminCommandAccessRights.getInstance().hasAccess(command, activeChar.getAccessLevel());
 
-		String target = (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target");
+		String target = (activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target");
 		GMAudit.auditGMAction(activeChar.getName(), command, target, "");
 
-		if(command.startsWith("admin_load_script"))
-		{
+		if (command.startsWith("admin_load_script")) {
 			File file;
 			StringTokenizer st = new StringTokenizer(command, " ");
 			st.nextToken();
 			String line = st.nextToken();
 
-			try
-			{
+			try {
 				file = new File(SCRIPT_FOLDER, line);
 
-				if(file.isFile())
-				{
-					try
-					{
+				if (file.isFile()) {
+					try {
 						L2ScriptEngineManager.getInstance().executeScript(file);
-					}
-					catch(ScriptException e)
-					{
+					} catch (ScriptException e) {
 						L2ScriptEngineManager.getInstance().reportScriptFileError(file, e);
 					}
+				} else {
+					_log.warn("Failed loading: (" + file.getCanonicalPath()
+							+ " - Reason: doesnt exists or is not a file.");
 				}
-				else
-				{
-					_log.warning("Failed loading: (" + file.getCanonicalPath() + " - Reason: doesnt exists or is not a file.");
-				}
-			}
-			catch(Exception e)
-			{
-				
+			} catch (Exception e) {
+
 			}
 		}
 		return true;
 	}
 
-	public String[] getAdminCommandList()
-	{
+	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
 	}
 }

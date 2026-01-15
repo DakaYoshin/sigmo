@@ -26,8 +26,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.ItemsAutoDestroy;
@@ -41,7 +41,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class ItemsOnGroundManager
 {
-	private static final Log _log = LogFactory.getLog(ItemsOnGroundManager.class);
+	private static final Logger _log = LoggerFactory.getLogger(ItemsOnGroundManager.class);
 
 	private static ItemsOnGroundManager _instance;
 	private List<L2ItemInstance> _items = null;

@@ -23,8 +23,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.ScheduledFuture;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.SkillTable;
 import com.gameserver.managers.CursedWeaponsManager;
@@ -50,7 +50,7 @@ import com.util.random.Rnd;
 
 public class CursedWeapon
 {
-	private static final Log _log = LogFactory.getLog(CursedWeaponsManager.class);
+	private static final Logger _log = LoggerFactory.getLogger(CursedWeaponsManager.class);
 
 	private final String _name;
 	private final int _itemId;

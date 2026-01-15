@@ -20,8 +20,8 @@ package com.gameserver.network.clientpackets;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.network.L2GameClient;
 import com.gameserver.network.serverpackets.L2GameServerPacket;
@@ -29,7 +29,7 @@ import com.mmocore.ReceivablePacket;
 
 public abstract class L2GameClientPacket extends ReceivablePacket<L2GameClient>
 {
-	protected static final Log _log = LogFactory.getLog(L2GameClientPacket.class);
+	protected static final Logger _log = LoggerFactory.getLogger(L2GameClientPacket.class);
 
 	@Override
 	protected boolean read()

@@ -40,8 +40,8 @@ import javolution.xml.stream.XMLStreamConstants;
 import javolution.xml.stream.XMLStreamException;
 import javolution.xml.stream.XMLStreamReaderImpl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.loginserver.GameServerThread;
 import com.loginserver.network.gameserverpackets.ServerStatus;
@@ -49,7 +49,7 @@ import com.util.database.L2DatabaseFactory;
 import com.util.random.Rnd;
 
 public class GameServerTable {
-	private static Log _log = LogFactory.getLog(GameServerTable.class);
+	private static Logger _log = LoggerFactory.getLogger(GameServerTable.class);
 
 	private static GameServerTable _instance;
 

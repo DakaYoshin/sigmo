@@ -18,8 +18,8 @@
  */
 package com.gameserver.model.quest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.NpcTable;
 import com.gameserver.model.actor.L2Character;
@@ -31,7 +31,7 @@ import com.util.random.Rnd;
 
 public final class QuestSpawn
 {
-	private final static Log _log = LogFactory.getLog(QuestSpawn.class);
+	private final static Logger _log = LoggerFactory.getLogger(QuestSpawn.class);
 
 	private static QuestSpawn instance;
 
@@ -129,3 +129,4 @@ public final class QuestSpawn
 		return null;
 	}
 }
+

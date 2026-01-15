@@ -23,8 +23,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -35,7 +35,7 @@ import com.gameserver.model.L2LvlupData;
 import com.gameserver.model.base.ClassId;
 
 public class LevelUpData {
-	private static final Log _log = LogFactory.getLog(LevelUpData.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(LevelUpData.class.getName());
 
 	private static final String CLASS_LVL = "class_lvl", CLASS_ID = "classid";
 	private static final String MP_MOD = "mpmod", MP_ADD = "mpadd", MP_BASE = "mpbase";

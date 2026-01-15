@@ -18,7 +18,8 @@
  */
 package com.handlers.admincommandhandlers;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.AdminCommandAccessRights;
 import com.gameserver.handler.IAdminCommandHandler;
@@ -27,49 +28,41 @@ import com.gameserver.model.actor.instance.L2PcInstance;
 import com.gameserver.network.SystemMessageId;
 import com.gameserver.network.serverpackets.SystemMessage;
 
-public class AdminUnblockIp implements IAdminCommandHandler
-{
-	private static final Logger _log = Logger.getLogger(AdminTeleport.class.getName());
+public class AdminUnblockIp implements IAdminCommandHandler {
+	private static final Logger _log = LoggerFactory.getLogger(AdminUnblockIp.class);
 
-	private static final String[] ADMIN_COMMANDS =
-	{
-		"admin_unblockip"
+	private static final String[] ADMIN_COMMANDS = {
+			"admin_unblockip"
 	};
 
-	public boolean useAdminCommand(String command, L2PcInstance activeChar)
-	{
+	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
 		AdminCommandAccessRights.getInstance().hasAccess(command, activeChar.getAccessLevel());
 
-		String target = (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target");
-        GMAudit.auditGMAction(activeChar.getName(), command, target, "");
+		String target = (activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target");
+		GMAudit.auditGMAction(activeChar.getName(), command, target, "");
 
-		if(command.startsWith("admin_unblockip "))
-		{
-			try
-			{
+		if (command.startsWith("admin_unblockip ")) {
+			try {
 				String ipAddress = command.substring(16);
 
-				if(unblockIp(ipAddress, activeChar))
-				{
-					activeChar.sendPacket(new SystemMessage(SystemMessageId.S1_S2).addString("Removed IP " + ipAddress + " from blocklist!"));
+				if (unblockIp(ipAddress, activeChar)) {
+					activeChar.sendPacket(new SystemMessage(SystemMessageId.S1_S2)
+							.addString("Removed IP " + ipAddress + " from blocklist!"));
 				}
-			}
-			catch(StringIndexOutOfBoundsException e)
-			{
-				activeChar.sendPacket(new SystemMessage(SystemMessageId.S1_S2).addString("Usage mode: //unblockip <ip>"));
+			} catch (StringIndexOutOfBoundsException e) {
+				activeChar
+						.sendPacket(new SystemMessage(SystemMessageId.S1_S2).addString("Usage mode: //unblockip <ip>"));
 			}
 		}
 		return true;
 	}
 
-	private boolean unblockIp(String ipAddress, L2PcInstance activeChar)
-	{
-		_log.warning("IP removed by GM " + activeChar.getName());
+	private boolean unblockIp(String ipAddress, L2PcInstance activeChar) {
+		_log.warn("IP removed by GM " + activeChar.getName());
 		return true;
 	}
 
-	public String[] getAdminCommandList()
-	{
+	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
 	}
 }

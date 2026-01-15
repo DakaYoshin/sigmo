@@ -21,8 +21,8 @@ package com.handlers.admincommandhandlers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.AdminCommandAccessRights;
 import com.gameserver.handler.IAdminCommandHandler;
@@ -30,45 +30,38 @@ import com.gameserver.model.GMAudit;
 import com.gameserver.model.actor.instance.L2PcInstance;
 import com.util.database.L2DatabaseFactory;
 
-public class AdminRepairChar implements IAdminCommandHandler
-{
-	private static Logger _log = Logger.getLogger(AdminRepairChar.class.getName());
+public class AdminRepairChar implements IAdminCommandHandler {
+	private static final Logger _log = LoggerFactory.getLogger(AdminRepairChar.class);
 
-	private static final String[] ADMIN_COMMANDS =
-	{
-		"admin_restore",
-		"admin_repair"
+	private static final String[] ADMIN_COMMANDS = {
+			"admin_restore",
+			"admin_repair"
 	};
 
-	public boolean useAdminCommand(String command, L2PcInstance activeChar)
-	{
+	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
 		AdminCommandAccessRights.getInstance().hasAccess(command, activeChar.getAccessLevel());
 
-		String target = (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target");
-        GMAudit.auditGMAction(activeChar.getName(), command, target, "");
+		String target = (activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target");
+		GMAudit.auditGMAction(activeChar.getName(), command, target, "");
 		handleRepair(command);
 		return true;
 	}
 
-	public String[] getAdminCommandList()
-	{
+	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
 	}
 
-	private void handleRepair(String command)
-	{
+	private void handleRepair(String command) {
 		String[] parts = command.split(" ");
 
-		if(parts.length != 2)
-		{
+		if (parts.length != 2) {
 			return;
 		}
 
 		String cmd = "UPDATE characters SET x = -84318, y = 244579, z = -3730 WHERE char_name = ?";
 		Connection connection = null;
 
-		try
-		{
+		try {
 			connection = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement = connection.prepareStatement(cmd);
 			statement.setString(1, parts[1]);
@@ -82,8 +75,7 @@ public class AdminRepairChar implements IAdminCommandHandler
 
 			int objId = 0;
 
-			if(rset.next())
-			{
+			if (rset.next()) {
 				objId = rset.getInt(1);
 			}
 
@@ -92,8 +84,7 @@ public class AdminRepairChar implements IAdminCommandHandler
 			rset = null;
 			statement = null;
 
-			if(objId == 0)
-			{
+			if (objId == 0) {
 				connection.close();
 				return;
 			}
@@ -108,20 +99,13 @@ public class AdminRepairChar implements IAdminCommandHandler
 			statement.setInt(1, objId);
 			statement.execute();
 			statement.close();
-		}
-		catch(Exception e)
-		{
-			_log.log(Level.WARNING, "Could not repair char:", e);
-		}
-		finally
-		{
-			try
-			{
+		} catch (Exception e) {
+			_log.warn("Could not repair char: " + e.getMessage(), e);
+		} finally {
+			try {
 				connection.close();
-			}
-			catch(Exception e)
-			{
-				
+			} catch (Exception e) {
+
 			}
 		}
 	}

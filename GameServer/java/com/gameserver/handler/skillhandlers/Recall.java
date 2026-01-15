@@ -20,8 +20,8 @@ package com.gameserver.handler.skillhandlers;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.datatables.xml.MapRegionTable;
 import com.gameserver.handler.ISkillHandler;
@@ -39,7 +39,7 @@ import com.gameserver.templates.skills.L2SkillType;
 
 public class Recall implements ISkillHandler
 {
-	private final static Log _log = LogFactory.getLog(Recall.class);
+	private final static Logger _log = LoggerFactory.getLogger(Recall.class);
 
 	private static final L2SkillType[] SKILL_IDS = { L2SkillType.RECALL };
 
@@ -186,3 +186,4 @@ public class Recall implements ISkillHandler
 		return SKILL_IDS;
 	}
 }
+

@@ -15,7 +15,7 @@
 
 	<target name="export" depends="init" description="Synchronizes build space contents with project.">
 		<sync todir="${build.dist.game}/data">
-			<fileset dir="${basedir}/data">
+			<fileset dir="../GameServer/data">
 				<exclude name=".project"/>
 				<exclude name="log/**"/>
 				<exclude name="cachedir/**"/>

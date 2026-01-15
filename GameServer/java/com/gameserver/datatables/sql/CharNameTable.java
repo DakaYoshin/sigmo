@@ -23,49 +23,43 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.util.ResourceUtil;
 import com.util.database.L2DatabaseFactory;
 
-public class CharNameTable
-{
-	private static final Log _log = LogFactory.getLog(CharNameTable.class.getName());
+public class CharNameTable {
+	private static final Logger _log = LoggerFactory.getLogger(CharNameTable.class.getName());
 
 	private final Map<Integer, String> _chars;
 	private final Map<Integer, Integer> _accessLevels;
-	
+
 	private static CharNameTable _instance;
 
-	protected CharNameTable()
-	{
+	protected CharNameTable() {
 		_chars = new FastMap<>();
 		_accessLevels = new FastMap<>();
 	}
-	
-	public static CharNameTable getInstance()
-	{
-		if(_instance == null)
-		{
+
+	public static CharNameTable getInstance() {
+		if (_instance == null) {
 			_instance = new CharNameTable();
 		}
 		return _instance;
 	}
 
-	public synchronized boolean doesCharNameExist(String name)
-	{
+	public synchronized boolean doesCharNameExist(String name) {
 		boolean result = true;
 		Connection con = null;
 
-		try
-		{
+		try {
 			con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("SELECT account_name FROM characters WHERE char_name = ?");
+			PreparedStatement statement = con
+					.prepareStatement("SELECT account_name FROM characters WHERE char_name = ?");
 			statement.setString(1, name);
 			ResultSet rset = statement.executeQuery();
 			result = rset.next();
@@ -74,71 +68,60 @@ public class CharNameTable
 			rset.close();
 			statement = null;
 			rset = null;
-		}
-		catch(SQLException e)
-		{
+		} catch (SQLException e) {
 			_log.error("could not check existing charname", e);
-		}
-		finally
-		{
-			ResourceUtil.closeConnection(con); 
+		} finally {
+			ResourceUtil.closeConnection(con);
 		}
 		return result;
 	}
 
-	public final String getNameById(int id)
-	{
+	public final String getNameById(int id) {
 		if (id <= 0)
 			return null;
-		
+
 		String name = _chars.get(id);
 		if (name != null)
 			return name;
-		
+
 		int accessLevel = 0;
-		
-		try (Connection con = L2DatabaseFactory.getInstance().getConnection())
-		{
-			PreparedStatement statement = con.prepareStatement("SELECT char_name,accesslevel FROM characters WHERE obj_Id=?");
+
+		try (Connection con = L2DatabaseFactory.getInstance().getConnection()) {
+			PreparedStatement statement = con
+					.prepareStatement("SELECT char_name,accesslevel FROM characters WHERE obj_Id=?");
 			statement.setInt(1, id);
 			ResultSet rset = statement.executeQuery();
-			while (rset.next())
-			{
+			while (rset.next()) {
 				name = rset.getString(1);
 				accessLevel = rset.getInt(2);
 			}
 			rset.close();
 			statement.close();
+		} catch (SQLException e) {
+			_log.warn("Could not load character name from database", e);
 		}
-		catch (SQLException e)
-		{
-			_log.warn(Level.WARNING);
-		}
-		
-		if (name != null && !name.isEmpty())
-		{
+
+		if (name != null && !name.isEmpty()) {
 			_chars.put(id, name);
 			_accessLevels.put(id, accessLevel);
 			return name;
 		}
-		
+
 		return null; // not found
 	}
-	
-	public int accountCharNumber(String account)
-	{
+
+	public int accountCharNumber(String account) {
 		Connection con = null;
 		int number = 0;
 
-		try
-		{
+		try {
 			con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement statement = con.prepareStatement("SELECT COUNT(char_name) FROM characters WHERE account_name = ?");
+			PreparedStatement statement = con
+					.prepareStatement("SELECT COUNT(char_name) FROM characters WHERE account_name = ?");
 			statement.setString(1, account);
 			ResultSet rset = statement.executeQuery();
 
-			while(rset.next())
-			{
+			while (rset.next()) {
 				number = rset.getInt(1);
 			}
 
@@ -146,14 +129,10 @@ public class CharNameTable
 			rset.close();
 			statement = null;
 			rset = null;
-		}
-		catch(SQLException e)
-		{
+		} catch (SQLException e) {
 			_log.error("could not check existing char number", e);
-		}
-		finally
-		{
-			ResourceUtil.closeConnection(con); 
+		} finally {
+			ResourceUtil.closeConnection(con);
 		}
 
 		return number;

@@ -18,8 +18,8 @@
  */
 package com.gameserver.network.clientpackets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.ai.CtrlIntention;
@@ -42,7 +42,7 @@ import com.gameserver.network.serverpackets.NpcHtmlMessage;
 import com.gameserver.util.FloodProtector;
 
 public final class RequestBypassToServer extends L2GameClientPacket {
-	private final static Log _log = LogFactory.getLog(RequestBypassToServer.class);
+	private final static Logger _log = LoggerFactory.getLogger(RequestBypassToServer.class);
 
 	private static final String _C__21_REQUESTBYPASSTOSERVER = "[C] 21 RequestBypassToServer";
 
@@ -262,3 +262,4 @@ public final class RequestBypassToServer extends L2GameClientPacket {
 	}
 
 }
+

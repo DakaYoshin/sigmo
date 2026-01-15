@@ -25,8 +25,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -47,7 +47,7 @@ import com.gameserver.util.Util;
 import com.util.random.Rnd;
 
 public class DimensionalRiftManager {
-	private static Log _log = LogFactory.getLog(DimensionalRiftManager.class.getName());
+	private static Logger _log = LoggerFactory.getLogger(DimensionalRiftManager.class.getName());
 
 	private static DimensionalRiftManager _instance;
 	private FastMap<Byte, FastMap<Byte, DimensionalRiftRoom>> _rooms = new FastMap<Byte, FastMap<Byte, DimensionalRiftRoom>>();

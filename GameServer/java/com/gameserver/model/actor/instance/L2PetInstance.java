@@ -23,8 +23,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.concurrent.Future;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.ai.CtrlIntention;
@@ -67,7 +67,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class L2PetInstance extends L2Summon
 {
-	private static final Log _log = LogFactory.getLog(L2PetInstance.class);
+	private static final Logger _log = LoggerFactory.getLogger(L2PetInstance.class);
 
 	private int _curFed;
 	private PetInventory _inventory;

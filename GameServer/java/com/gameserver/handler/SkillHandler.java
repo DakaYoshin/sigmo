@@ -21,8 +21,8 @@ package com.gameserver.handler;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.handler.skillhandlers.BalanceLife;
 import com.gameserver.handler.skillhandlers.Blow;
@@ -63,7 +63,7 @@ import com.gameserver.templates.skills.L2SkillType;
 
 public class SkillHandler
 {
-	private static final Log _log = LogFactory.getLog(SkillHandler.class.getName());
+	private static final Logger _log = LoggerFactory.getLogger(SkillHandler.class.getName());
 
 	private static SkillHandler _instance;
 

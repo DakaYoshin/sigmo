@@ -25,8 +25,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gameserver.communitybbs.BB.Forum;
 import com.gameserver.model.actor.instance.L2PcInstance;
@@ -35,7 +35,7 @@ import com.util.database.L2DatabaseFactory;
 
 public class ForumsBBSManager extends BaseBBSManager
 {
-	private final static Log _log = LogFactory.getLog(ForumsBBSManager.class);
+	private final static Logger _log = LoggerFactory.getLogger(ForumsBBSManager.class);
 
 	private List<Forum> _table;
 	private static ForumsBBSManager _instance;
@@ -155,3 +155,4 @@ public class ForumsBBSManager extends BaseBBSManager
 		
 	}
 }
+

@@ -19,9 +19,8 @@
 package com.handlers.admincommandhandlers;
 
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.Config;
 import com.gameserver.datatables.xml.AdminCommandAccessRights;
@@ -34,18 +33,13 @@ public class AdminBoat implements IAdminCommandHandler {
 			"admin_boat"
 	};
 
-	private static final Logger _logAudit = Logger.getLogger("gmaudit");
+	private static final Logger _logAudit = LoggerFactory.getLogger("gmaudit");
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
 		AdminCommandAccessRights.getInstance().hasAccess(command, activeChar.getAccessLevel());
 
 		if (Config.GMAUDIT) {
-			LogRecord record = new LogRecord(Level.INFO, command);
-			record.setLoggerName("gmaudit");
-			record.setParameters(new Object[] {
-					"GM: " + activeChar.getName(), " to target [" + activeChar.getTarget() + "] "
-			});
-			_logAudit.log(record);
+			_logAudit.info("GM: " + activeChar.getName() + " to target [" + activeChar.getTarget() + "] " + command);
 		}
 
 		L2BoatInstance boat = activeChar.getBoat();
